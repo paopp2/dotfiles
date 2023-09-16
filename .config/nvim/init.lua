@@ -40,8 +40,43 @@ P.S. You can delete this when you're done too. It's your config now :)
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
+
+
+
+-------- My keybindings ---------
+-- Set the mapleader to space
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+
+-- Create mappings for colon and semicolon
+vim.api.nvim_set_keymap('n', ';', ':', { noremap = true })
+vim.api.nvim_set_keymap('n', ':', ';', { noremap = true })
+
+-- Create an insert mode mapping for 'kj' to escape
+vim.api.nvim_set_keymap('i', 'kj', '<Esc>', {})
+
+-- Create normal mode mappings
+vim.api.nvim_set_keymap('n', '<Leader>s', ':w<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'tk', ':tabprev<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'tj', ':tabnext<CR>', { noremap = true })
+
+-- Set clipboard options
+vim.o.clipboard = 'unnamed,unnamedplus'
+
+-- Enable line numbers and relative line numbers
+vim.wo.number = true
+vim.wo.relativenumber = true
+
+-- Enable line wrapping and linebreak
+vim.wo.wrap = true
+vim.wo.linebreak = true
+
+-- Automatically change the current directory to the file's directory
+vim.o.autochdir = true
+
+
+
+
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
