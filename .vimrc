@@ -7,6 +7,7 @@ inoremap kj <Esc>
 nnoremap <Leader>s :w<Cr>
 nnoremap tk ;tabprev<Cr>
 nnoremap tj ;tabnext<Cr>
+nnoremap <Leader>yy _yg_
 set clipboard=unnamed,unnamedplus
 set number relativenumber
 set wrap
