@@ -34,7 +34,7 @@ alias adb="~/Android/Sdk/platform-tools/adb"
 alias sp="speedtest-cli --no-upload"
 alias go="/usr/local/go/bin/go"
 alias docker="sudo docker"
-alias dotfiles='/usr/bin/git --git-dir=/home/apollocasino/.dotfiles/ --work-tree=/home/apollocasino'
+alias config='/usr/bin/git --git-dir=/home/apollocasino/.dotfiles/ --work-tree=/home/apollocasino'
 
 # GIT ALIASES
 #alias git="git.exe"
