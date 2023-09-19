@@ -13,6 +13,8 @@ set number relativenumber
 set wrap
 set linebreak
 set autochdir
+set ignorecase
+set smartcase
 
 set noshowmode
 filetype plugin indent on
