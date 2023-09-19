@@ -15,10 +15,11 @@ if exists('g:vscode')
 
     nnoremap gh <Cmd>call VSCodeNotify('editor.action.showDefinitionPreviewHover')<Cr>
     nnoremap gd <Cmd>call VSCodeNotify('editor.action.revealDefinition')<CR>
-    nnoremap <Leader>gd <Cmd>call VSCodeNotify('references-view.findReference')<CR>
+    nnoremap <Leader>gd <Cmd>call VSCodeNotify('references-view.findReferences')<CR>
     "nnoremap <Leader><Leader> <Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>
-    nnoremap <Leader>d <Cmd>call VSCodeNotify('workbench.action.debug.start')<CR>
-    nnoremap <Leader>D <Cmd>call VSCodeNotify('workbench.action.debug.stop')<CR>
+    nnoremap <Leader>d <Cmd>call VSCodeNotify('workbench.action.debug.continue')<CR>
+    nnoremap <Leader><Leader>d <Cmd>call VSCodeNotify('workbench.action.debug.start')<CR>
+    nnoremap <Leader><Leader>D <Cmd>call VSCodeNotify('workbench.action.debug.stop')<CR>
 
     nnoremap <Leader>cc <Cmd>call VSCodeNotify('gitlens.compareWith')<CR>
     nnoremap <Leader>cw <Cmd>call VSCodeNotify('gitlens.compareWorkingWith')<CR>
