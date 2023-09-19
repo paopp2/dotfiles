@@ -2,15 +2,15 @@ set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath = &runtimepath
 source ~/.vimrc
 
-function! s:saveAllAndRefreshGit(...) abort
-    call VSCodeNotify('workbench.action.files.saveAll')
-    call VSCodeNotify('git.refresh')
-endfunction
+"function! s:saveAllAndRefreshGit(...) abort
+    "call VSCodeNotify('workbench.action.files.saveAll')
+    "call VSCodeNotify('git.refresh')
+"endfunction
 
 if exists('g:vscode')
-    nnoremap <Leader>s <Cmd>call <SID>saveAllAndRefreshGit()<CR>
+    " nnoremap <Leader>s <Cmd>call <SID>saveAllAndRefreshGit()<CR>
     "nnoremap <Space> <Cmd>call <SID>saveAllAndRefreshGit()<CR>
-    " nnoremap <Space> <Cmd>call VSCodeNotify('workbench.action.files.saveAll')<CR>
+    nnoremap <Leader>s <Cmd>call VSCodeNotify('workbench.action.files.saveAll')<CR>
     " nnoremap <Space> <Cmd>call VSCodeNotify('git.refresh')<CR>
 
     nnoremap gh <Cmd>call VSCodeNotify('editor.action.showDefinitionPreviewHover')<Cr>

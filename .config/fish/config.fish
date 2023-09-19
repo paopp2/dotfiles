@@ -21,13 +21,13 @@ set -g fish_greeting
 bind p fish_clipboard_paste
 
 #ALIASES
-alias vim="nvim"
 alias h="sudo systemctl hibernate"
 alias shutdown="sudo shutdown -h now"
 alias open="xdg-open"
 alias copy="xclip -sel clip"
 alias x=exit
-alias vw="nvim -c VimwikiIndex"
+alias vim="nvim"
+alias vw="vim -u $HOME/.config/vscode_nvim/init.vim -c VimwikiIndex"
 alias untar="tar -xvzf"
 alias r="ranger"
 alias adb="~/Android/Sdk/platform-tools/adb"
