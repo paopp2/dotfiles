@@ -8,6 +8,7 @@ nnoremap <Leader>s :w<Cr>
 nnoremap tk ;tabprev<Cr>
 nnoremap tj ;tabnext<Cr>
 nnoremap <Leader>yy _yg_
+vnoremap y ygv<Esc>
 set clipboard=unnamed,unnamedplus
 set number relativenumber
 set wrap
@@ -39,7 +40,7 @@ let g:lightline = {'colorscheme': 'wombat'}
 
 " PLUGINS "
 call plug#begin()
-Plug 'https://tpope.io/vim/surround.git'
+Plug 'tpope/vim-surround'
 Plug 'https://github.com/joshdick/onedark.vim.git'
 Plug 'itchyny/lightline.vim'
 Plug 'vimwiki/vimwiki'

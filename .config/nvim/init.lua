@@ -74,6 +74,8 @@ vim.wo.linebreak = true
 -- Automatically change the current directory to the file's directory
 vim.o.autochdir = true
 
+-- After visual yank, stay where the cursor is at
+vim.api.nvim_set_keymap('x', 'y', 'ygv<Esc>', { noremap = true })
 
 
 
