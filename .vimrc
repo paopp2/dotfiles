@@ -9,6 +9,8 @@ nnoremap tk ;tabprev<Cr>
 nnoremap tj ;tabnext<Cr>
 nnoremap <Leader>yy _yg_
 vnoremap y ygv<Esc>
+nnoremap Q @q
+nnoremap <leader>- 50%
 set clipboard=unnamed,unnamedplus
 set number relativenumber
 set wrap
