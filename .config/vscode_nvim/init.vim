@@ -38,6 +38,8 @@ if exists('g:vscode')
     nnoremap << <Cmd>call VSCodeNotify('workbench.action.moveEditorLeftInGroup')<CR>
     nnoremap >> <Cmd>call VSCodeNotify('workbench.action.moveEditorRightInGroup')<CR>
 
+    vnoremap u <Cmd>call VSCodeNotify('git.revertSelectedRanges')<CR>;
+
     "nnoremap / <Cmd>call VSCodeNotify('actions.find')<CR>
     "nnoremap n <Cmd>call VSCodeNotify('editor.action.nextMatchFindAction')<CR>
     "nnoremap N <Cmd>call VSCodeNotify('editor.action.previousMatchFindAction')<CR>
