@@ -1,0 +1,46 @@
+{
+	"name": "Vimium C",
+	"@time": "10/1/2023, 8:31:22 PM",
+	"time": 1696163482394,
+	"environment": {
+		"extension": "1.99.994",
+		"platform": "win",
+		"chromium": 117
+	},
+	"exclusionRules": [
+		{
+			"passKeys": "",
+			"pattern": ":https://www.typesy.com/"
+		},
+		{
+			"passKeys": "",
+			"pattern": ":https://leetcode.com/"
+		},
+		{
+			"passKeys": "",
+			"pattern": ":https://app.codility.com/"
+		},
+		{
+			"passKeys": "",
+			"pattern": ":https://monkeytype.com/"
+		},
+		{
+			"passKeys": "",
+			"pattern": ":https://vim-adventures.com/"
+		}
+	],
+	"keyLayout": 2,
+	"keyMappings": [
+		"#!no-check",
+		"unmap f",
+		"unmap F",
+		"unmap J",
+		"unmap K",
+		"map s LinkHints.activate",
+		"map S LinkHints.activateOpenInNewTab",
+		"map J nextTab",
+		"map K previousTab",
+		""
+	],
+	"vimSync": true
+}
