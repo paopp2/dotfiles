@@ -8,9 +8,15 @@ nnoremap <Leader>s :w<Cr>
 nnoremap tk ;tabprev<Cr>
 nnoremap tj ;tabnext<Cr>
 nnoremap <Leader>yy _yg_
-vnoremap y ygv<Esc>
 nnoremap Q @q
 nnoremap <leader>- 50%
+
+vnoremap y ygv<Esc>
+nnoremap <Leader>( <Esc>[(v%o
+vnoremap <Leader>( <Esc>[(v%o
+nnoremap <Leader>{ <Esc>[{v%o
+vnoremap <Leader>{ <Esc>[{v%o
+
 set clipboard=unnamed,unnamedplus
 set number relativenumber
 set wrap
