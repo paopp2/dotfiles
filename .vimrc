@@ -13,9 +13,9 @@ nnoremap <leader>- 50%
 
 vnoremap y ygv<Esc>
 nnoremap <Leader>( <Esc>[(v%o
-vnoremap <Leader>( <Esc>[(v%o
+vnoremap ( <Esc>[(v%o
 nnoremap <Leader>{ <Esc>[{v%o
-vnoremap <Leader>{ <Esc>[{v%o
+vnoremap { <Esc>[{v%o
 
 set clipboard=unnamed,unnamedplus
 set number relativenumber

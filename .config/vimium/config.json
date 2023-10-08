@@ -1,7 +1,7 @@
 {
 	"name": "Vimium C",
-	"@time": "10/1/2023, 8:31:22 PM",
-	"time": 1696163482394,
+	"@time": "10/8/2023, 8:28:53 PM",
+	"time": 1696768133953,
 	"environment": {
 		"extension": "1.99.994",
 		"platform": "win",
@@ -40,6 +40,8 @@
 		"map S LinkHints.activateOpenInNewTab",
 		"map J nextTab",
 		"map K previousTab",
+		"unmap ^",
+		"map <c-o> visitPreviousTab",
 		""
 	],
 	"vimSync": true
