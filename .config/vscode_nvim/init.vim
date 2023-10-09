@@ -34,7 +34,11 @@ if exists('g:vscode')
     nnoremap >> <Cmd>call VSCodeNotify('workbench.action.moveEditorRightInGroup')<CR>
 
     vnoremap u <Cmd>call VSCodeNotify('git.revertSelectedRanges')<CR>
+
     nnoremap <Leader>f <Cmd>call VSCodeNotify('editor.toggleFold')<CR>
     nnoremap <Leader><Leader>f <Cmd>call VSCodeNotify('editor.foldAll')<CR>
     nnoremap <Leader><Leader>F <Cmd>call VSCodeNotify('editor.unfoldAll')<CR>
+
+    nnoremap <Leader>b <Cmd>call VSCodeNotify('editor.debug.action.toggleBreakpoint')<CR>
+    nnoremap <Leader><Leader>b <Cmd>call VSCodeNotify('workbench.debug.viewlet.action.toggleBreakpointsActivatedAction')<CR>
 endif
