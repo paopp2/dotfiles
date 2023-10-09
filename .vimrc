@@ -3,13 +3,17 @@ let mapleader=" "
 noremap : ;
 noremap ; :
 inoremap kj <Esc>
-" nnoremap <Space> :w<Cr>
+
+nmap j gj
+nmap k gk
+
 nnoremap <Leader>s :w<Cr>
 nnoremap tk ;tabprev<Cr>
 nnoremap tj ;tabnext<Cr>
 nnoremap <Leader>yy _yg_
 nnoremap Q @q
 nnoremap <leader>- 50%
+nnoremap <leader>a ggVG
 
 vnoremap y ygv<Esc>
 nnoremap <Leader>( <Esc>[(v%o

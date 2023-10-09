@@ -29,18 +29,12 @@ if exists('g:vscode')
     nnoremap [e <Cmd>call VSCodeNotify('editor.action.marker.prevInFiles')<CR>
     nnoremap ]c <Cmd>call VSCodeNotify('workbench.action.editor.nextChange')<CR>
     nnoremap [c <Cmd>call VSCodeNotify('workbench.action.editor.previousChange')<CR>
-    "nnoremap <Leader>ne <Cmd>call VSCodeNotify('editor.action.marker.nextInFiles')<CR>
-    "nnoremap <Leader>pe <Cmd>call VSCodeNotify('editor.action.marker.prevInFiles')<CR>
-    "nnoremap <Leader>nc <Cmd>call VSCodeNotify('workbench.action.editor.nextChange')<CR>
-    "nnoremap <Leader>pc <Cmd>call VSCodeNotify('workbench.action.editor.previousChange')<CR>
-    "nnoremap <Leader>nc <Cmd>call VSCodeNotify('editor.action.dirtydiff.next')<CR>
 
     nnoremap << <Cmd>call VSCodeNotify('workbench.action.moveEditorLeftInGroup')<CR>
     nnoremap >> <Cmd>call VSCodeNotify('workbench.action.moveEditorRightInGroup')<CR>
 
-    vnoremap u <Cmd>call VSCodeNotify('git.revertSelectedRanges')<CR>;
-
-    "nnoremap / <Cmd>call VSCodeNotify('actions.find')<CR>
-    "nnoremap n <Cmd>call VSCodeNotify('editor.action.nextMatchFindAction')<CR>
-    "nnoremap N <Cmd>call VSCodeNotify('editor.action.previousMatchFindAction')<CR>
+    vnoremap u <Cmd>call VSCodeNotify('git.revertSelectedRanges')<CR>
+    nnoremap <Leader>f <Cmd>call VSCodeNotify('editor.toggleFold')<CR>
+    nnoremap <Leader><Leader>f <Cmd>call VSCodeNotify('editor.foldAll')<CR>
+    nnoremap <Leader><Leader>F <Cmd>call VSCodeNotify('editor.unfoldAll')<CR>
 endif
