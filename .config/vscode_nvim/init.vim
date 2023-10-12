@@ -29,6 +29,8 @@ if exists('g:vscode')
     nnoremap [e <Cmd>call VSCodeNotify('editor.action.marker.prevInFiles')<CR>
     nnoremap ]c <Cmd>call VSCodeNotify('workbench.action.editor.nextChange')<CR>
     nnoremap [c <Cmd>call VSCodeNotify('workbench.action.editor.previousChange')<CR>
+    nnoremap ]f <Cmd>call VSCodeNotify('editor.gotoNextFold')<CR>
+    nnoremap [f <Cmd>call VSCodeNotify('editor.gotoPreviousFold')<CR>
 
     nnoremap << <Cmd>call VSCodeNotify('workbench.action.moveEditorLeftInGroup')<CR>
     nnoremap >> <Cmd>call VSCodeNotify('workbench.action.moveEditorRightInGroup')<CR>
