@@ -14,6 +14,8 @@ nnoremap <Leader>yy _yg_
 nnoremap Q @q
 nnoremap <leader>- 50%
 nnoremap <leader>a ggVG
+nnoremap <leader>; v<Esc>A;<Esc>gv<Esc>
+nnoremap <leader>, v<Esc>A,<Esc>gv<Esc>
 
 vnoremap y ygv<Esc>
 nnoremap <Leader>( <Esc>[(v%o
