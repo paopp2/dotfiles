@@ -43,4 +43,5 @@ if exists('g:vscode')
 
     nnoremap <Leader>b <Cmd>call VSCodeNotify('editor.debug.action.toggleBreakpoint')<CR>
     nnoremap <Leader><Leader>b <Cmd>call VSCodeNotify('workbench.debug.viewlet.action.toggleBreakpointsActivatedAction')<CR>
+    nnoremap <Leader><Leader>B <Cmd>call VSCodeNotify('workbench.debug.viewlet.action.removeAllBreakpoints')<CR>
 endif
