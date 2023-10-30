@@ -28,6 +28,7 @@ alias copy="xclip -sel clip"
 alias x=exit
 alias vim="nvim"
 alias vw="vim -u $HOME/.config/vscode_nvim/init.vim -c VimwikiIndex"
+# alias vw="nvim.exe -c VimwikiIndex"
 alias untar="tar -xvzf"
 alias r="ranger"
 alias adb="~/Android/Sdk/platform-tools/adb"
@@ -42,8 +43,14 @@ alias gs="git status"
 alias ga="git add"
 alias gcm="git commit"
 alias gco="git checkout"
-alias gbr="git branch"
+alias gb="git branch"
 alias gacm="git add .;git commit"
+alias gl="git log"
+alias gll="git log --oneline --graph"
+alias gpul="git pull"
+alias gpsh="git push"
+alias gsh="git stash"
+alias gshp="git stash pop"
 
 # Defaults
 set -gx EDITOR nvim
@@ -51,3 +58,4 @@ set -gx EDITOR nvim
 # bun
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
+set --export ANDROID_SDK_ROOT "$HOME/Android/Sdk/"

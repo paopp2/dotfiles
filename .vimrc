@@ -12,7 +12,7 @@ nnoremap tk ;tabprev<Cr>
 nnoremap tj ;tabnext<Cr>
 nnoremap <Leader>yy _yg_
 nnoremap Q @q
-nnoremap <CR> ;noh<CR>
+" nnoremap <CR> ;noh<CR>
 nnoremap <leader>- 50%
 nnoremap <leader>a ggVG
 nnoremap <leader>; v<Esc>A;<Esc>gv<Esc>
