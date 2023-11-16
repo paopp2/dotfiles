@@ -47,11 +47,19 @@ alias gshp="git stash pop"
 # Defaults
 export EDITOR=nvim
 
+# Use vim keybindings for zsh
+bindkey -v
+bindkey -M viins 'kj' vi-cmd-mode
+
+# My tools/programs
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 export ANDROID_SDK_ROOT="$HOME/Android/Sdk/"
 
-# Use vim keybindings for zsh
-bindkey -v
-bindkey -M viins 'kj' vi-cmd-mode
+# flutter
+export PATH="$PATH:$HOME/Tools/flutter/bin"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
