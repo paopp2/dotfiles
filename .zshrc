@@ -17,7 +17,6 @@ unsetopt PROMPT_SP
 # Aliases
 alias h="sudo systemctl hibernate"
 alias shutdown="sudo shutdown -h now"
-alias open="xdg-open"
 alias copy="xclip -selection clipboard"
 alias x=exit
 alias vim="nvim"
