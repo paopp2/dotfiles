@@ -54,24 +54,24 @@ shift + alt - l : yabai -m window --stack east
 # ctrl + alt - l : yabai -m window --warp east
 
 # move window to display left and right
-rctrl + alt - s : yabai -m window --display west; yabai -m display --focus west;
-rctrl + alt - g : yabai -m window --display east; yabai -m display --focus east;
+rctrl + lshift - s : yabai -m window --display west; yabai -m display --focus west;
+rctrl + lshift - g : yabai -m window --display east; yabai -m display --focus east;
 
 
 # move window to prev and next space
-shift + alt - p : yabai -m window --space prev;
-shift + alt - n : yabai -m window --space next;
+shift + lshift - p : yabai -m window --space prev;
+shift + lshift - n : yabai -m window --space next;
 
 # move window to space #
-rctrl + alt - 1 : yabai -m window --space 1;
-rctrl + alt - 2 : yabai -m window --space 2;
-rctrl + alt - 3 : yabai -m window --space 3;
-rctrl + alt - 4 : yabai -m window --space 4;
-rctrl + alt - 5 : yabai -m window --space 5;
-rctrl + alt - 6 : yabai -m window --space 6;
-rctrl + alt - 7 : yabai -m window --space 7;
-rctrl + alt - 8 : yabai -m window --space 8;
-rctrl + alt - 9 : yabai -m window --space 9;
+rctrl + lshift - 1 : yabai -m window --space 1;
+rctrl + lshift - 2 : yabai -m window --space 2;
+rctrl + lshift - 3 : yabai -m window --space 3;
+rctrl + lshift - 4 : yabai -m window --space 4;
+rctrl + lshift - 5 : yabai -m window --space 5;
+rctrl + lshift - 6 : yabai -m window --space 6;
+rctrl + lshift - 7 : yabai -m window --space 7;
+rctrl + lshift - 8 : yabai -m window --space 8;
+rctrl + lshift - 9 : yabai -m window --space 9;
 
 # start/stop yabai
 ctrl + alt - r : yabai --restart-service
