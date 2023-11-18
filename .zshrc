@@ -50,15 +50,37 @@ export EDITOR=nvim
 bindkey -v
 bindkey -M viins 'kj' vi-cmd-mode
 
-# My tools/programs
+# ============== My tools/programs ================
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
-export ANDROID_SDK_ROOT="$HOME/Android/Sdk/"
+export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk/"
 
 # flutter
 export PATH="$PATH:$HOME/Tools/flutter/bin"
 
+# nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# java
+export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
+
+# nnn
+n () {
+    # Block nesting of nnn in subshells
+    [ "${NNNLVL:-0}" -eq 0 ] || {
+        echo "nnn is already running"
+        return
+    }
+
+    NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
+
+    command nnn "$@"
+
+    [ ! -f "$NNN_TMPFILE" ] || {
+        . "$NNN_TMPFILE"
+        rm -f "$NNN_TMPFILE" > /dev/null
+    }
+}

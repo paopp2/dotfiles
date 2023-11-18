@@ -59,8 +59,8 @@ rctrl + lshift - g : yabai -m window --display east; yabai -m display --focus ea
 
 
 # move window to prev and next space
-shift + lshift - p : yabai -m window --space prev;
-shift + lshift - n : yabai -m window --space next;
+rctrl + lshift - p : yabai -m window --space prev;
+rctrl + lshift - n : yabai -m window --space next;
 
 # move window to space #
 rctrl + lshift - 1 : yabai -m window --space 1;
