@@ -1,14 +1,14 @@
 # Changing window focus
 
 # change window focus within space
-alt - down : yabai -m window --focus south
-alt - up : yabai -m window --focus north
-alt - left : yabai -m window --focus west
-alt - right : yabai -m window --focus east
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - h : yabai -m window --focus west
+alt - l : yabai -m window --focus east
 
 # change window within stack
-alt - h : yabai -m window --focus stack.prev
-alt - l : yabai -m window --focus stack.next
+cmd - h : yabai -m window --focus stack.prev
+cmd - l : yabai -m window --focus stack.next
 
 # change focus between external displays (left and right)
 rctrl - s : yabai -m display --focus west
@@ -74,5 +74,6 @@ rctrl + alt - 8 : yabai -m window --space 8;
 rctrl + alt - 9 : yabai -m window --space 9;
 
 # start/stop yabai
-ctrl + alt - q : yabai --start-service
-ctrl + alt - s : yabai --stop-service
+ctrl + alt - r : yabai --restart-service
+ctrl + alt - s : yabai --start-service
+ctrl + alt - q : yabai --stop-service
