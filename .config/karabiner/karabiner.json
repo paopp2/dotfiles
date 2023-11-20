@@ -757,7 +757,7 @@
                     },
                     "to": [
                         {
-                            "apple_vendor_keyboard_key_code": "mission_control"
+                            "key_code": "illumination_decrement"
                         }
                     ]
                 },
@@ -767,7 +767,7 @@
                     },
                     "to": [
                         {
-                            "apple_vendor_keyboard_key_code": "spotlight"
+                            "key_code": "illumination_increment"
                         }
                     ]
                 },
