@@ -134,7 +134,8 @@
                                             "^io\\.alacritty$",
                                             "^net\\.kovidgoyal\\.kitty$",
                                             "^tv\\.parsec\\.www$",
-                                            "^com\\.apple\\.Terminal$"
+                                            "^com\\.apple\\.Terminal$",
+                                            "^com\\.googlecode\\.iterm2$",
                                         ],
                                         "type": "frontmost_application_unless"
                                     }
