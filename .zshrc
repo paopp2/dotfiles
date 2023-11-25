@@ -28,6 +28,7 @@ alias sp="speedtest-cli --no-upload"
 alias go="/usr/local/go/bin/go"
 alias docker="sudo docker"
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/.git --work-tree=$HOME'
+alias ll='ls -lah'
 
 # Git Aliases
 alias gs="git status"
