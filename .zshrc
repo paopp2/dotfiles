@@ -1,5 +1,6 @@
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Check if TMUX is not set, then start TMUX
 if [[ -z $TMUX ]]; then
@@ -50,12 +51,14 @@ export EDITOR=nvim
 # Use vim keybindings for zsh
 bindkey -v
 bindkey -M viins 'kj' vi-cmd-mode
+bindkey -v '^?' backward-delete-char
 
 # ============== My tools/programs ================
-# bun
+# paths
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk/"
+export FLUTTER_ROOT="$HOME/Tools/flutter"
 
 # flutter
 export PATH="$PATH:$HOME/Tools/flutter/bin"
@@ -85,3 +88,7 @@ n () {
         rm -f "$NNN_TMPFILE" > /dev/null
     }
 }
+
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)

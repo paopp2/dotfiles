@@ -1,5 +1,5 @@
 if not set -q TMUX
-    set -g TMUX tmux new-session -d -s default
+    set -g TMUX "tmux new-session -d -s default"
     eval $TMUX
     tmux attach-session -d -t default
 end
