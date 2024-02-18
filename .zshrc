@@ -46,7 +46,8 @@ alias gco="git checkout"
 alias gb="git branch"
 alias gacm="git add .;git commit"
 alias gl="git log"
-alias gll="git log --oneline --graph"
+alias gll='git log --pretty="%C(auto)%h %C(auto)%d%Creset%n    %C(cyan)%an %C(dim white)%ad%n    %s%Creset%n" --date=format:"%a %Y-%m-%d %H:%M"  --graph'
+alias glla='git log --full-history --pretty="%C(auto)%h %C(auto)%d%Creset%n    %C(cyan)%an %C(dim white)%ad%n    %s%Creset%n" --date=format:"%a %Y-%m-%d %H:%M"  --date-order --skip=0 --branches --tags --remotes --graph'
 alias gpul="git pull"
 alias gpsh="git push"
 alias gsh="git stash"
