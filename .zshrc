@@ -15,6 +15,12 @@ eval "$(starship init zsh)"
 # Remove Zsh greeting
 unsetopt PROMPT_SP
 
+# Command history options
+export HISTFILESIZE=10000
+export HISTSIZE=10000
+setopt HIST_IGNORE_ALL_DUPS
+setopt INC_APPEND_HISTORY
+
 # Aliases
 alias h="sudo systemctl hibernate"
 alias shutdown="sudo shutdown -h now"
@@ -30,6 +36,7 @@ alias go="/usr/local/go/bin/go"
 alias docker="sudo docker"
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/.git --work-tree=$HOME'
 alias ll='ls -lah'
+alias history='history -rn 0 | less'
 
 # Git Aliases
 alias gs="git status"
