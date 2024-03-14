@@ -1,7 +1,3 @@
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
 # Check if TMUX is not set, then start TMUX
 if [[ -z $TMUX ]]; then
     tmux new-session -d -s default
@@ -100,3 +96,7 @@ n () {
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
+
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
