@@ -1,11 +1,11 @@
 {
 	"name": "Vimium C",
-	"@time": "10/8/2023, 8:28:53 PM",
-	"time": 1696768133953,
+	"@time": "3/14/2024, 9:16:19 PM",
+	"time": 1710422179775,
 	"environment": {
 		"extension": "1.99.994",
-		"platform": "win",
-		"chromium": 117
+		"platform": "mac",
+		"chromium": 121
 	},
 	"exclusionRules": [
 		{
@@ -42,6 +42,8 @@
 		"map K previousTab",
 		"unmap ^",
 		"map <c-o> visitPreviousTab",
+		"map <up> scrollPageUp",
+		"map <down> scrollPageDown",
 		""
 	],
 	"vimSync": true
