@@ -60,6 +60,10 @@ vim.api.nvim_set_keymap('n', '<Leader>s', ':w<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'tk', ':tabprev<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'tj', ':tabnext<CR>', { noremap = true })
 
+-- Up/Down to half scroll up/down
+vim.api.nvim_set_keymap('n', '<Up>', '<C-u>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<Down>', '<C-d>', { noremap = true })
+
 -- Set clipboard options
 vim.o.clipboard = 'unnamed,unnamedplus'
 

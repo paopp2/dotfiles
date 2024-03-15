@@ -33,13 +33,14 @@ alias docker="sudo docker"
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/.git --work-tree=$HOME'
 alias ll='ls -lah'
 alias history='history -rn 0 | less'
+alias gdu='gdu-go --si'
 
 # Git Aliases
 alias gs="git status"
 alias ga="git add"
 alias gcm="git commit"
 alias gco="git checkout"
-alias gb="git branch"
+alias gb="git branch --sort=-committerdate --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:cyan)%(authorname)%(color:reset) %(color:dim white)(%(committerdate:relative))%(color:reset)'"
 alias gacm="git add .;git commit"
 alias gl="git log"
 alias gll='git log --pretty="%C(auto)%h %C(auto)%d%Creset%n    %C(cyan)%an %C(dim white)%ad%n    %s%Creset%n" --date=format:"%a %Y-%m-%d %H:%M"  --graph'
