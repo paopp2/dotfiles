@@ -94,10 +94,12 @@ n () {
     }
 }
 
-
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+
+# ZSH Autocomplete related
+bindkey -M menuselect '\r' .accept-line
