@@ -46,4 +46,6 @@ if exists('g:vscode')
     nnoremap <Leader>b <Cmd>lua require('vscode-neovim').action('editor.debug.action.toggleBreakpoint')<CR>
     nnoremap <Leader><Leader>b <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.toggleBreakpointsActivatedAction')<CR>
     nnoremap <Leader><Leader>B <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.removeAllBreakpoints')<CR>
+
+    nnoremap <Leader>xo <Cmd>lua require('vscode-neovim').action('workbench.action.closeOtherEditors')<CR>
 endif
