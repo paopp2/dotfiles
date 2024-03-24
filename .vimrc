@@ -23,10 +23,14 @@ vnoremap <Up> <C-u>
 vnoremap <Down> <C-d>
 
 vnoremap y ygv<Esc>
-nnoremap <Leader>( <Esc>[(v%o
-vnoremap ( <Esc>[(v%o
-nnoremap <Leader>{ <Esc>[{v%o
-vnoremap { <Esc>[{v%o
+nnoremap <Leader>( <Esc>[(vi(o
+vnoremap ( <Esc>[([(vi(o
+nnoremap <Leader>) <Esc>[(v%o
+vnoremap ) <Esc>[(v%o
+nnoremap <Leader>{ <Esc>[{vi{o
+vnoremap { <Esc>[{[{vi{o
+nnoremap <Leader>} <Esc>[{v%o
+vnoremap } <Esc>[{v%o
 
 set clipboard=unnamed,unnamedplus
 set number relativenumber
