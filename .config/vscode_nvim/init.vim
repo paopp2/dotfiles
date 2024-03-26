@@ -29,8 +29,8 @@ if exists('g:vscode')
     nnoremap [e <Cmd>lua require('vscode-neovim').action('editor.action.marker.prevInFiles')<CR>
     nnoremap ]c <Cmd>lua require('vscode-neovim').action('workbench.action.editor.nextChange')<CR>
     nnoremap [c <Cmd>lua require('vscode-neovim').action('workbench.action.editor.previousChange')<CR>
-    nnoremap }C <Cmd>lua require('vscode-neovim').action('workbench.action.compareEditor.nextChange')<CR>
-    nnoremap {C <Cmd>lua require('vscode-neovim').action('workbench.action.compareEditor.previousChange')<CR>
+    nnoremap ]C <Cmd>lua require('vscode-neovim').action('workbench.action.compareEditor.nextChange')<CR>
+    nnoremap [C <Cmd>lua require('vscode-neovim').action('workbench.action.compareEditor.previousChange')<CR>
     nnoremap ]f <Cmd>lua require('vscode-neovim').action('editor.gotoNextFold')<CR>
     nnoremap [f <Cmd>lua require('vscode-neovim').action('editor.gotoPreviousFold')<CR>
 
