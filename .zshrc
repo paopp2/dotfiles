@@ -31,10 +31,11 @@ alias adb="$HOME/Android/Sdk/platform-tools/adb"
 alias sp="speedtest-cli --no-upload"
 alias go="/usr/local/go/bin/go"
 alias docker="sudo docker"
-alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/.git --work-tree=$HOME'
 alias ll='ls -lah'
 alias history='history -rn 0 | less'
 alias gdu='gdu-go --si'
+alias c="caffeinate -d"
 
 # Git Aliases
 alias gs="git status"
