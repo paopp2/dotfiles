@@ -23,6 +23,7 @@ alias shutdown="sudo shutdown -h now"
 alias copy="xclip -selection clipboard"
 alias x=exit
 alias vim="nvim"
+alias v="nvim"
 alias vw="nvim -u $HOME/.config/vscode_nvim/init.vim -c VimwikiIndex"
 alias untar="tar -xvzf"
 alias r="ranger"

@@ -17,9 +17,9 @@ if exists('g:vscode')
     nnoremap gd <Cmd>lua require('vscode-neovim').action('editor.action.revealDefinition')<CR>
     nnoremap <Leader>gd <Cmd>lua require('vscode-neovim').action('references-view.findReferences')<CR>
     "nnoremap <Leader><Leader> <Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>
-    nnoremap <Leader>d <Cmd>lua require('vscode-neovim').action('workbench.action.debug.continue')<CR>
-    nnoremap <Leader><Leader>d <Cmd>lua require('vscode-neovim').action('workbench.action.debug.start')<CR>
-    nnoremap <Leader><Leader>D <Cmd>lua require('vscode-neovim').action('workbench.action.debug.stop')<CR>
+    nnoremap <Leader>dc <Cmd>lua require('vscode-neovim').action('workbench.action.debug.continue')<CR>
+    nnoremap <Leader>ds <Cmd>lua require('vscode-neovim').action('workbench.action.debug.start')<CR>
+    nnoremap <Leader>dS <Cmd>lua require('vscode-neovim').action('workbench.action.debug.stop')<CR>
 
     nnoremap <Leader>cc <Cmd>lua require('vscode-neovim').action('gitlens.compareWith')<CR>
     nnoremap <Leader>cw <Cmd>lua require('vscode-neovim').action('gitlens.compareWorkingWith')<CR>
@@ -33,6 +33,10 @@ if exists('g:vscode')
     nnoremap [C <Cmd>lua require('vscode-neovim').action('workbench.action.compareEditor.previousChange')<CR>
     nnoremap ]f <Cmd>lua require('vscode-neovim').action('editor.gotoNextFold')<CR>
     nnoremap [f <Cmd>lua require('vscode-neovim').action('editor.gotoPreviousFold')<CR>
+    nnoremap ]b <Cmd>lua require('vscode-neovim').action('editor.debug.action.goToNextBreakpoint')<CR>
+    nnoremap [b <Cmd>lua require('vscode-neovim').action('editor.debug.action.goToPreviousBreakpoint')<CR>
+    vnoremap ]b <Cmd>lua require('vscode-neovim').action('editor.debug.action.goToNextBreakpoint')<CR>
+    vnoremap [b <Cmd>lua require('vscode-neovim').action('editor.debug.action.goToPreviousBreakpoint')<CR>
 
     nnoremap << <Cmd>lua require('vscode-neovim').action('workbench.action.moveEditorLeftInGroup')<CR>
     nnoremap >> <Cmd>lua require('vscode-neovim').action('workbench.action.moveEditorRightInGroup')<CR>
@@ -44,8 +48,8 @@ if exists('g:vscode')
     nnoremap <Leader><Leader>F <Cmd>lua require('vscode-neovim').action('editor.unfoldAll')<CR>
 
     nnoremap <Leader>b <Cmd>lua require('vscode-neovim').action('editor.debug.action.toggleBreakpoint')<CR>
-    nnoremap <Leader><Leader>b <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.toggleBreakpointsActivatedAction')<CR>
-    nnoremap <Leader><Leader>B <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.removeAllBreakpoints')<CR>
+    nnoremap <Leader>B <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.toggleBreakpointsActivatedAction')<CR>
+    nnoremap <Leader>db <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.removeAllBreakpoints')<CR>
 
     nnoremap <Leader>xo <Cmd>lua require('vscode-neovim').action('workbench.action.closeOtherEditors')<CR>
 endif

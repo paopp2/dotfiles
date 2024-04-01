@@ -54,8 +54,8 @@ set nocompatible
 syntax on
 filetype plugin on
 let g:vimwiki_list = [{'syntax': 'markdown', 'ext': '.md'}]
-nnoremap <leader><Space> :VimwikiToggleListItem<Cr>
-vnoremap <leader><Space> :VimwikiToggleListItem<Cr>
+" nnoremap <leader><Space> :VimwikiToggleListItem<Cr>
+" vnoremap <leader><Space> :VimwikiToggleListItem<Cr>
 
 " For Lightline
 set laststatus=2
