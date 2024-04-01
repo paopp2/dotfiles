@@ -26,7 +26,6 @@ alias vim="nvim"
 alias v="nvim"
 alias vw="nvim -u $HOME/.config/vscode_nvim/init.vim -c VimwikiIndex"
 alias untar="tar -xvzf"
-alias r="ranger"
 alias adb="$HOME/Android/Sdk/platform-tools/adb"
 alias sp="speedtest-cli --no-upload"
 alias go="/usr/local/go/bin/go"
@@ -36,6 +35,25 @@ alias ll='ls -lah'
 alias history='history -rn 0 | less'
 alias gdu='gdu-go --si'
 alias c="caffeinate -d"
+
+# "r" alias for "ranger"
+# - Copied this function from here: https://github.com/ranger/ranger/issues/1554
+# Changed keybinding from Q to S
+function r {
+    local IFS=$'\t\n'
+    local tempfile="$(mktemp -t tmp.XXXXXX)"
+    local ranger_cmd=(
+        command
+        ranger
+        --cmd="map S chain shell echo %d > "$tempfile"; quitall"
+    )
+    
+    ${ranger_cmd[@]} "$@"
+    if [[ -f "$tempfile" ]] && [[ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]]; then
+        cd -- "$(cat "$tempfile")" || return
+    fi
+    command rm -f -- "$tempfile" 2>/dev/null
+}
 
 # Git Aliases
 alias gs="git status"
