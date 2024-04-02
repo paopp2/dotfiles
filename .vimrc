@@ -18,7 +18,7 @@ nnoremap <leader>a ggVG
 nnoremap <leader>; v<Esc>A;<Esc>gv<Esc>
 nnoremap <leader>, v<Esc>A,<Esc>gv<Esc>
 nnoremap <Up> <C-u>
-nnoremap <Down> <C-u>
+nnoremap <Down> <C-d>
 vnoremap <Up> <C-u>
 vnoremap <Down> <C-d>
 
