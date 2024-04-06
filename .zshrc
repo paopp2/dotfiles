@@ -30,11 +30,12 @@ alias adb="$HOME/Android/Sdk/platform-tools/adb"
 alias sp="speedtest-cli --no-upload"
 alias go="/usr/local/go/bin/go"
 alias docker="sudo docker"
-alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/.git --work-tree=$HOME'
+alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias ll='ls -lah'
 alias history='history -rn 0 | less'
 alias gdu='gdu-go --si'
 alias c="caffeinate -d"
+alias f="fzf"
 
 # "r" alias for "ranger"
 # - Copied this function from here: https://github.com/ranger/ranger/issues/1554
@@ -120,6 +121,9 @@ n () {
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+
+# asdf setup
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # ZSH Autocomplete related
 bindkey -M menuselect '\r' .accept-line
