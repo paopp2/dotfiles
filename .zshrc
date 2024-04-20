@@ -36,6 +36,9 @@ alias history='history -rn 0 | less'
 alias gdu='gdu-go --si'
 alias c="caffeinate -d"
 alias f="fzf"
+alias d="docker"
+alias dc="docker-compose"
+alias awslocal="aws --endpoint-url=http://localhost:4566"
 
 # "r" alias for "ranger"
 # - Copied this function from here: https://github.com/ranger/ranger/issues/1554
