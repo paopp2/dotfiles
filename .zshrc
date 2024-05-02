@@ -32,7 +32,7 @@ alias go="/usr/local/go/bin/go"
 alias docker="sudo docker"
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias ll='ls -lah'
-alias history='history -rn 0 | less'
+alias history='history -rn 0 | fzf --reverse --info=inline'
 alias gdu='gdu-go --si'
 alias c="caffeinate -d"
 alias f="fzf"
