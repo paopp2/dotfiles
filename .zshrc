@@ -63,7 +63,6 @@ function r {
 alias gs="git status"
 alias ga="git add"
 alias gcm="git commit"
-alias gco="git checkout"
 alias gb="git branch --sort=-committerdate --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:cyan)%(authorname)%(color:reset) %(color:dim white)(%(committerdate:relative))%(color:reset)'"
 alias gacm="git add .;git commit"
 alias gl="git log"
@@ -73,6 +72,18 @@ alias gpul="git pull"
 alias gpsh="git push"
 alias gsh="git stash"
 alias gshp="git stash pop"
+
+function gco () {
+    if [[ $# -eq 0 ]]; then
+        gb | grep -v "^\*" | fzf --reverse --info=inline | xargs | cut -d ' ' -f 1 | xargs git checkout
+    else
+        git checkout "$@"
+    fi
+}
+
+function gcoa {
+    gb --all | grep -v "^\*" | fzf --reverse --info=inline | xargs | cut -d ' ' -f 1 | xargs git checkout
+}
 
 # Defaults
 export EDITOR=nvim
