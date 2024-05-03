@@ -18,7 +18,7 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt INC_APPEND_HISTORY
 
 # Aliases
-alias h="sudo systemctl hibernate"
+# alias h="sudo systemctl hibernate"
 alias shutdown="sudo shutdown -h now"
 alias copy="xclip -selection clipboard"
 alias x=exit
@@ -32,7 +32,7 @@ alias go="/usr/local/go/bin/go"
 alias docker="sudo docker"
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias ll='ls -lah'
-alias history='history -rn 0 | fzf --reverse --info=inline'
+alias h='print -z -- $(history -rn 0 | fzf --reverse --info=inline)'
 alias gdu='gdu-go --si'
 alias c="caffeinate -d"
 alias f="fzf"
@@ -75,14 +75,14 @@ alias gshp="git stash pop"
 
 function gco () {
     if [[ $# -eq 0 ]]; then
-        gb | grep -v "^\*" | fzf --reverse --info=inline | xargs | cut -d ' ' -f 1 | xargs git checkout
+        gb | fzf --reverse | xargs | cut -d ' ' -f 1 | xargs git checkout
     else
         git checkout "$@"
     fi
 }
 
 function gcoa {
-    gb --all | grep -v "^\*" | fzf --reverse --info=inline | xargs | cut -d ' ' -f 1 | xargs git checkout
+    gb --all | fzf --reverse | xargs | cut -d ' ' -f 1 | xargs git checkout
 }
 
 # Defaults
