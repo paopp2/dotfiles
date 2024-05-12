@@ -137,7 +137,17 @@ source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # asdf setup
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+# . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # ZSH Autocomplete related
 bindkey -M menuselect '\r' .accept-line
+
+# === HapInS JIRA link scripts: ===
+jrl() {
+    echo -n "[AOIKE-$1](https://hapins.atlassian.net/browse/AOIKE-$1)" | pbcopy
+}
+
+jro() {
+    open "https://hapins.atlassian.net/browse/AOIKE-$1"
+}
+# =================================
