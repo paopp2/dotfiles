@@ -82,7 +82,7 @@ function gco () {
 }
 
 function gcoa {
-    gb --all | fzf --reverse | xargs | cut -d ' ' -f 1 | xargs git checkout
+    gb --all | fzf --reverse | xargs | cut -d ' ' -f 1 | sed 's/^origin\///' | xargs git checkout
 }
 
 # Defaults
