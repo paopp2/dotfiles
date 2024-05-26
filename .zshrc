@@ -100,6 +100,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk/"
 export FLUTTER_ROOT="$HOME/Tools/flutter"
 
+# fzf keybindings
+eval "$(fzf --zsh)"
+
 # flutter
 export PATH="$PATH:$HOME/Tools/flutter/bin"
 
@@ -137,7 +140,7 @@ source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # asdf setup
-# . /opt/homebrew/opt/asdf/libexec/asdf.sh
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # ZSH Autocomplete related
 bindkey -M menuselect '\r' .accept-line
