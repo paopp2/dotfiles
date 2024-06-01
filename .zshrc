@@ -40,24 +40,34 @@ alias d="docker"
 alias dc="docker-compose"
 alias awslocal="aws --endpoint-url=http://localhost:4566"
 
+# "r" = yazi; cd on exit
+function r {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
 # "r" alias for "ranger"
 # - Copied this function from here: https://github.com/ranger/ranger/issues/1554
 # Changed keybinding from Q to S
-function r {
-    local IFS=$'\t\n'
-    local tempfile="$(mktemp -t tmp.XXXXXX)"
-    local ranger_cmd=(
-        command
-        ranger
-        --cmd="map S chain shell echo %d > "$tempfile"; quitall"
-    )
-    
-    ${ranger_cmd[@]} "$@"
-    if [[ -f "$tempfile" ]] && [[ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]]; then
-        cd -- "$(cat "$tempfile")" || return
-    fi
-    command rm -f -- "$tempfile" 2>/dev/null
-}
+# function r {
+#     local IFS=$'\t\n'
+#     local tempfile="$(mktemp -t tmp.XXXXXX)"
+#     local ranger_cmd=(
+#         command
+#         ranger
+#         --cmd="map S chain shell echo %d > "$tempfile"; quitall"
+#     )
+#     
+#     ${ranger_cmd[@]} "$@"
+#     if [[ -f "$tempfile" ]] && [[ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]]; then
+#         cd -- "$(cat "$tempfile")" || return
+#     fi
+#     command rm -f -- "$tempfile" 2>/dev/null
+# }
 
 # Git Aliases
 alias gs="git status"
