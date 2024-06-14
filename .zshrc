@@ -82,6 +82,7 @@ alias gpul="git pull"
 alias gpsh="git push"
 alias gsh="git stash"
 alias gshp="git stash pop"
+alias gfa="git fetch --all"
 
 function gco () {
     if [[ $# -eq 0 ]]; then
