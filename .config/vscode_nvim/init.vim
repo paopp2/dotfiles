@@ -14,6 +14,8 @@ if exists('g:vscode')
     " nnoremap <Space> <Cmd>call VSCodeNotify('git.refresh')<CR>
 
     nnoremap gh <Cmd>lua require('vscode-neovim').action('editor.action.showDefinitionPreviewHover')<CR>
+    vnoremap gh <Cmd>lua require('vscode-neovim').action('editor.action.showDefinitionPreviewHover')<CR>
+
     nnoremap gd <Cmd>lua require('vscode-neovim').action('editor.action.revealDefinition')<CR>
     nnoremap <Leader>gd <Cmd>lua require('vscode-neovim').action('references-view.findReferences')<CR>
     "nnoremap <Leader><Leader> <Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>
