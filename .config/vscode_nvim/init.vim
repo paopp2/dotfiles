@@ -27,6 +27,11 @@ if exists('g:vscode')
     nnoremap <Leader>cw <Cmd>lua require('vscode-neovim').action('gitlens.compareWorkingWith')<CR>
     nnoremap <Leader>ch <Cmd>lua require('vscode-neovim').action('gitlens.compareHeadWith')<CR>
 
+    nnoremap <Leader>l <Cmd>lua require('vscode-neovim').action('aichat.newchataction')<CR>
+    nnoremap <Leader>k <Cmd>lua require('vscode-neovim').action('aipopup.action.modal.generate')<CR>
+    vnoremap <Leader>l <Cmd>lua require('vscode-neovim').action('aichat.newchataction')<CR>
+    vnoremap <Leader>k <Cmd>lua require('vscode-neovim').action('aipopup.action.modal.generate')<CR>
+
     nnoremap ]e <Cmd>lua require('vscode-neovim').action('editor.action.marker.nextInFiles')<CR>
     nnoremap [e <Cmd>lua require('vscode-neovim').action('editor.action.marker.prevInFiles')<CR>
     nnoremap ]c <Cmd>lua require('vscode-neovim').action('workbench.action.editor.nextChange')<CR>

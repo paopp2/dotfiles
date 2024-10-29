@@ -39,6 +39,7 @@ alias f="fzf"
 alias d="docker"
 alias dc="docker-compose"
 alias awslocal="aws --endpoint-url=http://localhost:4566"
+alias code="cursor" # Remove this should you ever return to VSCode from Cursor
 
 # "r" = yazi; cd on exit
 function r {
@@ -154,6 +155,7 @@ source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # ZSH Autocomplete related
+zstyle ':autocomplete:history' max 0
 bindkey -M menuselect '\r' .accept-line
 
 # === HapInS JIRA link scripts: ===
@@ -165,3 +167,6 @@ jro() {
     open "https://hapins.atlassian.net/browse/AOIKE-$1"
 }
 # =================================
+
+# Rust related
+. "$HOME/.cargo/env"
