@@ -1,0 +1,88 @@
+start-at-login = true
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'horizontal'
+
+[workspace-to-monitor-force-assignment]
+1 = 'main'
+2 = 'main'
+3 = 'main'
+4 = 'main'
+5 = 'main'
+6 = 'secondary'
+7 = 'secondary'
+8 = 'secondary'
+9 = 'secondary'
+10 = 'secondary'
+
+accordion-padding = 15
+
+[gaps]
+inner.horizontal = 5
+inner.vertical = 5
+outer.left = 0
+outer.bottom = 0
+outer.top = 0
+outer.right = 0
+
+[mode.main.binding]
+
+# Change window focus within space
+cmd-h = 'focus left'
+# cmd-j = 'focus down'
+# cmd-k = 'focus up' // I use this for Slack
+cmd-l = 'focus right'
+
+cmd-shift-h = 'move left'
+cmd-shift-j = 'move down'
+cmd-shift-k = 'move up'
+cmd-shift-l = 'move right'
+
+# TODO: Check if this is working
+ctrl-alt-h = ['resize width -10', 'resize width -10']
+ctrl-alt-j = ['resize height +10', 'resize height +10']
+ctrl-alt-k = ['resize height -10', 'resize height -10']
+ctrl-alt-l = ['resize width +10', 'resize width +10']
+
+
+ctrl-1 = 'workspace 1'
+ctrl-2 = 'workspace 2'
+ctrl-3 = 'workspace 3'
+ctrl-4 = 'workspace 4'
+ctrl-5 = 'workspace 5'
+
+ctrl-cmd-1 = 'workspace 6'
+ctrl-cmd-2 = 'workspace 7'
+ctrl-cmd-3 = 'workspace 8'
+ctrl-cmd-4 = 'workspace 9'
+ctrl-cmd-5 = 'workspace 10'
+
+ctrl-cmd-t = 'layout floating tiling'
+
+ctrl-s = 'focus-monitor left'
+ctrl-g = 'focus-monitor right'
+
+ctrl-shift-s = 'move-node-to-monitor left'
+ctrl-shift-g = 'move-node-to-monitor right'
+
+ctrl-cmd-shift-s = 'move-workspace-to-monitor prev'
+ctrl-cmd-shift-g = 'move-workspace-to-monitor next'
+
+ctrl-shift-1 = 'move-node-to-workspace 1'
+ctrl-shift-2 = 'move-node-to-workspace 2'
+ctrl-shift-3 = 'move-node-to-workspace 3'
+ctrl-shift-4 = 'move-node-to-workspace 4'
+ctrl-shift-5 = 'move-node-to-workspace 5'
+
+ctrl-cmd-shift-1 = 'move-node-to-workspace 6'
+ctrl-cmd-shift-2 = 'move-node-to-workspace 7'
+ctrl-cmd-shift-3 = 'move-node-to-workspace 8'
+ctrl-cmd-shift-4 = 'move-node-to-workspace 9'
+ctrl-cmd-shift-5 = 'move-node-to-workspace 10'
+
+ctrl-alt-r = 'reload-config'
+
+ctrl-cmd-s = 'layout tiles h_accordion'
