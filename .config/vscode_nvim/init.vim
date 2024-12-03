@@ -59,4 +59,8 @@ if exists('g:vscode')
     nnoremap <Leader>db <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.removeAllBreakpoints')<CR>
 
     nnoremap <Leader>xo <Cmd>lua require('vscode-neovim').action('workbench.action.closeOtherEditors')<CR>
+
+    nnoremap <Leader>w <Cmd>lua require('vscode-neovim').action('editor.debug.action.selectionToWatch')<CR>
+    vnoremap <Leader>w <Cmd>lua require('vscode-neovim').action('editor.debug.action.selectionToWatch')<CR>
+    nnoremap <Leader>dw <Cmd>lua require('vscode-neovim').action('workbench.debug.viewlet.action.removeAllWatchExpressions')<CR>
 endif
