@@ -6,6 +6,8 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 default-root-container-layout = 'tiles'
 default-root-container-orientation = 'horizontal'
 
+accordion-padding = 10
+
 [[on-window-detected]]
 if.app-name-regex-substring = 'iTerm2'
 run = ['layout floating']
@@ -22,8 +24,6 @@ run = ['layout floating']
 9 = 'secondary'
 10 = 'secondary'
 
-accordion-padding = 15
-
 [gaps]
 inner.horizontal = 5
 inner.vertical = 5
@@ -35,10 +35,10 @@ outer.right = 0
 [mode.main.binding]
 
 # Change window focus within space
-cmd-h = 'focus left'
+cmd-h = 'focus left --boundaries-action stop'
 # cmd-j = 'focus down'
 # cmd-k = 'focus up' // I use this for Slack
-cmd-l = 'focus right'
+cmd-l = 'focus right --boundaries-action stop'
 
 cmd-shift-h = 'move left'
 cmd-shift-j = 'move down'
@@ -81,10 +81,12 @@ ctrl-shift-3 = 'move-node-to-workspace 3'
 ctrl-shift-4 = 'move-node-to-workspace 4'
 ctrl-shift-5 = 'move-node-to-workspace 5'
 
+
 ctrl-cmd-shift-1 = 'move-node-to-workspace 6'
 ctrl-cmd-shift-2 = 'move-node-to-workspace 7'
 ctrl-cmd-shift-3 = 'move-node-to-workspace 8'
-ctrl-cmd-shift-4 = 'move-node-to-workspace 9'
+# Can't use 4 here as I use it for screenshot shortcut
+ctrl-shift-9 = 'move-node-to-workspace 9'
 ctrl-cmd-shift-5 = 'move-node-to-workspace 10'
 
 ctrl-alt-r = 'reload-config'
