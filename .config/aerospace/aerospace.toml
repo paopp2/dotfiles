@@ -9,6 +9,38 @@ default-root-container-orientation = 'horizontal'
 accordion-padding = 10
 
 [[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92' #Cursor
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
+if.app-id = 'com.brave.Browser' #Brave
+run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+if.app-id = 'com.facebook.archon.developerID' #Messenger
+run = 'move-node-to-workspace 7'
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap' #Slack
+run = 'move-node-to-workspace 7'
+
+[[on-window-detected]]
+if.app-id = 'com.openai.chat' #ChatGPT
+run = 'move-node-to-workspace 9'
+
+[[on-window-detected]]
+if.app-id = 'md.obsidian' #Obsidian
+run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+if.app-id = 'dev.kdrag0n.MacVirt' #OrbStack
+run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome' #Chrome
+run = 'move-node-to-workspace 8'
+
+[[on-window-detected]]
 if.app-name-regex-substring = 'iTerm2'
 run = ['layout floating']
 
