@@ -7,14 +7,15 @@ default-root-container-layout = 'tiles'
 default-root-container-orientation = 'horizontal'
 
 accordion-padding = 10
-
-[[on-window-detected]]
-if.app-id = 'com.todesktop.230313mzl4w4u92' #Cursor
-run = 'move-node-to-workspace 2'
+on-focus-changed = ['move-mouse window-lazy-center']
 
 [[on-window-detected]]
 if.app-id = 'com.brave.Browser' #Brave
 run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92' #Cursor
+run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.app-id = 'com.facebook.archon.developerID' #Messenger
