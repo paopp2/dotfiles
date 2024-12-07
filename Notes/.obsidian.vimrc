@@ -28,8 +28,9 @@ unmap <Space>
 exmap closeOthers obcommand workspace:close-others
 nnoremap <Space>xo :closeOthers
 
-exmap saveFile obcommand editor:save-file
-nnoremap <Space>s :saveFile
+" Seems obsidian saves files automatically
+" exmap saveFile obcommand editor:save-file
+" nnoremap <Space>s :saveFile
 
 exmap x obcommand workspace:close
 exmap xal obcommand workspace:close-tab-group
