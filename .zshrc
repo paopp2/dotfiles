@@ -85,6 +85,10 @@ alias gsh="git stash"
 alias gshp="git stash pop"
 alias gfa="git fetch --all"
 
+# cd -> zoxide
+export _ZO_RESOLVE_SYMLINKS=1
+eval "$(zoxide init zsh --cmd cd)"
+
 function gco () {
     if [[ $# -eq 0 ]]; then
         gb | fzf --reverse | xargs | cut -d ' ' -f 1 | xargs git checkout
@@ -149,14 +153,9 @@ n () {
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # asdf setup
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
-
-# ZSH Autocomplete related
-zstyle ':autocomplete:history' max 0
-bindkey -M menuselect '\r' .accept-line
 
 # === HapInS JIRA link scripts: ===
 jrl() {
