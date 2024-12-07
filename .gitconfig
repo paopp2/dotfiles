@@ -18,6 +18,9 @@
     diffFilter = delta --color-only
 
 [delta]
+    syntax-theme = Dracula
+    plus-style = syntax "#003800"
+    minus-style = syntax "#3f0001"
     navigate = true    # use n and N to move between diff sections
     side-by-side = true
     hyperlinks = true
