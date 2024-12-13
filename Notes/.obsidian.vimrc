@@ -37,4 +37,4 @@ exmap xal obcommand workspace:close-tab-group
 exmap xall obcommand workspace:close-tab-group
 
 
-set clipboard=unnamedplus
+set clipboard=unnamed
