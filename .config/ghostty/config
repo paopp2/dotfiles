@@ -1,0 +1,29 @@
+# Necessary to avoid the default title (👻)
+title=" "
+
+font-size=20
+
+# Disable font ligatures
+font-feature=-calt
+font-feature=-liga
+font-feature=-dlig
+
+macos-non-native-fullscreen=visible-menu
+quick-terminal-animation-duration=0
+quick-terminal-position=center
+background-opacity=0.85
+background-blur-radius=20
+background=1f1f1f
+
+keybind = cmd+f=toggle_fullscreen
+# SIGINT
+keybind = cmd+c=text:\x03
+
+# cmd+num for tmux tabs
+keybind = cmd+one=text:\x05\x31
+keybind = cmd+two=text:\x05\x32
+keybind = cmd+three=text:\x05\x33
+keybind = cmd+four=text:\x05\x34
+keybind = cmd+five=text:\x05\x35
+
+keybind = cmd+enter=unbind
