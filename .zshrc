@@ -101,34 +101,16 @@ function gcoa {
     gb --all | fzf --reverse | xargs | cut -d ' ' -f 1 | sed 's/^origin\///' | xargs git checkout
 }
 
-# Defaults
-export EDITOR=nvim
-
 # Use vim keybindings for zsh
 bindkey -v
 bindkey -M viins 'kj' vi-cmd-mode
 bindkey -v '^?' backward-delete-char
 
-# ============== My tools/programs ================
-# paths
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk/"
-export FLUTTER_ROOT="$HOME/Tools/flutter"
-
 # fzf keybindings
 eval "$(fzf --zsh)"
 
-# flutter
-export PATH="$PATH:$HOME/Tools/flutter/bin"
-
-# nvm
-export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# java
-export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 
 # nnn
 n () {
