@@ -1,5 +1,6 @@
 # Necessary to avoid the default title (👻)
 title=" "
+theme="OneHalfDark"
 
 font-size=20
 
