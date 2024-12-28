@@ -1,6 +1,7 @@
 # Necessary to avoid the default title (👻)
 title=" "
 theme="iceberg-dark"
+shell-integration=zsh
 
 font-size=20
 
