@@ -2,6 +2,7 @@
 title=" "
 theme="iceberg-dark"
 shell-integration=zsh
+macos-titlebar-proxy-icon=hidden
 
 font-size=20
 
