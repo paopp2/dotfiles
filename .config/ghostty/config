@@ -28,6 +28,8 @@ keybind = cmd+f=toggle_fullscreen
 # SIGINT
 keybind = cmd+c=text:\x03
 
+keybind = unconsumed:cmd+a=unbind
+
 # cmd+num for tmux tabs
 keybind = cmd+one=text:\x05\x31
 keybind = cmd+two=text:\x05\x32
