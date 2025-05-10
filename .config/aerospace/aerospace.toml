@@ -26,6 +26,15 @@ if.app-id = 'com.tinyspeck.slackmacgap' #Slack
 run = 'move-node-to-workspace 7'
 
 [[on-window-detected]]
+if.app-id = 'net.whatsapp.WhatsApp' #WhatsApp
+run = 'move-node-to-workspace 7'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Google Chat'
+run = 'move-node-to-workspace 7'
+
+
+[[on-window-detected]]
 if.app-id = 'com.openai.chat' #ChatGPT
 run = 'move-node-to-workspace 9'
 
