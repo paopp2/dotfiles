@@ -36,5 +36,9 @@ exmap x obcommand workspace:close
 exmap xal obcommand workspace:close-tab-group
 exmap xall obcommand workspace:close-tab-group
 
+nnoremap <Up> <C-u>
+nnoremap <Down> <C-d>
+vnoremap <Up> <C-u>
+vnoremap <Down> <C-d>
 
 set clipboard=unnamed
