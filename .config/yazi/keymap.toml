@@ -1,9 +1,17 @@
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = [ "<C-h>" ]
-run  = 'hidden toggle'
+run  = "hidden toggle"
 desc = "Toggle hidden files"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = [ "<C-c>" ]
 run  = 'shell "drag \"$@\"" --confirm --orphan'
 desc = "Drag selected files"
+
+[[mgr.prepend_keymap]]
+on = [ "z" ]
+run = "plugin zoxide"
+
+[[mgr.prepend_keymap]]
+on = [ "Z" ]
+run = "plugin fzf"
