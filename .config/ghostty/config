@@ -36,4 +36,4 @@ keybind = cmd+two=text:\x05\x32
 keybind = cmd+three=text:\x05\x33
 keybind = cmd+four=text:\x05\x34
 keybind = cmd+five=text:\x05\x35
-
+keybind = shift+enter=text:\n

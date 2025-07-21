@@ -85,3 +85,5 @@ jro() {
 
 # Rust related
 . "$HOME/.cargo/env"
+
+alias claude="/Users/nicolaspaolopepito/.claude/local/claude"
