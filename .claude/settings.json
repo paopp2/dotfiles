@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Awa daw part' | terminal-notifier -sound Blow -title 'Claude Code'"
+          }
+        ]
+      }
+    ]
+  }
+}
