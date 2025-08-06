@@ -53,3 +53,6 @@ alias pr="gh pr view -w"
 alias prs="gh pr list -w"
 alias prs-toreview='gh pr list --search "is:pr is:open -review:approved review-requested:@me" -w'
 alias prs-me='gh pr list --author "@me"'
+
+# Claude Code
+alias cc="claude"
