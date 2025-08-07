@@ -1,3 +1,8 @@
+---
+allowed-tools: Bash(mkdir:*), Bash(cursor:*)
+description: Create a comprehensive implementation plan
+---
+
 # Create Implementation Plan
 
 You are tasked with creating a comprehensive implementation plan for the user's request. Follow these guidelines:
