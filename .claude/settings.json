@@ -1,4 +1,5 @@
 {
+  "includeCoAuthoredBy": false,
   "hooks": {
     "Notification": [
       {
@@ -23,8 +24,7 @@
       }
     ]
   },
-  "feedbackSurveyState": {
-    "lastShownTime": 1754543311910
-  },
-  "includeCoAuthoredBy": false
+  "env": {
+    "DISABLE_ZOXIDE": "1"
+  }
 }

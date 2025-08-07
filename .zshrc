@@ -20,8 +20,10 @@ setopt INC_APPEND_HISTORY
 source ~/.zsh_aliases
 
 # cd -> zoxide
-export _ZO_RESOLVE_SYMLINKS=1
-eval "$(zoxide init zsh --cmd cd)"
+if [ -z "$DISABLE_ZOXIDE" ]; then
+    export _ZO_RESOLVE_SYMLINKS=1
+    eval "$(zoxide init zsh --cmd cd)"
+fi
 
 function gco () {
     if [[ $# -eq 0 ]]; then
@@ -86,4 +88,4 @@ jro() {
 # Rust related
 . "$HOME/.cargo/env"
 
-alias claude="/Users/nicolaspaolopepito/.claude/local/claude"
+# alias claude="/Users/nicolaspaolopepito/.claude/local/claude"
