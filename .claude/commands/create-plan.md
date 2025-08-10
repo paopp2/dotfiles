@@ -1,57 +1,72 @@
 ---
-allowed-tools: Bash(mkdir:*), Bash(cursor:*)
-description: Create a comprehensive implementation plan
+allowed-tools: Bash(mkdir:*), Bash(cursor:*), Write
+description: Create a staged implementation plan aligned with development guidelines
 ---
 
 # Create Implementation Plan
 
-You are tasked with creating a comprehensive implementation plan for the user's request. Follow these guidelines:
+You are tasked with creating an implementation plan aligned with the development guidelines in CLAUDE.md. Follow these guidelines:
+
+## Planning Approach
+- **Break work into 3-5 stages maximum** - Each stage should be independently deliverable
+- **Incremental progress over big bangs** - Small changes that compile and pass tests
+- **Learn from existing code** - Study patterns before implementing
+- **Pragmatic over dogmatic** - Adapt to project reality
 
 ## Setup
 1. Create a `.plan/` directory in the current working directory if it doesn't exist
 2. Generate a markdown implementation plan file in the `.plan/` directory with a descriptive filename
 
-## Plan Structure
-Create a detailed implementation plan that includes:
-
-### Project Analysis
-- Review existing codebase structure and conventions
-- Identify relevant files and directories
-- Check for existing patterns and frameworks in use
-- Review both user's global CLAUDE.md and any project-specific CLAUDE.md files
-
-### Implementation Strategy
-- Break down the implementation into logical phases
-- Each phase should have clear, actionable substeps
-- Keep the approach simple while being comprehensive
-- Identify potential dependencies between phases
-
-### Clarification Requirements
-- List any unclear requirements that need user clarification
-- Identify assumptions that should be validated
-- Note any missing information needed for implementation
-
-### Phase-by-Phase Breakdown
-For each phase:
-- List specific tasks and substeps
-- Suggest appropriate git commit messages based on the actual changes (not just task completion)
-- Include verification/testing steps where applicable
-- Note any manual user actions required
-
-### Important Guidelines
-- **Never run `git add`** - the user handles file staging
-- Always check for manual changes made by the user before suggesting commits
-- Wait for explicit "COMMIT" signal before proceeding with any git commits
-- If no "COMMIT" signal is given, assume further clarification or feedback is needed
-- Follow existing code conventions and patterns found in the codebase
-- Prioritize editing existing files over creating new ones
-- Only create files when absolutely necessary
-
 ## Process
-1. Analyze the user's requirements: {{ARGS}}
-2. Examine the current working directory and codebase
-3. Create the implementation plan following the structure above
+1. **Understand** - Study existing codebase patterns and conventions
+2. **Analyze** the user's requirements: {{ARGS}}
+3. Create the implementation plan in `.plan/` directory
 4. After creating the plan file, automatically open it in the user's active IDE using: `cursor -r ./.plan/{file_name}`
-5. Present the plan to the user and wait for feedback or approval before proceeding
+5. Present the plan and wait for feedback
 
-Remember: Do not make assumptions. When in doubt, ask clarifying questions.
+## Required Plan Structure
+
+```markdown
+# Implementation Plan
+
+## Overview
+[Brief description of what will be built]
+
+## Codebase Analysis
+- Existing patterns found
+- Libraries/frameworks in use
+- Testing approach (if any)
+- Code conventions observed
+
+## Stage 1: [Name]
+**Goal**: [Specific deliverable]
+**Success Criteria**: [Testable outcomes]
+**Tests**: [Specific test cases - skip if no existing test framework]
+**Status**: [Not Started|In Progress|Complete]
+
+## Stage 2: [Name]
+...
+
+[Repeat for 3-5 stages total]
+
+## Quality Gates
+- [ ] Code compiles
+- [ ] Existing tests pass (if any)
+- [ ] Linting/formatting passes
+- [ ] Manual testing complete
+```
+
+## Implementation Guidelines
+- **Single responsibility** per stage
+- **No premature abstractions** - Choose boring solutions
+- **Test-driven when tests exist** - Never disable existing tests
+- **Follow project conventions** - Use existing libraries and patterns
+- **Composition over inheritance** - Prefer dependency injection
+- **Fail fast** with descriptive error messages
+
+## Critical Rules
+- **Never run `git add`** - User handles staging
+- **Only commit when `COMMIT` signal given**
+- **Maximum 3 attempts per issue** - Document failures and try different approach
+- **Study 3 similar implementations** before starting
+- **Remove this file when all stages complete**

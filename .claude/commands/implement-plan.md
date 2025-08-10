@@ -1,6 +1,16 @@
+---
+description: Execute staged implementation plan following development guidelines
+---
+
 # Implement Plan
 
-You are tasked with executing an implementation plan step by step. Follow these guidelines:
+You are tasked with executing an implementation plan following the development guidelines. Follow these principles:
+
+## Core Philosophy
+- **Incremental progress over big bangs** - Complete one stage before moving to next
+- **Learning from existing code** - Study patterns before implementing
+- **Single responsibility per stage** - Each stage should be independently deliverable
+- **Maximum 3 attempts per issue** - Document failures and try different approach
 
 ## Setup
 1. If an implementation file path is provided as an argument: {{ARGS}}, use that file
@@ -9,45 +19,55 @@ You are tasked with executing an implementation plan step by step. Follow these 
    - Check for `.plan/` directory in current working directory and use the most recent file
    - If multiple files exist, ask the user to specify which one to use
 
-## Implementation Process
+## Implementation Flow
 
-### Step-by-Step Execution
+### 1. Understanding Phase
 - Read and understand the complete implementation plan
-- Execute each phase and substep in the exact order specified in the plan
-- Complete one step fully before moving to the next
-- Follow all guidelines and constraints mentioned in the plan
+- Study existing codebase patterns and conventions
+- Identify 3 similar implementations for reference
+- Verify all dependencies and requirements
 
-### After Each Significant Change
-1. **Analyze the actual changes made** (not just the task completed)
-2. **Suggest an appropriate git commit message** based on the specific code changes
-3. **Do NOT run `git add`** - the user handles all file staging
-4. **Wait for the "COMMIT" signal** before proceeding with `git commit`
+### 2. Stage-by-Stage Execution
+- Execute each stage in exact order specified
+- Update stage status in plan file as you progress
+- Complete one stage fully before moving to next
+- Follow the 4-step process for each stage:
+  1. **Understand** - Study existing patterns
+  2. **Test** - Write test first (if tests exist in codebase)
+  3. **Implement** - Minimal code to achieve stage goal
+  4. **Validate** - Run quality checks
 
-### Handling User Feedback
-- If no "COMMIT" signal is given, assume one of the following:
-  - User wants to make manual changes
-  - User has clarifying questions
-  - User wants modifications to the current changes
-- Respond accordingly and wait for further instructions
-- Only proceed to the next step after receiving the "COMMIT" signal
+### 3. After Each Stage Completion
+1. **Update plan status** to "Complete"
+2. **Analyze actual changes made** (not just task completed)
+3. **Suggest commit message** based on specific code changes
+4. **Never run `git add`** - user handles all staging
+5. **Wait for "COMMIT" signal** before proceeding
 
-### Important Guidelines
-- **Never run `git add`** - user handles staging
-- Always check for manual user changes before suggesting commits
-- Base commit messages on actual code changes, not task descriptions
-- Follow existing code conventions found in the codebase
-- Prioritize editing existing files over creating new ones
-- Ask clarifying questions if any step in the plan is unclear
-- Stop and wait for user input whenever uncertain
+### 4. When Stuck (Maximum 3 Attempts)
+1. **Document what failed**: What you tried, errors, why it failed
+2. **Research alternatives**: Find 2-3 different approaches
+3. **Question fundamentals**: Is this the right abstraction level?
+4. **Try different angle**: Different library/pattern/approach
+
+## Critical Rules
+- **Never run `git add`** - User controls staging
+- **Only commit when `COMMIT` signal given**
+- **Base commit messages on actual code changes**, not task descriptions
+- **Follow existing code conventions** found in codebase
+- **Prioritize editing existing files** over creating new ones
+- **Remove plan file when all stages complete**
+- **Run available quality checks** (linters, formatters, build scripts)
 
 ## Process Flow
-1. Load the implementation plan from the specified or inferred file
-2. Present a summary of the phases to be implemented
-3. Begin with Phase 1, Step 1
-4. For each completed step:
-   - Show what was changed
-   - Suggest a commit message based on actual changes
+1. Load implementation plan and present stage summary
+2. Begin with Stage 1
+3. For each stage:
+   - Update status to "In Progress"
+   - Execute using 4-step process
+   - Update status to "Complete"
+   - Show changes and suggest commit message
    - Wait for "COMMIT" signal before proceeding
-5. Continue until all phases are complete
+4. Remove plan file when all stages complete
 
-Remember: The user controls the git workflow. Your job is to implement the code changes and suggest appropriate commit messages, then wait for explicit approval to commit and proceed.
+Remember: You implement the code changes and suggest commit messages. The user controls the git workflow entirely.
