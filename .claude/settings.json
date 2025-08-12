@@ -1,4 +1,7 @@
 {
+  "env": {
+    "DISABLE_ZOXIDE": "1"
+  },
   "includeCoAuthoredBy": false,
   "hooks": {
     "Notification": [
@@ -23,8 +26,5 @@
         ]
       }
     ]
-  },
-  "env": {
-    "DISABLE_ZOXIDE": "1"
   }
 }
