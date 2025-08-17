@@ -21,13 +21,28 @@ You are tasked with executing an implementation plan following the development g
 
 ## Implementation Flow
 
-### 1. Understanding Phase
+### 1. Status Check Phase
+- Read and parse the implementation plan
+- Check current status of all stages:
+  - **No stages started**: Do nothing and exit
+  - **Completed stages**: Verify changes related to these stages exist
+  - **In Progress stages**: Handle continuation logic (see below)
+- Only proceed if there are actionable stages
+
+### 2. In Progress Stage Handling
+For any stage marked "In Progress":
+- Check if changes related to this stage are uncommitted:
+  - **Uncommitted changes**: Stash changes and restart stage from beginning
+  - **Committed changes**: Study existing commits and continue from where left off
+- Use git log and diff to understand current implementation state
+
+### 3. Understanding Phase
 - Read and understand the complete implementation plan
 - Study existing codebase patterns and conventions
 - Identify 3 similar implementations for reference
 - Verify all dependencies and requirements
 
-### 2. Stage-by-Stage Execution
+### 4. Stage-by-Stage Execution
 - Execute each stage in exact order specified
 - Update stage status in plan file as you progress
 - Complete one stage fully before moving to next
@@ -37,14 +52,14 @@ You are tasked with executing an implementation plan following the development g
   3. **Implement** - Minimal code to achieve stage goal
   4. **Validate** - Run quality checks
 
-### 3. After Each Stage Completion
+### 5. After Each Stage Completion
 1. **Update plan status** to "Complete"
 2. **Analyze actual changes made** (not just task completed)
 3. **Suggest commit message** based on specific code changes
 4. **Never run `git add`** - user handles all staging
 5. **Wait for "COMMIT" signal** before proceeding
 
-### 4. When Stuck (Maximum 3 Attempts)
+### 6. When Stuck (Maximum 3 Attempts)
 1. **Document what failed**: What you tried, errors, why it failed
 2. **Research alternatives**: Find 2-3 different approaches
 3. **Question fundamentals**: Is this the right abstraction level?
@@ -60,14 +75,18 @@ You are tasked with executing an implementation plan following the development g
 - **Run available quality checks** (linters, formatters, build scripts)
 
 ## Process Flow
-1. Load implementation plan and present stage summary
-2. Begin with Stage 1
-3. For each stage:
+1. Load implementation plan and check all stage statuses
+2. **Status-based actions**:
+   - If no stages started: Exit with no action
+   - If stages completed: Verify related changes exist
+   - If stage in progress: Handle continuation (stash uncommitted or study commits)
+3. Begin with first actionable stage
+4. For each stage:
    - Update status to "In Progress"
    - Execute using 4-step process
    - Update status to "Complete"
    - Show changes and suggest commit message
    - Wait for "COMMIT" signal before proceeding
-4. Remove plan file when all stages complete
+5. Remove plan file when all stages complete
 
 Remember: You implement the code changes and suggest commit messages. The user controls the git workflow entirely.

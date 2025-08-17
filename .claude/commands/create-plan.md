@@ -9,6 +9,7 @@ You are tasked with creating an implementation plan aligned with the development
 
 ## Planning Approach
 - **Break work into 3-5 stages maximum** - Each stage should be independently deliverable
+- **If more than 5 stages needed** - Split into multiple planning documents (append part-{num} to filename)
 - **Incremental progress over big bangs** - Small changes that compile and pass tests
 - **Learn from existing code** - Study patterns before implementing
 - **Pragmatic over dogmatic** - Adapt to project reality
@@ -16,6 +17,7 @@ You are tasked with creating an implementation plan aligned with the development
 ## Setup
 1. Create a `.plan/` directory in the current working directory if it doesn't exist
 2. Generate a markdown implementation plan file in the `.plan/` directory with a descriptive filename
+3. If the work requires more than 5 stages, create multiple files (e.g., `feature-implementation-part-1.md`, `feature-implementation-part-2.md`)
 
 ## Process
 1. **Understand** - Study existing codebase patterns and conventions
@@ -43,6 +45,11 @@ You are tasked with creating an implementation plan aligned with the development
 **Success Criteria**: [Testable outcomes]
 **Tests**: [Specific test cases - skip if no existing test framework]
 **Status**: [Not Started|In Progress|Complete]
+
+### Sub-steps:
+- [ ] [Step 1] - [atomic, git commit-able change]
+- [ ] [Step 2] - [atomic, git commit-able change]
+- [ ] [Step 3] - [atomic, git commit-able change]
 
 ## Stage 2: [Name]
 ...
