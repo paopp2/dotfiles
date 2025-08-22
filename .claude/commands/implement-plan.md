@@ -55,9 +55,15 @@ For any stage marked "In Progress":
 ### 5. After Each Stage Completion
 1. **Update plan status** to "Complete"
 2. **Analyze actual changes made** (not just task completed)
-3. **Suggest commit message** based on specific code changes
-4. **Never run `git add`** - user handles all staging
-5. **Wait for "COMMIT" signal** before proceeding
+3. **Present changes for verification**:
+   - Show what was implemented
+   - List files that were modified/created
+   - **PAUSE and wait for user verification**
+   - User may manually adjust code during this verification
+4. **After user verification**:
+   - **Suggest commit message** based on specific code changes (including any manual adjustments)
+   - **Never run `git add`** - user handles all staging
+   - **Wait for "COMMIT" signal** before proceeding to next stage
 
 ### 6. When Stuck (Maximum 3 Attempts)
 1. **Document what failed**: What you tried, errors, why it failed
@@ -85,8 +91,10 @@ For any stage marked "In Progress":
    - Update status to "In Progress"
    - Execute using 4-step process
    - Update status to "Complete"
-   - Show changes and suggest commit message
-   - Wait for "COMMIT" signal before proceeding
+   - **Present changes for user verification**
+   - **Wait for user verification (user may manually adjust code)**
+   - Show final changes and suggest commit message
+   - Wait for "COMMIT" signal before proceeding to next stage
 5. Remove plan file when all stages complete
 
 Remember: You implement the code changes and suggest commit messages. The user controls the git workflow entirely.
