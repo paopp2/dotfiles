@@ -16,8 +16,9 @@ You are tasked with creating an implementation plan aligned with the development
 
 ## Setup
 1. Create a `.plan/` directory in the current working directory if it doesn't exist
-2. Generate a markdown implementation plan file in the `.plan/` directory with a descriptive filename
-3. If the work requires more than 5 stages, create multiple files (e.g., `feature-implementation-part-1.md`, `feature-implementation-part-2.md`)
+2. **Always generate a new markdown implementation plan file** in the `.plan/` directory with a descriptive filename
+3. If a related plan file already exists, you may reference it for context, but **create a fresh plan based on the current user instruction**
+4. If the work requires more than 5 stages, create multiple files (e.g., `feature-implementation-part-1.md`, `feature-implementation-part-2.md`)
 
 ## Process
 1. **Understand** - Study existing codebase patterns and conventions
