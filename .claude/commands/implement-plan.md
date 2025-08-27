@@ -95,6 +95,7 @@ For any stage marked "In Progress":
    - **Wait for user verification (user may manually adjust code)**
    - Show final changes and suggest commit message
    - Wait for "COMMIT" signal before proceeding to next stage
-5. Remove plan file when all stages complete
+5. **Self-review phase**: After all stages complete, review all changes and remove any parts that were not absolutely necessary for the task
+6. Remove plan file when all stages complete
 
 Remember: You implement the code changes and suggest commit messages. The user controls the git workflow entirely.
