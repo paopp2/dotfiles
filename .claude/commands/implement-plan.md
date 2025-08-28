@@ -63,7 +63,7 @@ For any stage marked "In Progress":
 4. **After user verification**:
    - **Suggest commit message** based on specific code changes (including any manual adjustments)
    - **Never run `git add`** - user handles all staging
-   - **Wait for "COMMIT" signal** before proceeding to next stage
+   - **Wait for "COMMIT" or "PROCEED" signal** before proceeding to next stage
 
 ### 6. When Stuck (Maximum 3 Attempts)
 1. **Document what failed**: What you tried, errors, why it failed
@@ -74,6 +74,7 @@ For any stage marked "In Progress":
 ## Critical Rules
 - **Never run `git add`** - User controls staging
 - **Only commit when `COMMIT` signal given**
+- **Skip commit when `PROCEED` signal given** - Note changes but move to next stage
 - **Base commit messages on actual code changes**, not task descriptions
 - **Follow existing code conventions** found in codebase
 - **Prioritize editing existing files** over creating new ones
@@ -94,7 +95,9 @@ For any stage marked "In Progress":
    - **Present changes for user verification**
    - **Wait for user verification (user may manually adjust code)**
    - Show final changes and suggest commit message
-   - Wait for "COMMIT" signal before proceeding to next stage
+   - Wait for "COMMIT" or "PROCEED" signal before proceeding to next stage
+   - **COMMIT**: Execute commit and proceed to next stage
+   - **PROCEED**: Skip commit but note the changes and proceed to next stage
 5. **Self-review phase**: After all stages complete, review all changes and remove any parts that were not absolutely necessary for the task
 6. Remove plan file when all stages complete
 
