@@ -62,6 +62,9 @@ You are tasked with creating an implementation plan aligned with the development
 - [ ] Existing tests pass (if any)
 - [ ] Linting/formatting passes
 - [ ] Manual testing complete
+
+## Self-Review Phase
+**After all stages complete**: Review all changes and remove any parts that were not absolutely necessary for the task
 ```
 
 ## Implementation Guidelines
@@ -75,6 +78,7 @@ You are tasked with creating an implementation plan aligned with the development
 ## Critical Rules
 - **Never run `git add`** - User handles staging
 - **Only commit when `COMMIT` signal given**
+- **Skip commit when `PROCEED` signal given** - Note changes but move to next stage
 - **Maximum 3 attempts per issue** - Document failures and try different approach
 - **Study 3 similar implementations** before starting
 - **Remove this file when all stages complete**
