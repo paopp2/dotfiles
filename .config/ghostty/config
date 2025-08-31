@@ -21,6 +21,7 @@ background-blur-radius=30
 quick-terminal-animation-duration=0
 quick-terminal-position=top
 quick-terminal-screen=macos-menu-bar
+quick-terminal-autohide=false
 keybind = global:cmd+enter=toggle_quick_terminal
 window-save-state = always
 
