@@ -58,12 +58,8 @@ For any stage marked "In Progress":
 3. **Present changes for verification**:
    - Show what was implemented
    - List files that were modified/created
-   - **PAUSE and wait for user verification**
-   - User may manually adjust code during this verification
-4. **After user verification**:
-   - **Suggest commit message** based on specific code changes (including any manual adjustments)
-   - **Never run `git add`** - user handles all staging
-   - **Wait for "COMMIT" or "PROCEED" signal** before proceeding to next stage
+   - **PAUSE and wait for `PROCEED` signal**
+   - User may manually adjust code during this verification phase
 
 ### 6. When Stuck (Maximum 3 Attempts)
 1. **Document what failed**: What you tried, errors, why it failed
@@ -72,10 +68,8 @@ For any stage marked "In Progress":
 4. **Try different angle**: Different library/pattern/approach
 
 ## Critical Rules
-- **Never run `git add`** - User controls staging
-- **Only commit when `COMMIT` signal given**
-- **Skip commit when `PROCEED` signal given** - Note changes but move to next stage
-- **Base commit messages on actual code changes**, not task descriptions
+- **Never run git write operations** - Only readonly git commands (status, diff, log) allowed - User handles all git modifications
+- **Only proceed to next stage when `PROCEED` signal given**
 - **Follow existing code conventions** found in codebase
 - **Prioritize editing existing files** over creating new ones
 - **Remove plan file when all stages complete**
@@ -93,12 +87,10 @@ For any stage marked "In Progress":
    - Execute using 4-step process
    - Update status to "Complete"
    - **Present changes for user verification**
-   - **Wait for user verification (user may manually adjust code)**
-   - Show final changes and suggest commit message
-   - Wait for "COMMIT" or "PROCEED" signal before proceeding to next stage
-   - **COMMIT**: Execute commit and proceed to next stage
-   - **PROCEED**: Skip commit but note the changes and proceed to next stage
+   - **Wait for `PROCEED` signal (user may manually adjust code during this time)**
+   - When `PROCEED` is received, check for any manual changes and adapt plan if necessary
+   - Proceed to next stage
 5. **Self-review phase**: After all stages complete, review all changes and remove any parts that were not absolutely necessary for the task
 6. Remove plan file when all stages complete
 
-Remember: You implement the code changes and suggest commit messages. The user controls the git workflow entirely.
+Remember: You implement the code changes. The user controls all git operations entirely.

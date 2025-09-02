@@ -76,9 +76,8 @@ You are tasked with creating an implementation plan aligned with the development
 - **Fail fast** with descriptive error messages
 
 ## Critical Rules
-- **Never run `git add`** - User handles staging
-- **Only commit when `COMMIT` signal given**
-- **Skip commit when `PROCEED` signal given** - Note changes but move to next stage
+- **Never run git write operations** - Only readonly git commands (status, diff, log) allowed - User handles all git modifications
+- **Only proceed to next stage when `PROCEED` signal given**
 - **Maximum 3 attempts per issue** - Document failures and try different approach
 - **Study 3 similar implementations** before starting
 - **Remove this file when all stages complete**
