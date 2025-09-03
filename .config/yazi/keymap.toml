@@ -5,7 +5,7 @@ desc = "Toggle hidden files"
 
 [[mgr.prepend_keymap]]
 on   = [ "<C-c>" ]
-run  = 'shell "drag \"$@\"" --confirm --orphan'
+run  = 'shell "osascript -e \"tell application \\\"System Events\\\" to keystroke return using command down\" && drag \"$@\"" --confirm --orphan'
 desc = "Drag selected files"
 
 [[mgr.prepend_keymap]]
