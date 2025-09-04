@@ -7,6 +7,8 @@ description: Execute staged implementation plan following development guidelines
 You are tasked with executing an implementation plan following the development guidelines. Follow these principles:
 
 ## Core Philosophy
+- **Simple, elegant, minimal solutions** - Every line must earn its place, zero unnecessary complexity
+- **Bug-free over feature-rich** - Correctness trumps everything, zero tolerance for subtle errors
 - **Incremental progress over big bangs** - Complete one stage before moving to next
 - **Learning from existing code** - Study patterns before implementing
 - **Single responsibility per stage** - Each stage should be independently deliverable
@@ -47,10 +49,10 @@ For any stage marked "In Progress":
 - Update stage status in plan file as you progress
 - Complete one stage fully before moving to next
 - Follow the 4-step process for each stage:
-  1. **Understand** - Study existing patterns
-  2. **Test** - Write test first (if tests exist in codebase)
-  3. **Implement** - Minimal code to achieve stage goal
-  4. **Validate** - Run quality checks
+  1. **Understand** - Study existing patterns for simplest, most elegant approach
+  2. **Test** - Write test first (if tests exist in codebase) - design for zero bugs
+  3. **Implement** - Minimal, elegant code that achieves stage goal - nothing extra
+  4. **Validate** - Run quality checks and verify zero bugs, maximum simplicity
 
 ### 5. After Each Stage Completion
 1. **Update plan status** to "Complete"
@@ -90,7 +92,7 @@ For any stage marked "In Progress":
    - **Wait for `PROCEED` signal (user may manually adjust code during this time)**
    - When `PROCEED` is received, check for any manual changes and adapt plan if necessary
    - Proceed to next stage
-5. **Self-review phase**: After all stages complete, review all changes and remove any parts that were not absolutely necessary for the task
+5. **Self-review phase**: After all stages complete, ruthlessly review all changes and remove any parts that were not absolutely necessary for the task. The final result must be minimal, elegant, and completely bug-free.
 6. Remove plan file when all stages complete
 
 Remember: You implement the code changes. The user controls all git operations entirely.

@@ -25,6 +25,7 @@ You are tasked with creating a git commit that follows the strict guidelines def
 ### Message Content
 - **Base on actual changes**: Write the message based on the staged diff, not user instructions
 - **Focus on "why"**: Explain the purpose, not just what was changed
+- **Emphasize simplicity**: Highlight when changes make code simpler, more elegant, or more reliable
 - **Be concise**: 1-2 sentences maximum
 - **Use descriptive language**: `Add validation logic` not `Add stuff`
 

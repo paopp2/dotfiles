@@ -4,6 +4,8 @@
 
 ### Core Beliefs
 
+- **Simple, elegant, minimal code** - Every line must earn its place, every function must be crystal clear
+- **Bug-free over feature-rich** - Correctness trumps complexity, reliability over cleverness
 - **Incremental progress over big bangs** - Small changes that compile and pass existing tests
 - **Learning from existing code** - Study and plan before implementing
 - **Pragmatic over dogmatic** - Adapt to project reality
@@ -11,10 +13,13 @@
 
 ### Simplicity Means
 
-- Single responsibility per function/class
-- Avoid premature abstractions
-- No clever tricks - choose the boring solution
-- If you need to explain it, it's too complex
+- **Minimal viable implementation** - Build only what's needed, nothing more
+- **Elegant solutions** - Code that reads like well-written prose
+- **Single responsibility per function/class** - Each piece has one clear purpose
+- **Zero unnecessary abstractions** - Avoid premature abstractions entirely
+- **No clever tricks** - Choose the boring, obvious solution every time
+- **Self-documenting code** - If you need to explain it, it's too complex
+- **Fewer moving parts** - Less code means fewer bugs
 
 ## Process
 
@@ -36,8 +41,8 @@ Break complex work into 3-5 stages. Document in `IMPLEMENTATION_PLAN.md`:
 
 1. **Understand** - Study existing patterns in codebase
 2. **Test** - Write test first (red) - *skip if no existing tests found*
-3. **Implement** - Minimal code to pass (green)
-4. **Refactor** - Clean up with tests passing (if applicable)
+3. **Implement** - Minimal, elegant code that passes (green) - no excess complexity
+4. **Refactor** - Ruthlessly remove unnecessary code, simplify logic (if applicable)
 5. **Validate** - Run available quality checks (linters, formatters, build scripts, git hooks)
 6. **Wait for PROCEED** - Only proceed to next stage when `PROCEED` signal given
    - Note: User may have made manual changes during the wait - assess and adapt plan if absolutely necessary
@@ -69,10 +74,13 @@ Break complex work into 3-5 stages. Document in `IMPLEMENTATION_PLAN.md`:
 
 ### Architecture Principles
 
+- **Minimal viable architecture** - Build the simplest thing that works correctly
 - **Composition over inheritance** - Use dependency injection
-- **Interfaces over singletons** - Enable testing and flexibility
+- **Interfaces over singletons** - Enable testing and flexibility  
 - **Explicit over implicit** - Clear data flow and dependencies
+- **Elegant abstractions only** - Each abstraction must solve a real problem
 - **Test-driven when tests exist** - Never disable existing tests, fix them instead
+- **Bug prevention over bug fixing** - Design to eliminate entire classes of errors
 
 ### Code Quality
 
@@ -129,11 +137,12 @@ Break complex work into 3-5 stages. Document in `IMPLEMENTATION_PLAN.md`:
 
 When multiple valid approaches exist, choose based on:
 
-1. **Testability** - Can I easily test this? (if tests already exist or if there are none, if it would be easy to add tests for it in the future)
-2. **Readability** - Will someone understand this in 6 months?
-3. **Consistency** - Does this match project patterns?
-4. **Simplicity** - Is this the simplest solution that works?
-5. **Reversibility** - How hard to change later?
+1. **Correctness** - Does this eliminate bugs entirely? Zero tolerance for subtle errors
+2. **Simplicity** - Is this the most minimal, elegant solution that works?
+3. **Readability** - Will someone understand this instantly, in 6 months?
+4. **Testability** - Can I easily test this? (if tests already exist or if there are none, if it would be easy to add tests for it in the future)
+5. **Consistency** - Does this match project patterns?
+6. **Maintainability** - How hard to change later? Prefer solutions that are easy to modify
 
 ## Project Integration
 
@@ -155,6 +164,9 @@ When multiple valid approaches exist, choose based on:
 
 ### Definition of Done
 
+- [ ] **Zero bugs** - Implementation is completely correct and robust
+- [ ] **Minimal code** - Only essential code remains, no unnecessary complexity
+- [ ] **Elegant design** - Solution is obvious and reads naturally
 - [ ] Tests written and passing (only if existing test framework found)
 - [ ] Code follows project conventions
 - [ ] No linter/formatter warnings
