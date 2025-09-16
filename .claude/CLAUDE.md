@@ -199,3 +199,4 @@ When multiple valid approaches exist, choose based on:
 - Wait for explicit `PROCEED` signal before moving to next stage
 - Check for manual user changes when `PROCEED` is given
 - Remember that using `any` type is not recommended. Only use it as an absolute last resort. Otherwise, use the correct type based on the context
+- NEVER EVER REMOVE .plan directory
