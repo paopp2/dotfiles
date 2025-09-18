@@ -32,11 +32,14 @@ keybind = cmd+c=text:\x03
 keybind = unconsumed:cmd+a=unbind
 
 # cmd+num for tmux tabs
-keybind = cmd+one=text:\x05\x31
-keybind = cmd+two=text:\x05\x32
-keybind = cmd+three=text:\x05\x33
-keybind = cmd+four=text:\x05\x34
-keybind = cmd+five=text:\x05\x35
+# (Commented as for some reason, doesn't 
+# work any more as of Ghostty 1.2.0)
+# keybind = cmd+one=text:\x05\x31
+# keybind = cmd+two=text:\x05\x32
+# keybind = cmd+three=text:\x05\x33
+# keybind = cmd+four=text:\x05\x34
+# keybind = cmd+five=text:\x05\x35
+
 keybind = shift+enter=text:\n
 
 # text:\x16 == Ctrl+V
