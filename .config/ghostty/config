@@ -1,6 +1,6 @@
 # Necessary to avoid the default title (👻)
 title=" "
-theme="iceberg-dark"
+theme="Iceberg Dark"
 shell-integration=zsh
 macos-titlebar-proxy-icon=hidden
 
