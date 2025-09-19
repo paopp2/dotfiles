@@ -17,13 +17,13 @@ background-blur-radius=30
 # background=1f1f1f
 
 # After quick terminal size gets feature gets merged, set initial size to full screen
-# For now, manually expand with cursor to desired height
 quick-terminal-animation-duration=0
-quick-terminal-position=top
+quick-terminal-position=center
 quick-terminal-screen=macos-menu-bar
 quick-terminal-autohide=false
 keybind = global:cmd+enter=toggle_quick_terminal
 window-save-state = always
+quick-terminal-size = 100%,100%
 
 keybind = cmd+f=toggle_fullscreen
 # SIGINT
