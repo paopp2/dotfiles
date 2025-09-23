@@ -60,7 +60,7 @@ For any stage marked "In Progress":
 3. **Present changes for verification**:
    - Show what was implemented
    - List files that were modified/created
-   - **PAUSE and wait for `PROCEED` signal**
+   - **IMPORTANT: PAUSE and wait for `PROCEED` signal**
    - User may manually adjust code during this verification phase
 
 ### 6. When Stuck (Maximum 3 Attempts)
@@ -70,8 +70,8 @@ For any stage marked "In Progress":
 4. **Try different angle**: Different library/pattern/approach
 
 ## Critical Rules
-- **Never run git write operations** - Only readonly git commands (status, diff, log) allowed - User handles all git modifications
-- **Only proceed to next stage when `PROCEED` signal given**
+- **IMPORTANT: Never run git write operations** - Only readonly git commands (status, diff, log) allowed - User handles all git modifications
+- **IMPORTANT: Only proceed to next stage when `PROCEED` signal given**
 - **Follow existing code conventions** found in codebase
 - **Prioritize editing existing files** over creating new ones
 - **Remove plan file when all stages complete**
@@ -89,7 +89,7 @@ For any stage marked "In Progress":
    - Execute using 4-step process
    - Update status to "Complete"
    - **Present changes for user verification**
-   - **Wait for `PROCEED` signal (user may manually adjust code during this time)**
+   - **IMPORTANT: Wait for `PROCEED` signal (user may manually adjust code during this time)**
    - When `PROCEED` is received, check for any manual changes and adapt plan if necessary
    - Proceed to next stage
 5. **Self-review phase**: After all stages complete, ruthlessly review all changes and remove any parts that were not absolutely necessary for the task. The final result must be minimal, elegant, and completely bug-free.
