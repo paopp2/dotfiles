@@ -44,8 +44,6 @@ Break complex work into 3-5 stages. Document in `IMPLEMENTATION_PLAN.md`:
 3. **Implement** - Minimal, elegant code that passes (green) - no excess complexity
 4. **Refactor** - Ruthlessly remove unnecessary code, simplify logic (if applicable)
 5. **Validate** - Run available quality checks (linters, formatters, build scripts, git hooks)
-6. **Wait for PROCEED** - Only proceed to next stage when `PROCEED` signal given
-   - Note: User may have made manual changes during the wait - assess and adapt plan if absolutely necessary
 
 ### 3. When Stuck (After 3 Attempts)
 
@@ -119,19 +117,6 @@ Break complex work into 3-5 stages. Document in `IMPLEMENTATION_PLAN.md`:
   - If the repo uses **imperative mood only** (e.g., `Add validation logic`, `Fix crash on load`), follow that instead.
 - **Base the commit message on the actual staged changes**, not just the most recent user instruction. Always inspect the staged diff and summarize that accurately.
 
-### Git Operations
-- Do not run any git operations (`git add`, `git commit`, etc.). The developer handles all git operations.
-
-### Stage Progression
-- Only proceed to the next implementation stage when explicitly instructed with the exact signal: `PROCEED`
-- If the `PROCEED` signal is not given:
-  - Do not proceed to the next stage.
-  - Assume there may be further instructions and respond accordingly.
-  - User may make manual changes between stages - assess these changes when `PROCEED` is given.
-- If the `PROCEED` signal is given:
-  - Check for any manual changes made by the user since the last stage.
-  - Adapt the implementation plan if absolutely necessary based on these changes.
-  - Then proceed with the next stage in the implementation sequence.
 
 ## Decision Framework
 
@@ -190,13 +175,10 @@ When multiple valid approaches exist, choose based on:
 - Disable tests instead of fixing them
 - Commit code that doesn't compile
 - Make assumptions - verify with existing code
-- Run any git operations - developer handles all git operations
 
 **ALWAYS**:
 - Update plan documentation as you go
 - Learn from existing implementations
 - Stop after 3 failed attempts and reassess
-- Wait for explicit `PROCEED` signal before moving to next stage
-- Check for manual user changes when `PROCEED` is given
 - Remember that using `any` type is not recommended. Only use it as an absolute last resort. Otherwise, use the correct type based on the context
 - NEVER EVER REMOVE .plan directory
