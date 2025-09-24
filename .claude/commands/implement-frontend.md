@@ -21,7 +21,7 @@ The command will intelligently parse the input and handle each type appropriatel
 
 - **Simple, elegant, minimal solutions** - Beautiful but not complex
 - **Consistent with existing design** - Study and match current UI patterns
-- **Frontend-only implementation** - Use mock data with easy backend integration points
+- **Mock data by default** - Use mock data and API calls unless user explicitly requests existing functions
 - **Modern and pretty** - Clean, beautiful, but maintainable design
 - **KISS and SOLID principles** - Keep it simple, follow solid architecture
 - **Easy backend integration** - Clear TODO markers for backend connections
@@ -35,6 +35,7 @@ The command will intelligently parse the input and handle each type appropriatel
 - If image path provided: Analyze the design mockup or wireframe to understand UI requirements
 - If text provided: Use as feature requirements directly
 - If combination provided: Process each input type and synthesize requirements
+- **Check for existing function usage**: If user explicitly mentions using existing backend functions, identify and analyze them
 - Validate input and ensure requirements are clear
 
 **Research Phase:**
@@ -48,6 +49,7 @@ The command will intelligently parse the input and handle each type appropriatel
   - Analyze current styling approach (CSS modules, styled-components, Tailwind, etc.)
   - Study color schemes, typography, spacing patterns
   - Identify existing loading and error state patterns
+  - **Search for existing backend functions** if user requested their usage
   - **Infer component structure** from project setup and existing patterns
 
 ### 2. Design Planning
@@ -61,7 +63,9 @@ The command will intelligently parse the input and handle each type appropriatel
 **Feature Architecture:**
 - Design component hierarchy following SOLID principles
 - Plan state management approach (local state, context, store)
-- Design mock data structure that mirrors expected backend API
+- **Choose data approach**:
+  - **Default**: Design mock data structure that mirrors expected backend API
+  - **If existing functions specified**: Plan integration with identified backend functions
 - Plan loading and error state implementations
 
 ### 3. Implementation Phase
@@ -72,16 +76,21 @@ The command will intelligently parse the input and handle each type appropriatel
 - Use existing styling patterns and design tokens
 - Ensure responsive design following current breakpoint patterns
 
-**Mock Data Integration:**
-- Create realistic mock data that represents actual backend responses
-- Add artificial delays (500-1500ms) for loading states
-- Implement error simulation for robust error handling
-- Add clear TODO comments for backend integration points:
-  ```javascript
-  // TODO: Should fetch user profile data from API
-  // TODO: Should update user data here
-  // TODO: Should delete item via API call
-  ```
+**Data Integration:**
+- **Default approach (mock data)**:
+  - Create realistic mock data that represents actual backend responses
+  - Add artificial delays (500-1500ms) for loading states
+  - Implement error simulation for robust error handling
+  - Add clear TODO comments for backend integration points:
+    ```javascript
+    // TODO: Should fetch user profile data from API
+    // TODO: Should update user data here
+    // TODO: Should delete item via API call
+    ```
+- **When existing functions specified**:
+  - Integrate with identified backend functions
+  - Add proper error handling for real API calls
+  - Include TODO comments for any missing backend functionality
 
 **State Management:**
 - Implement loading states with elegant loading indicators
@@ -121,7 +130,9 @@ The command will intelligently parse the input and handle each type appropriatel
 - Ensure consistent styling with existing components
 - Validate that TODOs are clear for backend integration
 
-## Mock Data Guidelines
+## Data Integration Guidelines
+
+### Mock Data Approach (Default)
 
 **Structure:**
 ```javascript
@@ -140,6 +151,15 @@ const mockApiCall = async () => {
   return mockData;
 };
 ```
+
+### Existing Functions Approach (When Specified)
+
+**When user explicitly requests using existing backend functions:**
+- Search codebase for relevant API functions, services, or data fetchers
+- Analyze function signatures and return types
+- Integrate directly with existing functions
+- Add error handling appropriate to the existing patterns
+- Document any missing functionality with specific TODOs
 
 **Data Realism:**
 - Use realistic data that matches expected backend structure
@@ -201,7 +221,8 @@ refactor: extract reusable profile card component
 
 - **Study before implementing**: Always analyze existing patterns first
 - **Consistency over novelty**: Match existing design over new patterns
-- **Mock data must be realistic**: Structure should match expected backend
+- **Mock data by default**: Use mock data unless user explicitly requests existing functions
+- **When existing functions requested**: Search, analyze, and integrate with identified backend functions
 - **Clear integration points**: TODOs must be specific and actionable
 - **Responsive by default**: All components must work across breakpoints
 - **Accessibility compliance**: Follow existing a11y patterns
@@ -213,11 +234,11 @@ refactor: extract reusable profile card component
 
 - [ ] **Beautiful and elegant** - Visually appealing and modern design
 - [ ] **Consistent design** - Matches existing UI patterns perfectly
-- [ ] **Realistic mock data** - Easy to replace with backend integration
+- [ ] **Appropriate data approach** - Mock data by default, existing functions when requested
 - [ ] **Proper loading states** - Elegant loading indicators with delays
 - [ ] **Robust error handling** - Comprehensive error states and recovery
 - [ ] **Clean architecture** - Follows SOLID and KISS principles
-- [ ] **Clear TODOs** - Specific integration points for backend
+- [ ] **Clear integration points** - Specific TODOs for backend (mock approach) or missing functionality (existing functions approach)
 - [ ] **Responsive design** - Works across all existing breakpoints
 - [ ] **Accessible** - Follows existing accessibility patterns
 - [ ] **Atomic commits** - Each commit is focused and runnable
