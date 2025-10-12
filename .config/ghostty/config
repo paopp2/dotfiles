@@ -43,5 +43,6 @@ keybind = shift+enter=text:\n
 # text:\x16 == Ctrl+V
 # context: Claude Code uses Ctrl+V for pasting images so...
 keybind = cmd+shift+v=text:\x16
+keybind = ctrl+shift+e=text:\x07
 
 bell-features = no-attention
