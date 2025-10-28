@@ -15,10 +15,14 @@ You are tasked with creating atomic git commits from the current working tree ch
 - Have **focused scope** (possibly just part of a file, or specific files related to one change)
 - Make the git history **clear and bisectable**
 
+**IMPORTANT**: Having many small atomic commits is **strongly preferred** over fewer large commits. Don't worry about creating "too many" commits—more granular commits make the history easier to understand, review, and bisect. When in doubt, split changes into smaller commits.
+
 ## Process Overview
 
+**Expected Outcome**: You should typically create **many commits** (10, 20, or even more) from your working tree changes. Each commit should be as small and focused as possible while still being self-contained.
+
 1. **Analyze working tree changes**
-2. **Group changes logically** into atomic units
+2. **Group changes logically** into atomic units (lean toward more, smaller units)
 3. **Stage and commit each atomic unit** separately
 4. **Follow repository's commit message style**
 
@@ -40,16 +44,19 @@ Analyze:
 
 ### 2. Identify Atomic Units
 
-Group changes into logical, independent units. Examples:
+Group changes into logical, independent units. **Err on the side of smaller commits**. Examples:
 - Separate feature additions from bug fixes
 - Separate refactoring from new functionality
 - Separate test changes from implementation changes
 - Split unrelated changes in the same file
+- Split a large feature into multiple small steps (e.g., "add function signature", "add implementation", "add validation")
 
 **Important**: You can stage:
 - Entire files: `git add path/to/file.ts`
 - Parts of files: `git add -p path/to/file.ts` (interactive staging)
 - Multiple related files: `git add file1.ts file2.ts`
+
+**Remember**: If you're unsure whether changes should be in one commit or two, split them into two. More commits is always better than fewer.
 
 ### 3. Create Each Atomic Commit
 
@@ -114,14 +121,21 @@ Continue the process until `git status` shows no uncommitted changes.
 
 ## Examples of Atomic Commits
 
-### Good Atomic Commits
+### Good Atomic Commits (More is Better!)
 ```
-Commit 1: feat: add email validation to user registration
-Commit 2: fix: prevent null pointer exception in login handler
-Commit 3: refactor: extract validation logic into separate module
-Commit 4: test: add unit tests for email validator
-Commit 5: docs: update API documentation for auth endpoints
+Commit 1: feat: add email validation function signature
+Commit 2: feat: implement email validation logic
+Commit 3: feat: integrate email validation in user registration
+Commit 4: fix: prevent null pointer exception in login handler
+Commit 5: refactor: extract validation logic into separate file
+Commit 6: refactor: update imports to use new validation module
+Commit 7: test: add unit tests for email validator
+Commit 8: test: add integration tests for user registration
+Commit 9: docs: update API documentation for auth endpoints
+Commit 10: docs: add inline comments to validation module
 ```
+
+**Note**: Ten commits is perfectly fine and actually preferred over combining these changes. Don't hesitate to create even more granular commits.
 
 ### Bad (Non-Atomic) Commits
 ```
@@ -164,7 +178,7 @@ git commit -m "refactor: simplify user validation logic"
 - **Follow project conventions**: Match existing commit style exactly
 - **Handle hooks properly**: Never bypass with `--no-verify`
 - **Verify each commit**: Check it represents one logical change
-- **Keep commits focused**: Better to have more small commits than fewer large ones
+- **Prefer many small commits**: It's perfectly fine—and encouraged—to create dozens of tiny atomic commits. There is no such thing as "too many commits" as long as each is atomic. Ten 5-line commits are better than one 50-line commit.
 
 ## Success Criteria
 
