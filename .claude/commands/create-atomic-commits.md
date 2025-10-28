@@ -7,6 +7,29 @@ description: Create atomic git commits from working tree changes
 
 You are tasked with creating atomic git commits from the current working tree changes. Each commit should represent a single logical change, following the repository's commit message conventions.
 
+## ⚠️ CRITICAL: NO CODE MODIFICATIONS ALLOWED
+
+**THIS IS A COMMIT-ONLY OPERATION. YOU MUST NOT:**
+- Modify any code files
+- Fix bugs or issues you find
+- Refactor or improve existing code
+- Add comments or documentation
+- Format or lint files
+- Make any changes whatsoever to the codebase
+
+**WHAT YOU CAN DO:**
+- Read files to understand what changes exist (using Read tool or git diff)
+- Stage existing changes exactly as they are
+- Create atomic commits from those changes
+- Write appropriate commit messages based on what you read
+
+**WHAT YOU CANNOT DO:**
+- Use Edit or Write tools
+- Modify any file in any way
+- Change even a single character of code
+
+**IF YOU MODIFY ANY CODE, YOU HAVE FAILED THIS TASK.**
+
 ## Understanding Atomic Commits
 
 **Atomic commits** mean each commit should:
@@ -53,8 +76,21 @@ Group changes into logical, independent units. **Err on the side of smaller comm
 
 **Important**: You can stage:
 - Entire files: `git add path/to/file.ts`
-- Parts of files: `git add -p path/to/file.ts` (interactive staging)
+- Parts of files (interactive): `git add -p path/to/file.ts` (interactive staging)
+- Specific line ranges: `git add -L <start>,<end>:path/to/file.ts` (stage lines start through end)
 - Multiple related files: `git add file1.ts file2.ts`
+
+**Line Range Staging Example**:
+```bash
+# Stage only lines 10-25 from file.ts
+git add -L 10,25:src/file.ts
+
+# Stage from line 50 to end of file
+git add -L 50,:src/file.ts
+
+# Verify what's staged
+git diff --staged
+```
 
 **Remember**: If you're unsure whether changes should be in one commit or two, split them into two. More commits is always better than fewer.
 
@@ -153,8 +189,26 @@ git add src/validators/email.ts src/validators/phone.ts
 git commit -m "feat: add email and phone validators"
 ```
 
-### Partial Files (Patch Mode)
-When a file has multiple unrelated changes:
+### Partial Files - Line Range Staging (Recommended for Precision)
+When a file has multiple unrelated changes, use line ranges for precise control:
+```bash
+# Stage only lines 10-50 from user.ts (first logical change)
+git add -L 10,50:src/user.ts
+git diff --staged  # Verify what's staged
+git commit -m "fix: prevent null pointer in getUserById"
+
+# Stage lines 75-120 (second logical change)
+git add -L 75,120:src/user.ts
+git diff --staged  # Verify what's staged
+git commit -m "refactor: simplify user validation logic"
+
+# Stage remaining changes
+git add src/user.ts
+git commit -m "feat: add new user property"
+```
+
+### Partial Files - Interactive Patch Mode (Alternative)
+When you prefer interactive selection:
 ```bash
 git add -p src/user.ts
 # Select only hunks related to one logical change
@@ -165,6 +219,8 @@ git add -p src/user.ts
 git commit -m "refactor: simplify user validation logic"
 ```
 
+**Prefer line range staging (`-L`) when you know the exact lines, as it's more precise and doesn't require interactive prompts.**
+
 ## Error Handling
 
 - **Pre-commit hooks modify files**: Amend the commit to include hook changes
@@ -174,7 +230,9 @@ git commit -m "refactor: simplify user validation logic"
 
 ## Important Constraints
 
-- **NEVER modify code**: Only stage and commit existing changes
+- **NEVER MODIFY CODE - ZERO TOLERANCE**: Only stage and commit existing changes. Do not touch the code at all. Not even whitespace. Not even formatting. Nothing. This is a hard requirement.
+- **Reading is allowed**: Use Read tool or git commands to understand changes and write accurate commit messages
+- **Edit and Write tools are FORBIDDEN**: Do not use Edit or Write tools under any circumstances
 - **Follow project conventions**: Match existing commit style exactly
 - **Handle hooks properly**: Never bypass with `--no-verify`
 - **Verify each commit**: Check it represents one logical change
