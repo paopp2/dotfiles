@@ -11,8 +11,6 @@ You are tasked with creating a Test-Driven Development (TDD) implementation plan
 - **Test-first philosophy** - Write failing tests before implementation code
 - **Red-Green-Refactor cycle** - Each stage follows: failing test → minimal implementation → refactor
 - **Simple, elegant, minimal solutions** - Each stage must produce zero-bug, minimal code
-- **Break work into 3-5 stages maximum** - Each stage should be independently deliverable and testable
-- **If more than 5 stages needed** - Split into multiple planning documents (append part-{num} to filename)
 - **Incremental progress over big bangs** - Small changes that compile and pass tests
 - **Learn from existing code** - Study patterns and testing approaches before implementing
 - **Pragmatic over dogmatic** - Adapt to project reality while maintaining TDD principles
@@ -22,7 +20,6 @@ You are tasked with creating a Test-Driven Development (TDD) implementation plan
 1. Create a `.plan/` directory in the current working directory if it doesn't exist
 2. **Always generate a new markdown implementation plan file** in the `.plan/` directory with a descriptive filename ending in `-tdd.md`
 3. If a related plan file already exists, you may reference it for context, but **create a fresh plan based on the current user instruction**
-4. If the work requires more than 5 stages, create multiple files (e.g., `feature-implementation-tdd-part-1.md`, `feature-implementation-tdd-part-2.md`)
 
 ## Process
 1. **Understand** - Study existing codebase patterns, conventions, and testing frameworks
@@ -82,7 +79,7 @@ You are tasked with creating a Test-Driven Development (TDD) implementation plan
 ## Stage 2: [Name] - TDD Cycle
 ...
 
-[Repeat for 3-5 stages total]
+[Repeat for additional stages as needed]
 
 ## Quality Gates
 - [ ] **All tests pass** - Complete test suite runs successfully

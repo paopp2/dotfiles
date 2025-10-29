@@ -9,8 +9,6 @@ You are tasked with creating an implementation plan aligned with the development
 
 ## Planning Approach
 - **Simple, elegant, minimal solutions** - Each stage must produce zero-bug, minimal code
-- **Break work into 3-5 stages maximum** - Each stage should be independently deliverable
-- **If more than 5 stages needed** - Split into multiple planning documents (append part-{num} to filename)
 - **Incremental progress over big bangs** - Small changes that compile and pass tests
 - **Learn from existing code** - Study patterns before implementing
 - **Pragmatic over dogmatic** - Adapt to project reality
@@ -20,7 +18,6 @@ You are tasked with creating an implementation plan aligned with the development
 1. Create a `.plan/` directory in the current working directory if it doesn't exist
 2. **Always generate a new markdown implementation plan file** in the `.plan/` directory with a descriptive filename
 3. If a related plan file already exists, you may reference it for context, but **create a fresh plan based on the current user instruction**
-4. If the work requires more than 5 stages, create multiple files (e.g., `feature-implementation-part-1.md`, `feature-implementation-part-2.md`)
 
 ## Process
 1. **Understand** - Study existing codebase patterns and conventions
@@ -57,7 +54,7 @@ You are tasked with creating an implementation plan aligned with the development
 ## Stage 2: [Name]
 ...
 
-[Repeat for 3-5 stages total]
+[Repeat for additional stages as needed]
 
 ## Quality Gates
 - [ ] **Zero bugs** - Implementation is completely correct and robust
