@@ -1,6 +1,7 @@
 ---
 allowed-tools: Bash(git:*)
 description: Create atomic git commits from working tree changes
+model: claude-haiku-4-5-20251001
 ---
 
 # Create Atomic Commits Command
