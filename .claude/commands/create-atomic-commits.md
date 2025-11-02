@@ -8,28 +8,38 @@ model: claude-haiku-4-5-20251001
 
 You are tasked with creating atomic git commits from the current working tree changes. Each commit should represent a single logical change, following the repository's commit message conventions.
 
-## ⚠️ CRITICAL: NO CODE MODIFICATIONS ALLOWED
+## ⚠️ CRITICAL: ABSOLUTELY ZERO CODE MODIFICATIONS ALLOWED
 
-**THIS IS A COMMIT-ONLY OPERATION. YOU MUST NOT:**
-- Modify any code files
-- Fix bugs or issues you find
+**THIS IS A READ-ONLY COMMIT ORGANIZATION OPERATION.**
+
+Your ONLY job is to take existing changes in the working tree and organize them into well-structured atomic commits. You are NOT implementing anything. You are NOT fixing anything. You are ONLY organizing what already exists.
+
+**YOU MUST NOT:**
+- Modify any code files in any way whatsoever
+- Fix bugs or issues you find in the changes
 - Refactor or improve existing code
-- Add comments or documentation
-- Format or lint files
-- Make any changes whatsoever to the codebase
+- Add, remove, or modify comments or documentation
+- Format, lint, or clean up files
+- Change indentation, whitespace, or styling
+- Make ANY modifications to the working tree changes
+- Touch the implementation AT ALL
 
-**WHAT YOU CAN DO:**
-- Read files to understand what changes exist (using Read tool or git diff)
-- Stage existing changes exactly as they are
-- Create atomic commits from those changes
+**YOU CAN AND SHOULD:**
+- Read files to understand what changes exist (using Read tool or git diff/git status)
+- Stage existing changes exactly as they are (using git add, git add -p, git add -e)
+- Create atomic commits from those unchanged changes
 - Write appropriate commit messages based on what you read
 
-**WHAT YOU CANNOT DO:**
-- Use Edit or Write tools
+**YOU ABSOLUTELY CANNOT:**
+- Use Edit or Write tools under any circumstances
 - Modify any file in any way
-- Change even a single character of code
+- Change even a single character of the implementation
+- Run formatters, linters, or any tool that modifies files
+- "Improve" or "fix" anything in the changes
 
-**IF YOU MODIFY ANY CODE, YOU HAVE FAILED THIS TASK.**
+**IF YOU MODIFY EVEN ONE CHARACTER OF CODE, YOU HAVE COMPLETELY FAILED THIS TASK.**
+
+The working tree changes are SACRED and UNTOUCHABLE. Your role is purely organizational - splitting existing changes into logical commits.
 
 ## Understanding Atomic Commits
 
@@ -43,11 +53,13 @@ You are tasked with creating atomic git commits from the current working tree ch
 
 ## Process Overview
 
+**REMEMBER**: This is purely an organizational task. The implementation work is already complete in the working tree. You are ONLY splitting those existing changes into logical commits. DO NOT modify any code during this process.
+
 **Expected Outcome**: You should typically create **many commits** (10, 20, or even more) from your working tree changes. Each commit should be as small and focused as possible while still being self-contained.
 
-1. **Analyze working tree changes**
+1. **Analyze working tree changes** (read-only, no modifications)
 2. **Group changes logically** into atomic units (lean toward more, smaller units)
-3. **Stage and commit each atomic unit** separately
+3. **Stage and commit each atomic unit** separately (existing changes only, no modifications)
 4. **Follow repository's commit message style**
 
 ## Step-by-Step Execution
@@ -77,17 +89,20 @@ Group changes into logical, independent units. **Err on the side of smaller comm
 
 **Important**: You can stage:
 - Entire files: `git add path/to/file.ts`
-- Parts of files (interactive): `git add -p path/to/file.ts` (interactive staging)
-- Specific line ranges: `git add -L <start>,<end>:path/to/file.ts` (stage lines start through end)
+- Parts of files interactively: `git add -p path/to/file.ts` (select hunks interactively)
+- Parts of files with edit mode: `git add -e path/to/file.ts` (manually edit what to stage)
 - Multiple related files: `git add file1.ts file2.ts`
 
-**Line Range Staging Example**:
+**Partial File Staging Example**:
 ```bash
-# Stage only lines 10-25 from file.ts
-git add -L 10,25:src/file.ts
+# Interactive patch mode - select hunks one by one
+git add -p src/file.ts
+# Press 'y' to stage a hunk, 'n' to skip, 's' to split, 'e' to edit
 
-# Stage from line 50 to end of file
-git add -L 50,:src/file.ts
+# Edit mode - open editor to manually select what to stage
+git add -e src/file.ts
+# Delete '+' lines you don't want to stage
+# Change '-' to ' ' (space) for deletions you don't want to stage
 
 # Verify what's staged
 git diff --staged
@@ -190,16 +205,23 @@ git add src/validators/email.ts src/validators/phone.ts
 git commit -m "feat: add email and phone validators"
 ```
 
-### Partial Files - Line Range Staging (Recommended for Precision)
-When a file has multiple unrelated changes, use line ranges for precise control:
+### Partial Files - Interactive Patch Mode (Recommended)
+When a file has multiple unrelated changes, use patch mode to interactively select hunks:
 ```bash
-# Stage only lines 10-50 from user.ts (first logical change)
-git add -L 10,50:src/user.ts
+# Stage changes interactively from user.ts
+git add -p src/user.ts
+# You'll see hunks one by one. Options:
+#   y - stage this hunk
+#   n - don't stage this hunk
+#   s - split this hunk into smaller hunks
+#   e - manually edit this hunk
+#   ? - show help
+
 git diff --staged  # Verify what's staged
 git commit -m "fix: prevent null pointer in getUserById"
 
-# Stage lines 75-120 (second logical change)
-git add -L 75,120:src/user.ts
+# Stage next logical change
+git add -p src/user.ts
 git diff --staged  # Verify what's staged
 git commit -m "refactor: simplify user validation logic"
 
@@ -208,19 +230,26 @@ git add src/user.ts
 git commit -m "feat: add new user property"
 ```
 
-### Partial Files - Interactive Patch Mode (Alternative)
-When you prefer interactive selection:
+### Partial Files - Edit Mode (For Precise Line Control)
+When you need precise control over which specific lines to stage, use edit mode:
 ```bash
-git add -p src/user.ts
-# Select only hunks related to one logical change
+# Open editor to manually select lines from user.ts
+git add -e src/user.ts
+# In the editor you'll see a patch with:
+#   Lines starting with '+' are additions - DELETE these lines to NOT stage them
+#   Lines starting with '-' are deletions - CHANGE to ' ' (space) to NOT stage the deletion
+#   Lines starting with ' ' are context - LEAVE THESE ALONE
+# Save and close the editor to stage your selection
+
+git diff --staged  # Verify what's staged
 git commit -m "fix: prevent null pointer in getUserById"
 
-# Then stage remaining changes separately
-git add -p src/user.ts
+# Repeat for next logical change
+git add -e src/user.ts
 git commit -m "refactor: simplify user validation logic"
 ```
 
-**Prefer line range staging (`-L`) when you know the exact lines, as it's more precise and doesn't require interactive prompts.**
+**CRITICAL REMINDER**: You are ONLY selecting which existing changes to stage. DO NOT modify the changes themselves. DO NOT fix bugs, format code, or improve anything. ONLY choose what to stage exactly as it exists.
 
 ## Error Handling
 
@@ -231,12 +260,22 @@ git commit -m "refactor: simplify user validation logic"
 
 ## Important Constraints
 
-- **NEVER MODIFY CODE - ZERO TOLERANCE**: Only stage and commit existing changes. Do not touch the code at all. Not even whitespace. Not even formatting. Nothing. This is a hard requirement.
-- **Reading is allowed**: Use Read tool or git commands to understand changes and write accurate commit messages
-- **Edit and Write tools are FORBIDDEN**: Do not use Edit or Write tools under any circumstances
-- **Follow project conventions**: Match existing commit style exactly
-- **Handle hooks properly**: Never bypass with `--no-verify`
-- **Verify each commit**: Check it represents one logical change
+- **ABSOLUTELY ZERO CODE MODIFICATIONS - ZERO TOLERANCE POLICY**: This command is ONLY for organizing existing changes into commits. You are NOT implementing features, NOT fixing bugs, NOT improving code. Only stage and commit existing changes exactly as they are. Do not touch the code at all. Not even whitespace. Not even formatting. Not even comments. Nothing. This is a hard, non-negotiable requirement. The implementation is COMPLETE and UNTOUCHABLE.
+
+- **This is purely organizational work**: You are organizing completed work into logical commits. The "what" has already been implemented. You are ONLY organizing the "how it's committed."
+
+- **Reading is allowed and required**: Use Read tool or git commands (git diff, git status) to understand what changes exist and write accurate commit messages based on what you find.
+
+- **Edit and Write tools are STRICTLY FORBIDDEN**: Do not use Edit or Write tools under any circumstances. These tools modify files, and file modification is absolutely prohibited in this command.
+
+- **No modification tools allowed**: Do not run formatters, linters, or any tool that changes files. Only use git commands for reading (git diff, git status, git log) and staging (git add).
+
+- **Follow project conventions**: Match existing commit style exactly by studying git log output.
+
+- **Handle hooks properly**: Never bypass hooks with `--no-verify`. If hooks modify files, amend the commit.
+
+- **Verify each commit**: Check that each commit represents one logical change and nothing more.
+
 - **Prefer many small commits**: It's perfectly fine—and encouraged—to create dozens of tiny atomic commits. There is no such thing as "too many commits" as long as each is atomic. Ten 5-line commits are better than one 50-line commit.
 
 ## Success Criteria
