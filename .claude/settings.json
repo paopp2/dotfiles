@@ -3,6 +3,7 @@
     "DISABLE_ZOXIDE": "1"
   },
   "includeCoAuthoredBy": false,
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -31,5 +32,9 @@
     "type": "command",
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
-  }
+  },
+  "enabledPlugins": {
+    "superpowers@superpowers-marketplace": true
+  },
+  "alwaysThinkingEnabled": true
 }
