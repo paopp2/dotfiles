@@ -13,6 +13,7 @@ vim.api.nvim_set_keymap('i', 'kj', '<Esc>', {})
 vim.api.nvim_set_keymap('n', '<Leader>s', ':w<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'tk', ':tabprev<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'tj', ':tabnext<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<Leader>md', ':PeekOpen<CR>', { noremap = true, desc = 'Markdown Preview' })
 
 -- Up/Down to half scroll up/down
 vim.api.nvim_set_keymap('n', '<Up>', '<C-u>', { noremap = true })
