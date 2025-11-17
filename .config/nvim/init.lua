@@ -432,20 +432,28 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
 
+-- Configure servers using vim.lsp.config (Neovim 0.11+)
+for server_name, config in pairs(servers) do
+  vim.lsp.config(server_name, {
+    capabilities = capabilities,
+    settings = config,
+    filetypes = config.filetypes,
+  })
+end
+
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
+  automatic_enable = true,
 }
 
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
-  end
-}
+-- Move on_attach logic to LspAttach autocmd (Neovim 0.11+)
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(ev)
+    local bufnr = ev.buf
+    -- Call the existing on_attach function
+    on_attach(nil, bufnr)
+  end,
+})
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
