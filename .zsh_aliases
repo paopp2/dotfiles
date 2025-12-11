@@ -48,6 +48,38 @@ alias gsh="git stash"
 alias gshp="git stash pop"
 alias gfa="git fetch --all"
 
+# grba - rebase all branches in linear chain onto parent
+function grba {
+  local parent="${1:?Usage: grba <parent-branch>}"
+  local current=$(git rev-parse --abbrev-ref HEAD)
+  local branches=()
+  local merge_base=$(git merge-base "$parent" "$current")
+
+  # Find branches between merge-base and HEAD, sorted by distance
+  while IFS= read -r branch; do
+    [[ "$branch" == "$parent" ]] && continue
+    if git merge-base --is-ancestor "$branch" "$current" && \
+       git merge-base --is-ancestor "$merge_base" "$branch"; then
+      branches+=("$(git rev-list --count "$merge_base".."$branch"):$branch")
+    fi
+  done < <(git branch --format='%(refname:short)')
+
+  IFS=$'\n' branches=($(sort -t: -k1 -n <<<"${branches[*]}")); unset IFS
+
+  local prev="$parent"
+  for entry in "${branches[@]}"; do
+    local branch="${entry#*:}"
+    echo "Rebasing $branch onto $prev..."
+    git checkout "$branch" && git rebase "$prev" || return 1
+    if git rev-parse --abbrev-ref "$branch@{u}" &>/dev/null; then
+      git push --force-with-lease
+    fi
+    prev="$branch"
+  done
+
+  echo "Done. Rebased ${#branches[@]} branch(es)."
+}
+
 # Github Aliases
 alias pr="gh pr view -w"
 alias prs="gh pr list -w"
