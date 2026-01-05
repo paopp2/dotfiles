@@ -10,6 +10,7 @@
 	cm = commit
 [push]
 	autoSetupRemote = true
+	followTags = true
 
 [core]
     pager = delta
