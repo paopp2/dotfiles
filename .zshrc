@@ -89,3 +89,5 @@ jro() {
 . "$HOME/.cargo/env"
 
 # alias claude="/Users/nicolaspaolopepito/.claude/local/claude"
+
+. "$HOME/.local/bin/env"
