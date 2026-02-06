@@ -3,6 +3,7 @@
     "DISABLE_ZOXIDE": "1"
   },
   "includeCoAuthoredBy": false,
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -10,7 +11,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Awa daw part' | terminal-notifier -sound Blow -title 'Claude Code'"
+            "command": "osascript -e 'display notification \"Awaiting input\" with title \"Claude Code\" sound name \"Blow\"'"
           }
         ]
       }
@@ -21,7 +22,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Mana part' | terminal-notifier -sound Blow -title 'Claude Code'"
+            "command": "/Users/npaolopepito/.claude/hooks/stop-notify.sh"
           }
         ]
       }
