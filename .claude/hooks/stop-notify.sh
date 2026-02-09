@@ -34,16 +34,17 @@ if [ -z "$MSG" ]; then
   MSG="Done"
 fi
 
-# Prefix with tmux session name and window number if inside tmux
+# Build title with tmux session name and window number if inside tmux
+TITLE="(S)"
 if [ -n "$TMUX" ]; then
   TMUX_SESSION=$(tmux display-message -p '#S' 2>/dev/null)
   TMUX_WINDOW=$(tmux display-message -p '#I' 2>/dev/null)
   if [ -n "$TMUX_SESSION" ] && [ -n "$TMUX_WINDOW" ]; then
-    MSG="[$TMUX_SESSION $TMUX_WINDOW]: $MSG"
+    TITLE="$TMUX_SESSION $TMUX_WINDOW (S)"
   fi
 fi
 
 # Truncate to 200 chars and escape for AppleScript
 MSG=$(echo "$MSG" | tr '\n' ' ' | head -c 200 | sed 's/\\/\\\\/g; s/"/\\"/g')
 
-osascript -e "display notification \"$MSG\" with title \"Claude Code\" sound name \"Blow\""
+osascript -e "display notification \"$MSG\" with title \"$TITLE\" sound name \"Blow\""
