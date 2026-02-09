@@ -11,6 +11,8 @@ fi
 MSG="Done"
 
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
+  # Wait for transcript to be fully flushed to disk
+  sleep 0.5
   FULL_TEXT=$(tac "$TRANSCRIPT_PATH" | while IFS= read -r line; do
     role=$(echo "$line" | jq -r '.message.role // empty' 2>/dev/null)
     if [ "$role" = "assistant" ]; then
