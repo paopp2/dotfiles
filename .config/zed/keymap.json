@@ -3,6 +3,7 @@
   {
     "bindings": {
       "ctrl-p": "file_finder::Toggle",
+      "ctrl-shift-f": "pane::DeploySearch",
       "ctrl-shift-h": "project_panel::ToggleFocus",
       "alt-shift-g": "git_panel::ToggleFocus",
       "ctrl-h": ["workspace::ActivatePaneInDirection", "Left"],
