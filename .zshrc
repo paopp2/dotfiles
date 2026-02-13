@@ -85,9 +85,13 @@ jro() {
 }
 # =================================
 
+
 # Rust related
 . "$HOME/.cargo/env"
 
 # alias claude="/Users/nicolaspaolopepito/.claude/local/claude"
 
 . "$HOME/.local/bin/env"
+
+# bun completions
+[ -s "/Users/npaolopepito/.bun/_bun" ] && source "/Users/npaolopepito/.bun/_bun"
