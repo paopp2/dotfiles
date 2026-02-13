@@ -18,6 +18,10 @@ if.app-id = 'com.todesktop.230313mzl4w4u92' #Cursor
 run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
+if.app-id = 'dev.zed.Zed-Preview' #Zed Preview
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
 if.app-id = 'com.facebook.archon.developerID' #Messenger
 run = 'move-node-to-workspace 7'
 
