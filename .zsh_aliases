@@ -21,7 +21,7 @@ alias f="fzf"
 alias d="docker"
 alias dc="docker-compose"
 alias awslocal="aws --endpoint-url=http://localhost:4566"
-alias code="cursor" # Remove this should you ever return to VSCode from Cursor
+alias code="zed" # Fuck VSCode and Cursor. We're now using Zed. This is the future
 
 # "r" = yazi; cd on exit
 function r {
