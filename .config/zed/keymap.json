@@ -1,0 +1,165 @@
+[
+  // Global bindings
+  {
+    "bindings": {
+      "ctrl-p": "file_finder::Toggle",
+      "ctrl-shift-h": "project_panel::ToggleFocus",
+      "alt-shift-g": "git_panel::ToggleFocus",
+      "ctrl-h": ["workspace::ActivatePaneInDirection", "Left"],
+      "ctrl-l": ["workspace::ActivatePaneInDirection", "Right"],
+      "ctrl-k": ["workspace::ActivatePaneInDirection", "Up"],
+      "ctrl-j": ["workspace::ActivatePaneInDirection", "Down"],
+      "cmd-1": ["pane::ActivateItem", 0],
+      "cmd-2": ["pane::ActivateItem", 1],
+      "cmd-3": ["pane::ActivateItem", 2],
+      "cmd-4": ["pane::ActivateItem", 3],
+      "cmd-5": ["pane::ActivateItem", 4],
+      "cmd-6": ["pane::ActivateItem", 5],
+      "cmd-7": ["pane::ActivateItem", 6],
+      "cmd-8": ["pane::ActivateItem", 7],
+      "cmd-9": "pane::ActivateLastItem",
+      "ctrl-shift-p": "command_palette::Toggle",
+      "ctrl-w": "pane::CloseActiveItem",
+      "cmd-q": "workspace::CloseWindow"
+    }
+  },
+
+  // When project panel is focused, ctrl+shift+h closes it
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "ctrl-shift-h": "workspace::ToggleLeftDock"
+    }
+  },
+
+  // Kill collab panel shortcut and bind copy relative path
+  {
+    "bindings": {
+      "cmd-shift-c": "editor::CopyFileLocation",
+      "ctrl-shift-c": "editor::CopyFileLocation",
+      "ctrl-shift-r": "editor::CopyFileLocation"
+    }
+  },
+
+  // === VIM: Normal + Visual mode ===
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      // Toggle line comment
+      "ctrl-/": "editor::ToggleComments",
+
+      // Swap ; and : (command mode)
+      ";": "command_palette::Toggle",
+      ":": "vim::RepeatFind",
+
+      // Visual line navigation (j/k move by display line)
+      "j": "vim::Down",
+      "k": "vim::Up",
+
+      // Hover / definition preview (gh)
+      "g h": "editor::Hover",
+
+      // Go to definition (gd) — already default, but explicit
+      "g d": "editor::GoToDefinition",
+
+      // Arrow keys as half-page scroll
+      "up": "vim::ScrollUp",
+      "down": "vim::ScrollDown",
+
+      // Next/prev diagnostic (]e / [e)
+      "] e": "editor::GoToDiagnostic",
+      "[ e": "editor::GoToPreviousDiagnostic",
+
+      // Next/prev git change (]c / [c)
+      "] c": "editor::GoToHunk",
+      "[ c": "editor::GoToPreviousHunk",
+
+      // Replay macro with Q
+      "shift-q": ["workspace::SendKeystrokes", "@ q"]
+    }
+  },
+
+  // === VIM: Normal mode only ===
+  {
+    "context": "vim_mode == normal && !menu",
+    "bindings": {
+      // Leader = space
+      // Save file
+      "space s": "workspace::Save",
+
+      // Tab navigation (tj / tk)
+      "t j": "pane::ActivateNextItem",
+      "t k": "pane::ActivatePrevItem",
+
+      // Yank line content without newline (leader+yy)
+      "space y y": ["workspace::SendKeystrokes", "^ y g _"],
+
+      // Go to 50% of file
+      "space -": ["workspace::SendKeystrokes", "5 0 %"],
+
+      // Select all (leader+a)
+      "space a": ["workspace::SendKeystrokes", "g g shift-v shift-g"],
+
+      // Append semicolon at end of line
+      "space ;": ["workspace::SendKeystrokes", "v escape shift-a ; escape g v escape"],
+
+      // Append comma at end of line
+      "space ,": ["workspace::SendKeystrokes", "v escape shift-a , escape g v escape"],
+
+      // Find all references (leader+gd)
+      "space g d": "editor::FindAllReferences",
+
+      // Fold toggles
+      "space f": "editor::ToggleFold",
+      "space space f": "editor::FoldAll",
+      "space space shift-f": "editor::UnfoldAll",
+
+      // Close other editors (leader+xo)
+      "space x o": "workspace::CloseInactiveTabsAndPanes",
+
+      // AI assistant (leader+l)
+      "space l": "assistant::ToggleFocus",
+
+      // Jump to matching bracket pairs
+      "space (": ["workspace::SendKeystrokes", "[ ( v i ( o"],
+      "space )": ["workspace::SendKeystrokes", "[ ( v % o"],
+      "space {": ["workspace::SendKeystrokes", "[ { v i { o"],
+      "space }": ["workspace::SendKeystrokes", "[ { v % o"]
+    }
+  },
+
+  // === VIM: Multibuffer (references, search results) ===
+  {
+    "context": "vim_mode == normal && multibuffer",
+    "bindings": {
+      "enter": "editor::OpenExcerpts"
+    }
+  },
+
+  // === VIM: Insert mode ===
+  {
+    "context": "vim_mode == insert",
+    "bindings": {
+      // kj to escape
+      "k j": "vim::NormalBefore"
+    }
+  },
+
+  // === VIM: Visual mode ===
+  {
+    "context": "vim_mode == visual && !menu",
+    "bindings": {
+      // Revert selected git changes
+      "u": "editor::RevertSelectedHunks",
+
+      // Hover in visual mode
+      "g h": "editor::Hover",
+
+      // Bracket navigation from visual mode
+      "(": ["workspace::SendKeystrokes", "escape [ ( [ ( v i ( o"],
+      ")": ["workspace::SendKeystrokes", "escape [ ( v % o"],
+      "{": ["workspace::SendKeystrokes", "escape [ { [ { v i { o"],
+      "}": ["workspace::SendKeystrokes", "escape [ { v % o"]
+    }
+  }
+]
