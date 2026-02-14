@@ -26,6 +26,15 @@
     }
   },
 
+  // Tab cycling without modal — sequential order
+  {
+    "context": "Pane",
+    "bindings": {
+      "ctrl-tab": "pane::ActivateNextItem",
+      "ctrl-shift-tab": "pane::ActivatePrevItem"
+    }
+  },
+
   // When project panel is focused, ctrl+shift+h closes it
   {
     "context": "ProjectPanel",
@@ -137,7 +146,9 @@
   {
     "context": "vim_mode == normal && multibuffer",
     "bindings": {
-      "enter": "editor::OpenExcerpts"
+      "enter": "editor::OpenExcerpts",
+      "}": "editor::MoveToStartOfNextExcerpt",
+      "{": "editor::MoveToEndOfPreviousExcerpt"
     }
   },
 

@@ -5,8 +5,18 @@ play = [
 vimd = [
 	{ run = 'nvim -c "autocmd User VeryLazy PeekOpen" "$@"', block = true },
 ]
+zed = [
+	{ run = 'zed-preview -a "$@"', orphan = true },
+]
 
 [open]
 prepend_rules = [
 	{ name = "*.md", use = "vimd" },
+	{ name = "*.{ts,tsx,js,jsx,mjs,cjs}", use = "zed" },
+	{ name = "*.{py,rb,rs,go,java,kt,swift,c,cpp,h,hpp}", use = "zed" },
+	{ name = "*.{css,scss,sass,less,html,svelte,vue}", use = "zed" },
+	{ name = "*.{json,yaml,yml,toml,xml,graphql}", use = "zed" },
+	{ name = "*.{sh,bash,zsh,fish,lua,sql,ex,exs,erl}", use = "zed" },
+	{ name = "*.{dockerfile,makefile,cmake}", use = "zed" },
+	{ name = "{Dockerfile,Makefile,CMakeLists.txt}", use = "zed" },
 ]
