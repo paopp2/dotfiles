@@ -138,7 +138,11 @@
       "space (": ["workspace::SendKeystrokes", "[ ( v i ( o"],
       "space )": ["workspace::SendKeystrokes", "[ ( v % o"],
       "space {": ["workspace::SendKeystrokes", "[ { v i { o"],
-      "space }": ["workspace::SendKeystrokes", "[ { v % o"]
+      "space }": ["workspace::SendKeystrokes", "[ { v % o"],
+
+      // Move tab left/right
+      "> >": "pane::SwapItemRight",
+      "< <": "pane::SwapItemLeft"
     }
   },
 
