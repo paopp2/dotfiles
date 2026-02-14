@@ -1,4 +1,5 @@
 {
+  "icon_theme": "VSCode Icons for Zed (Dark)",
   "theme": "One Monokai",
   "git_panel": {
     "tree_view": true
@@ -21,19 +22,24 @@
   "format_on_save": "on",
   "languages": {
     "TypeScript": {
-      "formatter": "prettier"
+      "formatter": "prettier",
+      "language_servers": ["...", "!biome", "!typescript-language-server"]
     },
     "TSX": {
-      "formatter": "prettier"
+      "formatter": "prettier",
+      "language_servers": ["...", "!biome", "!typescript-language-server"]
     },
     "JavaScript": {
-      "formatter": "prettier"
+      "formatter": "prettier",
+      "language_servers": ["...", "!biome"]
     },
     "JSON": {
-      "formatter": "prettier"
+      "formatter": "prettier",
+      "language_servers": ["...", "!biome"]
     },
     "CSS": {
-      "formatter": "prettier"
+      "formatter": "prettier",
+      "language_servers": ["...", "!biome"]
     },
     "Markdown": {
       "formatter": "prettier"
