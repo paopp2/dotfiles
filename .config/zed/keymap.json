@@ -6,10 +6,10 @@
       "ctrl-shift-f": "pane::DeploySearch",
       "ctrl-shift-h": "project_panel::ToggleFocus",
       "alt-shift-g": "git_panel::ToggleFocus",
-      "ctrl-h": ["workspace::ActivatePaneInDirection", "Left"],
-      "ctrl-l": ["workspace::ActivatePaneInDirection", "Right"],
-      "ctrl-k": ["workspace::ActivatePaneInDirection", "Up"],
-      "ctrl-j": ["workspace::ActivatePaneInDirection", "Down"],
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
       "cmd-1": ["pane::ActivateItem", 0],
       "cmd-2": ["pane::ActivateItem", 1],
       "cmd-3": ["pane::ActivateItem", 2],
@@ -90,7 +90,7 @@
 
       // Tab navigation (tj / tk)
       "t j": "pane::ActivateNextItem",
-      "t k": "pane::ActivatePrevItem",
+      "t k": "pane::ActivatePreviousItem",
 
       // Yank line content without newline (leader+yy)
       "space y y": ["workspace::SendKeystrokes", "^ y g _"],
@@ -143,6 +143,20 @@
     "bindings": {
       // kj to escape
       "k j": "vim::NormalBefore"
+    }
+  },
+
+  // === Edit Predictions: Accept with right arrow ===
+  {
+    "context": "Editor && edit_prediction",
+    "bindings": {
+      "right": "editor::AcceptEditPrediction"
+    }
+  },
+  {
+    "context": "Editor && edit_prediction_conflict",
+    "bindings": {
+      "right": "editor::AcceptEditPrediction"
     }
   },
 
