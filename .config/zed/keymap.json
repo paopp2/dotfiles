@@ -20,6 +20,7 @@
       "cmd-8": ["pane::ActivateItem", 7],
       "cmd-9": "pane::ActivateLastItem",
       "ctrl-shift-p": "command_palette::Toggle",
+      "ctrl-shift-m": "git::OpenModifiedFiles",
       "ctrl-w": "pane::CloseActiveItem",
       "cmd-q": "workspace::CloseWindow"
     }
@@ -114,6 +115,9 @@
       "space f": "editor::ToggleFold",
       "space space f": "editor::FoldAll",
       "space space shift-f": "editor::UnfoldAll",
+
+      // Expand all diff hunks inline (leader+c / Escape to collapse)
+      "space c": "editor::ExpandAllDiffHunks",
 
       // Close other editors (leader+xo)
       "space x o": "workspace::CloseInactiveTabsAndPanes",
