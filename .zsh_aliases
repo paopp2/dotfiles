@@ -93,13 +93,26 @@ alias zed="zed-preview"
 # Diff two commits/branches in Zed's native git diff view
 # Usage: zdf <hash>          → show changes in that commit
 #        zdf <ref1> <ref2>   → diff between two refs
-#        zdf                 → fzf picker (select two commits)
-zdf() {
+#        zdf                 → fzf picker (local commits only)
+#        zdfa                → fzf picker (all branches/tags/remotes)
+# Resolve refs from fzf or args, then open diff in Zed
+# $1 = log mode: "local" or "all"
+# $2+ = explicit refs (optional, skips fzf)
+_zdf_impl() {
+  local mode="$1"; shift
   local ref1 ref2
-  if [[ $# -eq 0 ]]; then
+
+  if [[ $# -eq 1 ]]; then
+    ref1="$1~1"; ref2="$1"
+  elif [[ $# -ge 2 ]]; then
+    ref1="$1"; ref2="$2"
+  else
+    # Interactive fzf picker
+    local -a log_flags=()
+    [[ "$mode" == "all" ]] && log_flags=(--full-history --date-order --branches --tags --remotes)
+
     local git_output
-    git_output=$(git log --graph --oneline --decorate --color=always \
-      --full-history --date-order --branches --tags --remotes)
+    git_output=$(git log --graph --oneline --decorate --color=always "${log_flags[@]}")
 
     # First pick
     local pick1
@@ -132,10 +145,6 @@ zdf() {
     else
       ref1="$hash1"; ref2="$hash2"
     fi
-  elif [[ $# -eq 1 ]]; then
-    ref1="$1~1"; ref2="$1"
-  else
-    ref1="$1"; ref2="$2"
   fi
 
   # Ensure older commit is ref1 (left), newer is ref2 (right)
@@ -167,6 +176,9 @@ zdf() {
     tell application "System Events" to key code 5 using {option down, shift down}
   ') &>/dev/null &
 }
+
+zdf()  { _zdf_impl local "$@"; }
+zdfa() { _zdf_impl all "$@"; }
 
 # Claude Code
 alias cc="claude"
