@@ -4,47 +4,50 @@
   "icon_theme": "VSCode Icons for Zed (Dark)",
   "theme": "One Monokai",
   "git_panel": {
-    "tree_view": true
+    "tree_view": true,
   },
   "vim_mode": true,
   "vim": {
     "use_system_clipboard": "always",
     "use_smartcase_find": true,
-    "toggle_relative_line_numbers": true
+    "toggle_relative_line_numbers": true,
   },
   "relative_line_numbers": "enabled",
   "buffer_font_features": {
     "calt": false,
-    "liga": false
+    "liga": false,
   },
   "scroll_beyond_last_line": "vertical_scroll_margin",
   "wrap_guides": [],
   "soft_wrap": "none",
+  "edit_predictions": {
+    "provider": "supermaven",
+  },
   "formatter": "prettier",
   "format_on_save": "on",
   "languages": {
     "TypeScript": {
       "formatter": "prettier",
-      "language_servers": ["...", "!biome", "!typescript-language-server"]
+      "language_servers": ["...", "!biome", "!typescript-language-server"],
     },
     "TSX": {
       "formatter": "prettier",
-      "language_servers": ["...", "!biome", "!typescript-language-server"]
+      "language_servers": ["...", "!biome", "!typescript-language-server"],
     },
     "JavaScript": {
       "formatter": "prettier",
-      "language_servers": ["...", "!biome"]
+      "language_servers": ["...", "!biome"],
     },
     "JSON": {
       "formatter": "prettier",
-      "language_servers": ["...", "!biome"]
+      "language_servers": ["...", "!biome"],
     },
     "CSS": {
       "formatter": "prettier",
-      "language_servers": ["...", "!biome"]
+      "language_servers": ["...", "!biome"],
     },
     "Markdown": {
-      "formatter": "prettier"
-    }
-  }
+      "formatter": "prettier",
+    },
+  },
 }
