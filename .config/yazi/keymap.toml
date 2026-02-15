@@ -15,3 +15,8 @@ run = "plugin zoxide"
 [[mgr.prepend_keymap]]
 on = [ "Z" ]
 run = "plugin fzf"
+
+[[mgr.prepend_keymap]]
+on = ["c", "c"]
+run = "plugin copy-path-tilde"
+desc = "Copy file path with ~ for home"
