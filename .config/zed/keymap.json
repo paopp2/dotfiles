@@ -22,7 +22,8 @@
       "ctrl-shift-p": "command_palette::Toggle",
       "ctrl-shift-m": "git::OpenModifiedFiles",
       "ctrl-w": "pane::CloseActiveItem",
-      "cmd-q": "workspace::CloseWindow"
+      "cmd-q": "workspace::CloseWindow",
+      "g shift-s": "project_symbols::Toggle"
     }
   },
 
