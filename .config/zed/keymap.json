@@ -138,6 +138,11 @@
       // Expand all diff hunks inline (leader+c / Escape to collapse)
       "space c": "editor::ExpandAllDiffHunks",
 
+      // Breakpoints
+      "space b": "editor::ToggleBreakpoint",
+      "space shift-b": "debugger::ToggleIgnoreBreakpoints",
+      "space d b": "debugger::ClearAllBreakpoints",
+
       // Close other editors (leader+xo)
       "space x o": "workspace::CloseInactiveTabsAndPanes",
 
