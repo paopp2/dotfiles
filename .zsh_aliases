@@ -154,6 +154,9 @@ _zdf_impl() {
     local swap="$ref1"; ref1="$ref2"; ref2="$swap"
   fi
 
+  # Show diff stats summary
+  git diff --shortstat "$ref1" "$ref2"
+
   # Clean up previous zdiff worktrees
   for wt in /tmp/zdiff-*(/N); do
     git worktree remove "$wt" --force 2>/dev/null
