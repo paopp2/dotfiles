@@ -23,7 +23,8 @@
       "ctrl-shift-m": "git::OpenModifiedFiles",
       "ctrl-w": "pane::CloseActiveItem",
       "cmd-q": "workspace::CloseWindow",
-      "g shift-s": "project_symbols::Toggle"
+      "g shift-s": "project_symbols::Toggle",
+      "ctrl-shift-d": "debug_panel::ToggleFocus"
     }
   },
 
@@ -41,6 +42,14 @@
     "context": "ProjectPanel",
     "bindings": {
       "ctrl-shift-h": "workspace::ToggleLeftDock"
+    }
+  },
+
+  // When debug panel is focused, ctrl+shift+d closes it
+  {
+    "context": "DebugPanel",
+    "bindings": {
+      "ctrl-shift-d": "workspace::ToggleBottomDock"
     }
   },
 
@@ -151,7 +160,9 @@
   {
     "context": "vim_mode == normal && multibuffer",
     "bindings": {
-      "enter": "editor::OpenExcerpts",
+      "space shift-f": "editor::ToggleFoldAll",
+      "enter": "editor::ToggleFold",
+      "g enter": "editor::OpenExcerpts",
       "}": "editor::MoveToStartOfNextExcerpt",
       "{": "editor::MoveToEndOfPreviousExcerpt"
     }
