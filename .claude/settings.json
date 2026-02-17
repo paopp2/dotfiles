@@ -1,9 +1,9 @@
 {
   "env": {
-    "DISABLE_ZOXIDE": "1"
+    "DISABLE_ZOXIDE": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "includeCoAuthoredBy": false,
-  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -41,5 +41,7 @@
     "chrome-devtools-mcp@chrome-devtools-plugins": true
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "effortLevel": "medium",
+  "teammateMode": "tmux"
 }
