@@ -1,4 +1,7 @@
 {
+  "title_bar": {
+    "show_sign_in": false,
+  },
   "buffer_font_family": "JetBrains Mono",
   "buffer_font_size": 16,
   "icon_theme": "VSCode Icons for Zed (Dark)",
