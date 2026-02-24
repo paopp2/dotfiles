@@ -53,6 +53,19 @@
     }
   },
 
+  // Tmux-style pane move and swap (ctrl+e prefix)
+  {
+    "bindings": {
+      // Helper bindings for raw splits (used by SendKeystrokes below)
+      "ctrl-shift-alt-'": "pane::SplitRight",
+      "ctrl-shift-alt-;": "pane::SplitDown",
+      // Move file to new right pane: split right, go back, close original, return
+      "ctrl-e '": ["workspace::SendKeystrokes", "ctrl-shift-alt-' ctrl-h ctrl-w ctrl-l"],
+      // Move file to new bottom pane: split down, go back, close original, return
+      "ctrl-e ;": ["workspace::SendKeystrokes", "ctrl-shift-alt-; ctrl-k ctrl-w ctrl-j"],
+    }
+  },
+
   // Kill collab panel shortcut and bind copy relative path
   {
     "bindings": {
@@ -168,8 +181,12 @@
       "space shift-f": "editor::ToggleFoldAll",
       "enter": "editor::ToggleFold",
       "g enter": "editor::OpenExcerpts",
+      "ctrl-shift-alt-enter": "editor::OpenExcerpts",
       "}": "editor::MoveToStartOfNextExcerpt",
-      "{": "editor::MoveToEndOfPreviousExcerpt"
+      "{": "editor::MoveToEndOfPreviousExcerpt",
+      // Open excerpt then move it to a new split
+      "ctrl-e '": ["workspace::SendKeystrokes", "ctrl-shift-alt-enter ctrl-shift-alt-' ctrl-h ctrl-w ctrl-l"],
+      "ctrl-e ;": ["workspace::SendKeystrokes", "ctrl-shift-alt-enter ctrl-shift-alt-; ctrl-k ctrl-w ctrl-j"]
     }
   },
 
