@@ -81,8 +81,8 @@ function grba {
   echo "Done. Rebased ${#branches[@]} branch(es)."
 }
 
-# gwt-sync - Update master and detach all worktrees at that commit
-function gwt-sync {
+# git-wt-sync - Update master and detach all worktrees at that commit
+function git-wt-sync {
   local remote="${1:-origin}"
   local branch="${2:-master}"
 
