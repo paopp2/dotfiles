@@ -81,6 +81,35 @@ function grba {
   echo "Done. Rebased ${#branches[@]} branch(es)."
 }
 
+# gwt-sync - Update master and detach all worktrees at that commit
+function gwt-sync {
+  local remote="${1:-origin}"
+  local branch="${2:-master}"
+
+  git fetch "$remote" "$branch"
+  local hash=$(git rev-parse "$remote/$branch")
+  git branch -f "$branch" "$hash" 2>/dev/null || true
+
+  local root=$(git rev-parse --show-toplevel)
+  git worktree list --porcelain | grep '^worktree ' | sed 's/^worktree //' | while read -r wt; do
+    [[ "$wt" != "$root"* ]] && continue
+    echo "--- Syncing: $wt"
+
+    local stash_output=$(git -C "$wt" stash -u 2>&1)
+    if [[ "$stash_output" != *"No local changes"* ]]; then
+      echo "  Stashed changes"
+    fi
+
+    if [[ "$wt" == "$root" ]]; then
+      git -C "$wt" checkout "$branch"
+    else
+      git -C "$wt" checkout --detach "$hash"
+    fi
+  done
+
+  echo "\nAll worktrees detached at $branch ($hash)"
+}
+
 # Github Aliases
 alias pr="gh pr view -w"
 alias prs="gh pr list -w"
