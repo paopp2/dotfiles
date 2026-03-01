@@ -81,15 +81,43 @@ function grba {
   echo "Done. Rebased ${#branches[@]} branch(es)."
 }
 
-# git-wt-sync - Update master and detach all worktrees at that commit
+# git-wt-sync - Sync all worktrees to a given ref (default: main branch)
+# Usage: git-wt-sync [ref] [remote]
+#   ref    = branch, tag, or commit hash (default: auto-detected main branch)
+#   remote = remote name (default: origin)
 function git-wt-sync {
-  local remote="${1:-origin}"
-  local branch="${2:-master}"
+  local remote="${2:-origin}"
+  local target="$1"
 
-  git fetch "$remote" "$branch"
-  local hash=$(git rev-parse "$remote/$branch")
-  git branch -f "$branch" "$hash" 2>/dev/null || true
+  # Auto-detect main branch if no target given
+  if [[ -z "$target" ]]; then
+    if git show-ref --verify --quiet refs/heads/main; then
+      target="main"
+    elif git show-ref --verify --quiet refs/heads/master; then
+      target="master"
+    else
+      echo "Error: could not detect main branch. Pass a ref explicitly." >&2
+      return 1
+    fi
+  fi
 
+  # Determine if target is a branch on the remote (fetch if so)
+  local hash
+  if git show-ref --verify --quiet "refs/heads/$target" || \
+     git ls-remote --exit-code --heads "$remote" "$target" &>/dev/null; then
+    git fetch "$remote" "$target"
+    hash=$(git rev-parse "$remote/$target")
+    git branch -f "$target" "$hash" 2>/dev/null || true
+  else
+    # Treat as a commit hash, tag, or arbitrary ref
+    hash=$(git rev-parse --verify "$target" 2>/dev/null)
+    if [[ -z "$hash" ]]; then
+      echo "Error: '$target' is not a valid ref." >&2
+      return 1
+    fi
+  fi
+
+  local label="$target"
   local root=$(git rev-parse --show-toplevel)
   git worktree list --porcelain | grep '^worktree ' | sed 's/^worktree //' | while read -r wt; do
     [[ "$wt" != "$root"* ]] && continue
@@ -101,13 +129,13 @@ function git-wt-sync {
     fi
 
     if [[ "$wt" == "$root" ]]; then
-      git -C "$wt" checkout "$branch"
+      git -C "$wt" checkout "$target"
     else
       git -C "$wt" checkout --detach "$hash"
     fi
   done
 
-  echo "\nAll worktrees detached at $branch ($hash)"
+  echo "\nAll worktrees synced at $label (${hash:0:12})"
 }
 
 # Github Aliases
