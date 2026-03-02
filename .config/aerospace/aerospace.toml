@@ -120,8 +120,8 @@ ctrl-cmd-5 = 'workspace 10'
 
 ctrl-cmd-t = 'layout floating tiling'
 
-ctrl-s = 'focus-monitor left'
-ctrl-g = 'focus-monitor right'
+ctrl-s = 'focus-monitor --wrap-around left'
+ctrl-g = 'focus-monitor --wrap-around right'
 
 ctrl-shift-s = 'move-node-to-monitor left'
 ctrl-shift-g = 'move-node-to-monitor right'
