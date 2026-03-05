@@ -8,6 +8,7 @@
   "theme": "One Monokai",
   "git_panel": {
     "tree_view": true,
+    "diff_stats": true,
   },
   "vim_mode": true,
   "vim": {
