@@ -44,17 +44,28 @@ Then for each repo:
 gh api repos/{owner}/{repo}/commits --method GET -f author={username} -f since={since_date} --jq '.[].commit.message' 2>/dev/null
 ```
 
-### 3. Check local changes (if GitHub results are sparse)
+### 3. Check local repositories
 
-If GitHub results are empty or minimal, also check local git repos for uncommitted/unpushed work:
+Always check local git repos for commits and uncommitted work that may not have been pushed to GitHub. Use `zoxide` to discover frequently visited directories:
 
 ```bash
-# Check the current working directory if it's a git repo
-git log --oneline --since="{since_date}" --author="{username}" 2>/dev/null
-
-# Check for uncommitted changes
-git status --short 2>/dev/null
+# Get top zoxide destinations and filter for git repos
+zoxide query -l | head -30
 ```
+
+For each directory that is a git repo (has `.git` or is inside a worktree), check for:
+
+1. **Local commits** not yet on GitHub:
+   ```bash
+   git -C "{dir}" log --oneline --since="{since_date}" --author="{username}" --all 2>/dev/null
+   ```
+
+2. **Uncommitted/unstaged changes**:
+   ```bash
+   git -C "{dir}" status --short 2>/dev/null
+   ```
+
+**Deduplication:** Skip repos whose commits already appeared in the GitHub results from step 2. Match by repo name (basename of directory vs repo name from GitHub). Only include local repos that have *additional* activity not covered by GitHub.
 
 ### 4. Format output
 
