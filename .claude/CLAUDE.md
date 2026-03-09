@@ -85,8 +85,7 @@
 
 ### Setting Up Docs for Review
 When markdown docs need review (research, design, plan, etc.):
-1. Use the `tmux-split` skill to open a new pane, running:
-   `zsh -ic "r .plan/{name-of-directory}/design.md; exec zsh"`
+1. Use the `review-doc` skill to open the doc for review
 - Do NOT open duplicate panes for the same directory — if a plan is written after a design was reviewed, reuse the existing pane since they share the same directory
 
 ## Technical Standards
