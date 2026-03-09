@@ -225,6 +225,12 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+-- Automatically reload files changed outside of Neovim
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI' }, {
+  command = "if mode() != 'c' | checktime | endif",
+})
+
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience
