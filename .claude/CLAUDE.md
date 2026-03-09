@@ -54,6 +54,9 @@
   5. **Validate** - Run available quality checks (linters, formatters, build scripts, git hooks)
 - Use good judgement on when to call a code reviewer — not after every small change, but at meaningful checkpoints
 - After the final code review, run the `/simplify` skill on the changes
+- After finishing, ask the user if they'd like to review the changes:
+  - If they say yes and changes are uncommitted (working tree only): run `code {current-project-path}` to open the directory in Zed
+  - If they say yes and changes are committed: run `zdf` on the relevant commit(s) to open the diff in Zed
 
 ### When Stuck (After 3 Attempts)
 
