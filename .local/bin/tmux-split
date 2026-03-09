@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "Usage: tmux-split [--source-pane <pane_id>] [--print-pane-id] -- <command> [args...]"
+  echo ""
+  echo "Split the current (or specified) tmux pane and run a command."
+  echo ""
+  echo "Options:"
+  echo "  --source-pane <id>   Pane to split from (default: current pane)"
+  echo "  --print-pane-id      Print the new pane ID to stdout"
+  echo "  -h, --help           Show this help"
+  exit 0
+}
+
+SOURCE_PANE=""
+PRINT_PANE_ID=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --source-pane) SOURCE_PANE="$2"; shift 2 ;;
+    --print-pane-id) PRINT_PANE_ID=true; shift ;;
+    -h|--help) usage ;;
+    --) shift; break ;;
+    *) break ;;
+  esac
+done
+
+if [[ $# -eq 0 ]]; then
+  echo "Error: No command specified" >&2
+  echo "Usage: tmux-split [options] -- <command> [args...]" >&2
+  exit 1
+fi
+
+# Default to current pane
+if [[ -z "$SOURCE_PANE" ]]; then
+  SOURCE_PANE=$(tmux display-message -p '#{pane_id}')
+fi
+
+# Smart orientation: split along the longer axis
+# Terminal chars are ~2x taller than wide, so double height to compare actual pixel space
+PANE_WIDTH=$(tmux display-message -t "$SOURCE_PANE" -p '#{pane_width}')
+PANE_HEIGHT=$(tmux display-message -t "$SOURCE_PANE" -p '#{pane_height}')
+SPLIT_FLAG=$( [ "$PANE_WIDTH" -gt $((PANE_HEIGHT * 3)) ] && echo "-h" || echo "-v" )
+
+# Build the command string
+CMD="$*"
+
+if [[ "$PRINT_PANE_ID" == true ]]; then
+  tmux split-window $SPLIT_FLAG -t "$SOURCE_PANE" -P -F '#{pane_id}' "$CMD"
+else
+  tmux split-window $SPLIT_FLAG -t "$SOURCE_PANE" "$CMD"
+fi
