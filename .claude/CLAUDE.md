@@ -85,15 +85,8 @@
 
 ### Setting Up Docs for Review
 When markdown docs need review (research, design, plan, etc.):
-1. Split the tmux window horizontally (vertical if not enough space), **targeting Claude Code's own pane** so the split always opens in the correct window regardless of which window the user is focused on:
-   ```bash
-   CLAUDE_TTY=$(ps -o tty= -p $PPID | tr -d ' ')
-   CLAUDE_PANE=$(tmux list-panes -s -F '#{pane_id} #{pane_tty}' | grep "$CLAUDE_TTY" | awk '{print $1}')
-   tmux split-window -h -t "$CLAUDE_PANE" 'zsh -ic "r .plan/{name-of-directory}/design.md; exec zsh"'
-   ```
-   - `$PPID` resolves to Claude Code's node process; `ps -o tty=` finds its TTY; the tmux lookup maps TTY → pane ID. All values are dynamic per session.
-   - Use `zsh -ic` (interactive shell) so that shell functions from `~/.zsh_aliases` are loaded. Using plain `zsh -c` will fail because `r` won't be defined (zsh's built-in `r` alias for `fc -s` takes over).
-   - The `exec zsh` keeps the pane alive after yazi exits.
+1. Use the `tmux-split` skill to open a new pane, running:
+   `zsh -ic "r .plan/{name-of-directory}/design.md; exec zsh"`
 - Do NOT open duplicate panes for the same directory — if a plan is written after a design was reviewed, reuse the existing pane since they share the same directory
 
 ## Technical Standards
