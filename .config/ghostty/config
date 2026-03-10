@@ -12,8 +12,8 @@ font-feature=-liga
 font-feature=-dlig
 
 macos-non-native-fullscreen=visible-menu
-background-opacity=0.85
-background-blur-radius=30
+background-opacity=0.75
+background-blur=macos-glass-regular
 # background=1f1f1f
 
 # After quick terminal size gets feature gets merged, set initial size to full screen
@@ -25,7 +25,9 @@ keybind = global:cmd+enter=toggle_quick_terminal
 window-save-state = always
 quick-terminal-size = 100%,100%
 
-keybind = cmd+f=toggle_fullscreen
+# Free up cmd+f for scrollback search (new default in 1.3)
+keybind = cmd+shift+f=toggle_fullscreen
+keybind = cmd+shift+o=toggle_background_opacity
 # SIGINT
 keybind = cmd+c=text:\x03
 
