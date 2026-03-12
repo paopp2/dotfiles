@@ -95,3 +95,6 @@ jro() {
 
 # bun completions
 [ -s "/Users/npaolopepito/.bun/_bun" ] && source "/Users/npaolopepito/.bun/_bun"
+
+# Google Cloud SDK
+[ -f "/opt/homebrew/share/google-cloud-sdk/path.zsh.inc" ] && source "/opt/homebrew/share/google-cloud-sdk/path.zsh.inc"
