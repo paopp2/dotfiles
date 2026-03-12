@@ -24,9 +24,7 @@
   "scroll_beyond_last_line": "vertical_scroll_margin",
   "wrap_guides": [],
   "soft_wrap": "none",
-  "edit_predictions": {
-    "provider": "supermaven",
-  },
+  "edit_predictions": {},
   "formatter": "prettier",
   "format_on_save": "on",
   "languages": {
