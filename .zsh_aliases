@@ -240,5 +240,8 @@ _zdf_impl() {
 zdf()  { _zdf_impl local "$@"; }
 zdfa() { _zdf_impl all "$@"; }
 
+# Azure
+alias azs='(( $+commands[az] )) && az account set --subscription "$(az account list --query '"'"'[?name!=`N/A(tenant level account)`].name'"'"' -o tsv | fzf)"'
+
 # Claude Code
 alias cc="claude"
