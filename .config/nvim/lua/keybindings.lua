@@ -56,3 +56,18 @@ vim.api.nvim_set_keymap('n', '<Leader>{', '<Esc>[{v%o', { noremap = true })
 
 -- Map { in visual mode to surround text in curly braces
 vim.api.nvim_set_keymap('x', '{', '<Esc>[{v%o', { noremap = true })
+
+-- Toggle markdown checkbox with Ctrl+Shift+L
+local function toggle_checkbox()
+  local line = vim.api.nvim_get_current_line()
+  local new_line
+  if line:find('%[ %]') then
+    new_line = line:gsub('%[ %]', '[x]', 1)
+  elseif line:find('%[x%]') then
+    new_line = line:gsub('%[x%]', '[ ]', 1)
+  end
+  if new_line then
+    vim.api.nvim_set_current_line(new_line)
+  end
+end
+vim.keymap.set('n', '<C-L>', toggle_checkbox, { noremap = true, desc = 'Toggle markdown checkbox' })
