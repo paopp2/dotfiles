@@ -17,6 +17,9 @@ export HISTSIZE=10000
 setopt HIST_IGNORE_ALL_DUPS
 setopt INC_APPEND_HISTORY
 
+# Machine-local env vars (not tracked in dotfiles)
+[[ -f "$HOME/.zsh_local" ]] && source "$HOME/.zsh_local"
+
 source ~/.zsh_aliases
 
 # cd -> zoxide
@@ -72,29 +75,3 @@ n () {
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-# asdf setup
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-
-# === HapInS JIRA link scripts: ===
-jrl() {
-    echo -n "[AOIKE-$1](https://hapins.atlassian.net/browse/AOIKE-$1)" | pbcopy
-}
-
-jro() {
-    open "https://hapins.atlassian.net/browse/AOIKE-$1"
-}
-# =================================
-
-
-# Rust related
-. "$HOME/.cargo/env"
-
-# alias claude="/Users/nicolaspaolopepito/.claude/local/claude"
-
-. "$HOME/.local/bin/env"
-
-# bun completions
-[ -s "/Users/npaolopepito/.bun/_bun" ] && source "/Users/npaolopepito/.bun/_bun"
-
-# Google Cloud SDK
-[ -f "/opt/homebrew/share/google-cloud-sdk/path.zsh.inc" ] && source "/opt/homebrew/share/google-cloud-sdk/path.zsh.inc"

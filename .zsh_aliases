@@ -21,7 +21,6 @@ alias f="fzf"
 alias d="docker"
 alias dc="docker-compose"
 alias awslocal="aws --endpoint-url=http://localhost:4566"
-alias code="zed" # Fuck VSCode and Cursor. We're now using Zed. This is the future
 
 # "r" = yazi; cd on exit
 function r {
@@ -144,17 +143,23 @@ alias prs="gh pr list -w"
 alias prs-toreview='gh pr list --search "is:pr is:open -review:approved review-requested:@me" -w'
 alias prs-me='gh pr list --author "@me"'
 
-# Zed
-alias zed="zed-preview"
+# Zed (custom build with native commit diff support)
+# Requires ZED_CUSTOM_BUILD env var pointing to the zed repo clone
+# Set it in ~/.zsh_local (not tracked in dotfiles):
+#   export ZED_CUSTOM_BUILD="$HOME/Work/personal/zed"
+if [[ -n "$ZED_CUSTOM_BUILD" && -f "$ZED_CUSTOM_BUILD/target/release/cli" ]]; then
+  alias zed="$ZED_CUSTOM_BUILD/target/release/cli --zed $ZED_CUSTOM_BUILD/target/release/Zed"
+  alias code="zed"
+else
+  alias zed="zed-preview"
+  alias code="zed"
+fi
 
-# Diff two commits/branches in Zed's native git diff view
+# Diff two commits/branches using native Zed diff view
 # Usage: zdf <hash>          → show changes in that commit
 #        zdf <ref1> <ref2>   → diff between two refs
 #        zdf                 → fzf picker (local commits only)
 #        zdfa                → fzf picker (all branches/tags/remotes)
-# Resolve refs from fzf or args, then open diff in Zed
-# $1 = log mode: "local" or "all"
-# $2+ = explicit refs (optional, skips fzf)
 _zdf_impl() {
   local mode="$1"; shift
   local ref1 ref2
@@ -183,7 +188,7 @@ _zdf_impl() {
     local line_num
     line_num=$(echo "$git_output" | sed $'s/\033\\[[0-9;]*m//g' | grep -n "$hash1" | head -1 | cut -d: -f1)
 
-    # Second pick, cursor at same position, highlight first pick in green
+    # Second pick
     local pick2
     pick2=$(echo "$git_output" \
       | awk -v h="$hash1" 'BEGIN{bg="\033[48;2;20;50;20m"}{
@@ -214,31 +219,21 @@ _zdf_impl() {
   # Show diff stats summary
   git diff --shortstat "$ref1" "$ref2"
 
-  # Clean up previous zdiff worktrees
-  for wt in /tmp/zdiff-*(/N); do
-    git worktree remove "$wt" --force 2>/dev/null
-    rm -rf "$wt" 2>/dev/null
-  done
-  git worktree prune 2>/dev/null
-
-  local tmp=$(mktemp -d /tmp/zdiff-XXXXXXXX)
-
-  git worktree add --detach "$tmp" "$ref1" 2>/dev/null
-  git -C "$tmp" diff "$ref1" "$ref2" | git -C "$tmp" apply --allow-empty
-  git -C "$tmp" add -N . 2>/dev/null
-  chmod -R a-w "$tmp"
-
-  # Toggle Ghostty, open Zed, then open git panel
-  osascript -e 'tell application "System Events" to key code 36 using command down' &
-  zed-preview "$tmp"
-  (osascript -e '
-    tell application "Zed Preview" to activate
-    tell application "System Events" to key code 5 using {option down, shift down}
-  ') &>/dev/null &
+  # Open native diff view
+  if [[ -n "$ZED_CUSTOM_BUILD" && -f "$ZED_CUSTOM_BUILD/target/release/cli" ]]; then
+    "$ZED_CUSTOM_BUILD/target/release/cli" --zed "$ZED_CUSTOM_BUILD/target/release/Zed" diff "$ref1" "$ref2"
+  else
+    echo "zdf: ZED_CUSTOM_BUILD not set or release binary not built." >&2
+    echo "  Set ZED_CUSTOM_BUILD in ~/.zsh_local and run: cargo build --release -p zed -p cli" >&2
+    return 1
+  fi
 }
 
 zdf()  { _zdf_impl local "$@"; }
 zdfa() { _zdf_impl all "$@"; }
+
+# Update custom Zed build: rebase on upstream, rebuild
+alias zed-update='cd "$ZED_CUSTOM_BUILD" && git fetch origin && git checkout custom && git rebase origin/main && git push --force-with-lease && cargo build --release -p zed -p cli -v'
 
 # Azure
 alias azs='(( $+commands[az] )) && az account set --subscription "$(az account list --query '"'"'[?name!=`N/A(tenant level account)`].name'"'"' -o tsv | fzf)"'
