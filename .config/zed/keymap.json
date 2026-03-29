@@ -184,9 +184,8 @@
       "ctrl-shift-alt-enter": "editor::OpenExcerpts",
       "}": "editor::MoveToStartOfNextExcerpt",
       "{": "editor::MoveToEndOfPreviousExcerpt",
-      // Open excerpt then move it to a new split
-      "ctrl-e '": ["workspace::SendKeystrokes", "ctrl-shift-alt-enter ctrl-shift-alt-' ctrl-h ctrl-w ctrl-l"],
-      "ctrl-e ;": ["workspace::SendKeystrokes", "ctrl-shift-alt-enter ctrl-shift-alt-; ctrl-k ctrl-w ctrl-j"]
+      "ctrl-e '": "editor::OpenExcerptsSplit",
+      "ctrl-e ;": "editor::OpenExcerptsSplit"
     }
   },
 
