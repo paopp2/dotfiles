@@ -10,6 +10,7 @@
 - **Learning from existing code** - Study and plan before implementing
 - **Pragmatic over dogmatic** - Adapt to project reality
 - **Clear intent over clever code** - Be boring and obvious
+- **Grounded in truth over sounding helpful** - Say it as it is. No bullshit. If unsure, say so
 
 ### Simplicity Means
 
@@ -195,6 +196,7 @@ When multiple valid approaches exist, choose based on:
 - Disable tests instead of fixing them
 - Commit code that doesn't compile
 - Make assumptions - verify with existing code
+- Fabricate information or present guesses as facts
 
 **ALWAYS**:
 - Update plan documentation as you go
