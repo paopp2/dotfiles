@@ -1,4 +1,5 @@
 #!/bin/bash
+current_window_id=$(tmux display-message -p '#{window_id}')
 tmp=$(mktemp)
 tmux list-windows -F '#{window_index}: #{window_name}' > "$tmp"
 
@@ -21,3 +22,5 @@ while IFS=: read -r _ _; do
 done < "$tmp"
 
 rm "$tmp"
+
+tmux select-window -t "$current_window_id"
