@@ -2,8 +2,6 @@
 
 ## Philosophy
 
-### Core Beliefs
-
 - **Simple, elegant, minimal code** - Every line earns its place; code reads like well-written prose
 - **Bug-free over feature-rich** - Correctness trumps complexity, reliability over cleverness
 - **Incremental progress over big bangs** - Small changes that compile and pass existing tests
@@ -16,193 +14,107 @@
 
 ## Communication Style
 
-- Lead with the answer. No preamble, no restating the question
 - No sycophancy: never open with "Great question!", "Sure!", "Absolutely!" or close with "Let me know if you need anything!"
-- Code first, explanation after — and only if non-obvious
+- Code first, explanation after -- and only if non-obvious
 - When corrected, integrate silently. Don't re-announce the behavior change
 - Say "I don't know" rather than speculate. Never reference unread files or APIs
 - ASCII only in output: use -- not em dashes, "quotes" not smart quotes
 
 ## Workflow
 
-### Researching
-- Document research outputs in markdown files organized by topic
-- Standalone research tasks: save to `.research/{sensible-directory-name}/`
-- Research done as part of brainstorming/design: save alongside the design at `.plan/{sensible-directory-name}/`
+### Phase Order
 
-### Brainstorming & Design
-- Use the `superpowers:brainstorming` skill
-- When the design is finalized, document it at `.plan/{sensible-directory-name}/design.md`
-- **STOP after writing the design** — do NOT proceed to implementation planning
-- Set up the design doc for review (see "Setting Up Docs for Review" below)
-- Only proceed with implementation planning after explicit approval
+Not all phases apply to every task -- skip phases as appropriate (e.g., bug fixes may go straight to Implement).
 
-### Implementation Plan Writing
-- Write the plan at `.plan/{sensible-directory-name}/plan.md` (same directory as the design)
-- Load and use the `superpowers:writing-plans` skill
-- If there are frontend-related parts, load relevant frontend skills (e.g., `frontend-design`, `nextjs`, `tailwindcss`, etc.) as appropriate
-- Write/update tests first before implementation when tests are necessary (use `superpowers:test-driven-development` skill; skip for super trivial cases)
-- Keep implementation simple, elegant, and reasonably robust — KISS, ETC, and YAGNI ruthlessly within reason
-- Check quality gates periodically
-
-### Implementation Phase
-- Typically invoked via `/subagent-driven-development {path-to-plan}`, but dispatching an agent team is also a viable option when it makes more sense for the task
-- Before implementing, read the corresponding `design.md` in the same directory for context on rationale behind decisions
-- Follow this loop for each piece of work:
-  1. **Understand** - Study existing patterns in codebase
-  2. **Test** - Write test first (red) - *skip unless existing tests found or asked to set up a new test suite*
-  3. **Implement** - Minimal, elegant code that passes (green) - no excess complexity
-  4. **Refactor** - Ruthlessly remove unnecessary code, simplify logic (if applicable)
-  5. **Validate** - Run available quality checks (linters, formatters, build scripts, git hooks)
-- Use good judgement on when to call a code reviewer — not after every small change, but at meaningful checkpoints
-- After the final code review, run the `/simplify` skill on the changes
-- After finishing, ask the user if they'd like to review the changes:
-  - If they say yes and changes are uncommitted (working tree only): run `code {current-project-path}` to open the directory in Zed
-  - If they say yes and changes are committed: run `zdf` on the relevant commit(s) to open the diff in Zed
+1. **Research** -> save to `.research/{sensible-directory-name}/`; if part of design, save to `.plan/{sensible-directory-name}/`
+2. **Brainstorm & Design** -> use `superpowers:brainstorming`, save to `.plan/{sensible-directory-name}/design.md`, set up for review using `review-doc` skill, then **STOP** -- do NOT proceed without explicit approval
+3. **Implementation Plan** -> only after explicit design approval, use `superpowers:writing-plans`, save to `.plan/{sensible-directory-name}/plan.md`
+   - Load relevant frontend skills (e.g., `frontend-design`, `nextjs`, `tailwindcss`) as appropriate
+   - Write/update tests first when existing tests found or asked to set up new suite (use `superpowers:test-driven-development` skill; skip for trivial cases)
+   - Keep implementation simple and reasonably robust -- KISS, ETC, and YAGNI ruthlessly within reason
+   - Check quality gates periodically
+4. **Implement** -> typically via `/subagent-driven-development {path-to-plan}` or agent team dispatch
+   - Read `design.md` first for rationale context
+   - Follow: Understand -> Test (red) -> Implement (green) -> Refactor -> Validate (run linters, formatters, build scripts, git hooks)
+   - Skip test-first unless existing tests found or asked to set up new suite
+   - Code reviewer at meaningful checkpoints, `/simplify` after final review
+5. **Offer review** -> uncommitted: `code {path}` for Zed; committed: `zdf` on relevant commits
 
 ### When Stuck (After 3 Attempts)
 
 **CRITICAL**: Maximum 3 attempts per issue, then STOP.
 
-1. **Document what failed** at `.gotstuck/{sensible-directory-name}/`:
-   - What you tried
-   - Specific error messages
-   - Why you think it failed
-
-2. **Research alternatives**:
-   - Find 2-3 similar implementations
-   - Note different approaches used
-
-3. **Question fundamentals**:
-   - Is this the right abstraction level?
-   - Can this be split into smaller problems?
-   - Is there a simpler approach entirely?
-
-4. **Try different angle**:
-   - Different library/framework feature?
-   - Different architectural pattern?
-   - Remove abstraction instead of adding?
-
-5. Set up the documentation for review (see "Setting Up Docs for Review")
+1. Document at `.gotstuck/{sensible-directory-name}/`: what tried, specific error messages, why it failed
+2. Research 2-3 alternative implementations
+3. Question fundamentals: right abstraction? split smaller? simpler approach?
+4. Try different angle: different library/pattern? remove abstraction instead of adding?
+5. Set up documentation for review using `review-doc` skill
 
 ### Setting Up Docs for Review
-When markdown docs need review (research, design, plan, etc.):
-1. Use the `review-doc` skill to open the doc for review
-- Do NOT open duplicate panes for the same directory — if a plan is written after a design was reviewed, reuse the existing pane since they share the same directory
+- Use `review-doc` skill. Don't open duplicate panes for same directory.
 
 ## Technical Standards
 
 ### Architecture Principles
 
-- **Minimal viable architecture** - Build the simplest thing that works correctly
 - **Composition over inheritance** - Use dependency injection
-- **Interfaces over singletons** - Enable testing and flexibility  
+- **Interfaces over singletons** - Enable testing and flexibility
 - **Explicit over implicit** - Clear data flow and dependencies
-- **Elegant abstractions only** - Each abstraction must solve a real problem
-- **Test-driven when tests exist** - Never disable existing tests, fix them instead
-- **Bug prevention over bug fixing** - Design to eliminate entire classes of errors
+- **Fail fast** - Descriptive error messages; never silently swallow exceptions
 
 ### Code Quality
 
-- **Every commit must**:
-  - Compile successfully
-  - Pass all existing tests (if any)
-  - Follow project formatting/linting
-  - Run available quality checks (build scripts, pre-commit hooks)
-
-- **Before committing**:
-  - Run formatters/linters if available
-  - Run any build/validation scripts
-  - Self-review changes
-  - Ensure commit message explains "why"
-
-- **Testing approach**:
-  - If tests exist: Include tests for new functionality
-  - If no tests exist: Do not introduce testing framework unless explicitly requested
-
-### Error Handling
-
-- Fail fast with descriptive messages
-- Include context for debugging
-- Handle errors at appropriate level
-- Never silently swallow exceptions
+- **Every commit must**: compile, pass existing tests, follow project formatting/linting, pass quality checks
+- **Before committing**: run formatters/linters, run build/validation scripts, self-review, ensure commit message explains "why"
+- **Testing**: if tests exist, include tests for new features. If no tests, don't introduce framework unless requested
 
 ## Git & Commit Guidelines
 
-### Commit Style
-- Make atomic commits — not one big commit for all changes
-- No need to split a single file across multiple commits
-
-### Commit Message Style
-- Match the repository's existing commit message format. Review previous commits and follow the dominant style. For example:
-  - If the repo uses **Conventional Commits** (e.g., `feat:`, `fix:`), follow that format.
-  - If the repo uses **imperative mood only** (e.g., `Add validation logic`, `Fix crash on load`), follow that instead.
+- Make atomic commits -- not one big commit for all changes. No need to split a single file across multiple commits
+- Review previous commits to discover the dominant commit message style, then match it. Examples:
+  - Conventional Commits: `feat:`, `fix:`
+  - Imperative mood: `Add validation logic`, `Fix crash on load`
 - **Base the commit message on the actual staged changes**, not just the most recent user instruction. Always inspect the staged diff and summarize that accurately.
-
 
 ## Decision Framework
 
 When multiple valid approaches exist, choose based on:
 
-1. **Correctness** - Does this eliminate bugs entirely? Zero tolerance for subtle errors
-2. **Simplicity** - Is this the most minimal, elegant solution that works?
-3. **Readability** - Will someone understand this instantly, in 6 months?
-4. **Testability** - Can I easily test this? (if tests already exist or if there are none, if it would be easy to add tests for it in the future)
-5. **Consistency** - Does this match project patterns?
-6. **Maintainability** - How hard to change later? Prefer solutions that are easy to modify
+1. **Correctness** - Zero tolerance for subtle errors
+2. **Simplicity** - Most minimal solution that works
+3. **Readability** - Understandable in 6 months
+4. **Testability** - Easy to test now or in the future
+5. **Consistency** - Matches project patterns
+6. **Maintainability** - Easy to change later
 
 ## Project Integration
 
-### Learning the Codebase
-
-- Find 3 similar features/components
-- Identify common patterns and conventions
-- Use same libraries/utilities when possible
-- Follow existing test patterns (if any)
-
-### Tooling
-
-- Use project's existing build system
-- Use project's test framework (if any)
-- Use project's formatter/linter settings
+- Find 3 similar features/components before implementing
+- Use same libraries/utilities and patterns as existing code
+- Use project's existing build system, test framework, and formatter/linter settings
 - Don't introduce new tools without strong justification
 
 ## Quality Gates
 
 ### Definition of Done
 
-- [ ] **Zero bugs** - Implementation is completely correct and robust
-- [ ] **Minimal code** - Only essential code remains, no unnecessary complexity
-- [ ] **Elegant design** - Solution is obvious and reads naturally
 - [ ] Tests written and passing (only if existing test framework found)
 - [ ] Code follows project conventions
 - [ ] No linter/formatter warnings
 - [ ] Available quality checks pass (build scripts, git hooks)
-- [ ] Commit messages are clear
+- [ ] Commit messages are clear and explain "why"
 - [ ] Implementation matches plan
 - [ ] No TODOs without issue numbers
-
-### Test Guidelines (When Tests Exist)
-
-- Test behavior, not implementation
-- One assertion per test when possible
-- Clear test names describing scenario
-- Use existing test utilities/helpers
-- Tests should be deterministic
 
 ## Important Reminders
 
 **NEVER**:
 - Use `--no-verify` to bypass commit hooks
 - Disable tests instead of fixing them
-- Commit code that doesn't compile
-- Make assumptions - verify with existing code
-- Fabricate information or present guesses as facts
+- Make assumptions -- verify with existing code
+- Remove `.plan/`, `.research/`, or `.gotstuck/` directories
 
 **ALWAYS**:
 - Update plan documentation as you go
-- Learn from existing implementations
-- Stop after 3 failed attempts and reassess
-- Remember that using `any` type is not recommended. Only use it as an absolute last resort. Otherwise, use the correct type based on the context
-- NEVER EVER REMOVE `.plan/`, `.research/`, or `.gotstuck/` directories
+- Avoid `any` type -- use correct types based on context; `any` is an absolute last resort
 - Do not git add document artifacts in dotfile directories (`.plan/`, `.research/`, `.gotstuck/`, etc.)
