@@ -47,6 +47,10 @@ if.app-name-regex-substring = 'Gemini'
 run = 'move-node-to-workspace 9'
 
 [[on-window-detected]]
+if.app-id = 'com.anthropic.claudefordesktop' #Claude
+run = 'move-node-to-workspace 9'
+
+[[on-window-detected]]
 if.app-id = 'md.obsidian' #Obsidian
 run = 'move-node-to-workspace 4'
 
