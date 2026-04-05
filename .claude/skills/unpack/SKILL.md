@@ -76,29 +76,51 @@ If no explicit flag, infer depth from the user's phrasing:
 
 When language conflicts with a flag, the explicit flag wins.
 
+## Diagrams First
+
+**Default to ASCII diagrams whenever they explain a concept, relationship, or flow better than prose.** This applies at every layer -- even TLDR. A 3-box diagram showing how components connect often says more than two sentences of prose.
+
+Use diagrams for: data flow, component relationships, request lifecycles, state machines, layered architectures, pipelines, decision trees.
+
+Skip diagrams for: single-purpose utilities, trivial configs, concepts that are purely sequential with no branching.
+
+### Diagram detail scales with depth
+
+| Layer | Diagram style |
+|-------|---------------|
+| 1 (TLDR) | High-level boxes and arrows -- major components and how they connect. Labels only, no internals. |
+| 2 (Mental Model) | More detailed -- show subcomponents, data flow direction, key interfaces between parts. |
+| 3 (Walkthrough) | Annotated diagrams alongside prose -- show the path through the system step by step, call out important decision points. |
+| 4 (Edge Cases) | Diagrams showing failure paths, fallback flows, or alternate routes through the system. |
+
 ## The Four Layers
 
-### Layer 1 -- Intent (1-2 sentences)
+### Layer 1 -- Overview (TLDR)
 
-What does this thing do and why does it exist? Zero implementation details. A smart non-technical person should understand this.
+What does this thing do, why does it exist, and how do its major parts connect?
+
+**Prefer an ASCII diagram** showing the high-level components and their relationships over prose. A box-and-arrow diagram of 3-6 components with labeled connections is the ideal TLDR for anything with moving parts. Add 1-2 sentences of context only if the diagram doesn't stand alone.
 
 **For code/files:** State where it fits in the broader system before anything else.
 
-### Layer 2 -- Mental Model (short paragraph or ASCII diagram)
+### Layer 2 -- Mental Model (detailed diagram)
 
-A simplified analogy, metaphor, or diagram showing how the parts relate. This is the scaffold -- name the key components and show their relationships. Prefer spatial/visual representations.
+Zoom into the diagram from Layer 1. Show subcomponents, data flow, key interfaces, and the important boundaries. Name the parts and show how data/control moves between them.
+
+Use analogies or metaphors alongside the diagram when they genuinely clarify -- but the diagram is primary, not the metaphor.
 
 ### Layer 3 -- Walkthrough (the main explanation)
 
 Step through the actual implementation or mechanism:
-- **Constantly map back** to the mental model from Layer 2
+- **Trace a path through the Layer 2 diagram** -- walk through it step by step
 - **Highlight** what's important vs what's incidental
 - **For code:** show relevant code inline within the walkthrough, not as a separate block before the explanation
 - Use concrete examples over abstract descriptions
+- Add annotated diagrams for complex sub-flows (state transitions, retry logic, etc.)
 
 ### Layer 4 -- Edge Cases & Nuance (optional, offer to expand)
 
-Failure modes, tradeoffs, gotchas, common misconceptions, performance characteristics. Don't dump this unless `--deep` is set or there's a critical gotcha the user must know.
+Failure modes, tradeoffs, gotchas, common misconceptions, performance characteristics. Don't dump this unless `--deep` is set or there's a critical gotcha the user must know. Use diagrams for failure/fallback paths when they involve branching logic.
 
 ## Complexity Assessment
 
