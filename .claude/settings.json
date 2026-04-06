@@ -3,7 +3,6 @@
     "DISABLE_ZOXIDE": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "includeCoAuthoredBy": false,
   "hooks": {
     "Notification": [
       {
