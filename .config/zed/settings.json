@@ -1,4 +1,18 @@
 {
+  "project_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "dock": "left"
+  },
+  "collaboration_panel": {
+    "dock": "left"
+  },
+  "agent": {
+    "dock": "right",
+    "favorite_models": [],
+    "model_parameters": []
+  },
   "title_bar": {
     "show_sign_in": false,
   },
@@ -7,6 +21,7 @@
   "icon_theme": "VSCode Icons for Zed (Dark)",
   "theme": "One Monokai",
   "git_panel": {
+    "dock": "left",
     "tree_view": true,
     "diff_stats": true,
   },
