@@ -11,37 +11,48 @@ Explain anything technical using **Layered Elaboration** -- start with intent, b
 
 **Core rule:** Never start with the walkthrough. The most common explanation failure is jumping straight into implementation.
 
+## Output
+
+Write the explanation to a markdown file, then open it for review.
+
+### Output path
+
+- **Default:** `/tmp/unpack/{sensible-name}.md` -- derive the name from the topic (e.g., `auth-middleware.md`, `kubernetes-ingress.md`, `retry-logic.md`). Keep it short, lowercase, kebab-case.
+- **Explicit save:** If the user specifies a path (e.g., `/unpack --save docs/explainers/auth.md ...`), write there instead.
+
+Create the `/tmp/unpack/` directory if it doesn't exist.
+
+### After writing
+
+Open the file for review using `review-doc`:
+
+```bash
+CLAUDE_TTY=$(ps -o tty= -p $PPID | tr -d ' ')
+CLAUDE_PANE=$(tmux list-panes -s -F '#{pane_id} #{pane_tty}' | grep "$CLAUDE_TTY" | awk '{print $1}')
+review-doc --source-pane "$CLAUDE_PANE" <file-path>
+```
+
+**Do NOT duplicate the explanation to the terminal.** The review pane is the primary reading surface. Only print a short status line to the terminal, e.g.: `Wrote explanation to /tmp/unpack/auth-middleware.md -- opening for review.`
+
 ## Argument Parsing
 
 Parse `$ARGUMENTS` in this order:
 
-```dot
-digraph parse {
-  rankdir=TB;
-  "Read $ARGUMENTS" [shape=box];
-  "Is it a file path?" [shape=diamond];
-  "Is it a directory?" [shape=diamond];
-  "Contains function/class name?" [shape=diamond];
-  "Is it text/concept?" [shape=diamond];
-  "Empty?" [shape=diamond];
-  "Read file, explain it" [shape=box];
-  "Read key files, explain module" [shape=box];
-  "Grep/Glob to locate, then explain" [shape=box];
-  "Explain concept (no file needed)" [shape=box];
-  "Use recent context" [shape=box];
-
-  "Read $ARGUMENTS" -> "Is it a file path?";
-  "Is it a file path?" -> "Read file, explain it" [label="yes"];
-  "Is it a file path?" -> "Is it a directory?" [label="no"];
-  "Is it a directory?" -> "Read key files, explain module" [label="yes"];
-  "Is it a directory?" -> "Contains function/class name?" [label="no"];
-  "Contains function/class name?" -> "Grep/Glob to locate, then explain" [label="yes"];
-  "Contains function/class name?" -> "Is it text/concept?" [label="no"];
-  "Is it text/concept?" -> "Explain concept (no file needed)" [label="yes"];
-  "Is it text/concept?" -> "Empty?" [label="no"];
-  "Empty?" -> "Use recent context" [label="yes"];
-}
+```mermaid
+flowchart TB
+    A["Read $ARGUMENTS"] --> B{"Is it a file path?"}
+    B -- yes --> C["Read file, explain it"]
+    B -- no --> D{"Is it a directory?"}
+    D -- yes --> E["Read key files, explain module"]
+    D -- no --> F{"Contains function/class name?"}
+    F -- yes --> G["Grep/Glob to locate, then explain"]
+    F -- no --> H{"Is it text/concept?"}
+    H -- yes --> I["Explain concept (no file needed)"]
+    H -- no --> J{"Empty?"}
+    J -- yes --> K["Use recent context"]
 ```
+
+Also scan for `--save <path>` to override the default output location.
 
 **Examples:**
 - `/unpack src/auth/middleware.ts` -- file path
@@ -49,6 +60,7 @@ digraph parse {
 - `/unpack "the retry logic in handleRequest"` -- concept in codebase
 - `/unpack kubernetes ingress` -- general technical concept
 - `/unpack` -- explain last code/topic in conversation
+- `/unpack --save docs/auth.md src/auth/` -- explicit save location
 
 ## Depth Control
 
@@ -78,20 +90,47 @@ When language conflicts with a flag, the explicit flag wins.
 
 ## Diagrams First
 
-**Default to ASCII diagrams whenever they explain a concept, relationship, or flow better than prose.** This applies at every layer -- even TLDR. A 3-box diagram showing how components connect often says more than two sentences of prose.
+**Default to mermaid diagrams whenever they explain a concept, relationship, or flow better than prose.** This applies at every layer -- even TLDR. A 3-box diagram showing how components connect often says more than two sentences of prose.
 
-Use diagrams for: data flow, component relationships, request lifecycles, state machines, layered architectures, pipelines, decision trees.
+**Always use `flowchart` (never `graph`) as the mermaid keyword** -- `graph` is the legacy alias with worse feature support and may not render in all previewers.
 
-Skip diagrams for: single-purpose utilities, trivial configs, concepts that are purely sequential with no branching.
+### When to use diagrams
+
+Use diagrams for: data flow, component relationships, request lifecycles, state machines, layered architectures, pipelines, decision trees, class/entity relationships, sequence flows.
+
+### When to skip diagrams
+
+Skip diagrams for: single-purpose utilities, trivial configs, concepts that are purely sequential with no branching, or when a short paragraph is genuinely clearer.
+
+### Hybrid approach
+
+Many explanations benefit from **annotated diagrams + prose** rather than one or the other:
+- Use the diagram to show structure/flow, then use prose annotations to explain *why* each part exists or *what* happens at key transitions.
+- Inline code snippets alongside diagrams when walking through implementation.
+- A diagram with 2-3 sentences of context often beats either alone.
 
 ### Diagram detail scales with depth
 
 | Layer | Diagram style |
 |-------|---------------|
 | 1 (TLDR) | High-level boxes and arrows -- major components and how they connect. Labels only, no internals. |
-| 2 (Mental Model) | More detailed -- show subcomponents, data flow direction, key interfaces between parts. |
+| 2 (Mental Model) | More detailed -- show subcomponents, data flow direction, key interfaces between parts. Consider sequence diagrams for request flows. |
 | 3 (Walkthrough) | Annotated diagrams alongside prose -- show the path through the system step by step, call out important decision points. |
 | 4 (Edge Cases) | Diagrams showing failure paths, fallback flows, or alternate routes through the system. |
+
+### Mermaid diagram types
+
+Pick the diagram type that best fits the concept:
+
+| Concept | Mermaid type |
+|---------|-------------|
+| Component relationships, data flow, pipelines | `flowchart` |
+| Request/response lifecycles, multi-actor interactions | `sequenceDiagram` |
+| State machines, lifecycle states | `stateDiagram-v2` |
+| Class/entity relationships | `classDiagram` |
+| Timelines, ordered phases | `timeline` |
+
+Default to `flowchart` when unsure. Use the simplest diagram type that communicates the idea.
 
 ## The Four Layers
 
@@ -99,7 +138,7 @@ Skip diagrams for: single-purpose utilities, trivial configs, concepts that are 
 
 What does this thing do, why does it exist, and how do its major parts connect?
 
-**Prefer an ASCII diagram** showing the high-level components and their relationships over prose. A box-and-arrow diagram of 3-6 components with labeled connections is the ideal TLDR for anything with moving parts. Add 1-2 sentences of context only if the diagram doesn't stand alone.
+**Prefer a mermaid diagram** showing the high-level components and their relationships over prose. A `flowchart` of 3-6 components with labeled connections is the ideal TLDR for anything with moving parts. Add 1-2 sentences of context only if the diagram doesn't stand alone.
 
 **For code/files:** State where it fits in the broader system before anything else.
 
