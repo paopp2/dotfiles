@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SPLIT_FLAG="${1:--v}"
+SELECTION=$(cat)
+
+PANE_PATH=$(tmux display-message -p '#{pane_current_path}')
+CLAUDE="$HOME/.local/bin/claude"
+CLAUDE_ARGS="--continue --fork-session --dangerously-skip-permissions"
+
+if [[ -n "$SELECTION" ]]; then
+  FORMATTED=$(printf 'Regarding:\n```\n%s\n```' "$SELECTION")
+  tmux load-buffer -b claude-fork - <<< "$FORMATTED"
+
+  NEW_PANE=$(tmux split-window "$SPLIT_FLAG" -c "$PANE_PATH" -P -F '#{pane_id}' \
+    "$CLAUDE $CLAUDE_ARGS")
+  tmux select-layout -E
+
+  # Poll until claude shows INSERT mode (ready for input), then paste
+  (
+    for _ in $(seq 1 50); do
+      if tmux capture-pane -t "$NEW_PANE" -p 2>/dev/null | grep -q "INSERT"; then
+        tmux paste-buffer -b claude-fork -t "$NEW_PANE" -p
+        tmux delete-buffer -b claude-fork
+        break
+      fi
+      sleep 0.1
+    done
+  ) &
+else
+  tmux split-window "$SPLIT_FLAG" -c "$PANE_PATH" \
+    "$CLAUDE $CLAUDE_ARGS" \; select-layout -E
+fi
