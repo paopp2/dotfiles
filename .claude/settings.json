@@ -3,6 +3,9 @@
     "DISABLE_ZOXIDE": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "attribution": {
+    "commit": "Assisted by Claude <noreply@anthropic.com>"
+  },
   "hooks": {
     "Notification": [
       {
@@ -40,9 +43,6 @@
     "chrome-devtools-mcp@chrome-devtools-plugins": true,
     "ralph-loop@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true
-  },
-  "attribution": {
-    "commit": "Assisted by Claude <noreply@anthropic.com>"
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
