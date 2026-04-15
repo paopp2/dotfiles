@@ -5,6 +5,8 @@ description: Use when the user asks to explain how something works -- code, a co
 
 # Unpack
 
+> **GLOBAL SKILL** — User-level version. A project-level version may also exist. When this skill loads, announce to the user: "Running global version of unpack."
+
 ## Overview
 
 Explain anything technical using **Layered Elaboration** -- start with intent, build a mental model, then walk through implementation. Based on Reigeluth's Elaboration Theory and Ausubel's Advance Organizers: scaffold understanding before details.
