@@ -8,6 +8,7 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk/"
 export FLUTTER_ROOT="$HOME/Tools/flutter"
+export DSTASK_GIT_REPO="$HOME/Notes/Tasks"
 
 # flutter
 export PATH="$PATH:$HOME/Tools/flutter/bin"

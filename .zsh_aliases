@@ -20,6 +20,7 @@ alias c="caffeinate -d"
 alias f="fzf"
 alias d="docker"
 alias dc="docker-compose"
+alias t="dstask"
 alias awslocal="aws --endpoint-url=http://localhost:4566"
 
 # "r" = yazi; cd on exit
