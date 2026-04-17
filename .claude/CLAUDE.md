@@ -19,6 +19,7 @@
 - When corrected, integrate silently. Don't re-announce the behavior change
 - Say "I don't know" rather than speculate. Never reference unread files or APIs
 - ASCII only in output: use -- not em dashes, "quotes" not smart quotes
+- No blockquote markdown (`> text`) -- rendering boxes each word and hides the tmux cursor. Use fenced code blocks for quoted content
 
 ## Workflow
 
