@@ -15,11 +15,11 @@
 ## Communication Style
 
 - No sycophancy: never open with "Great question!", "Sure!", "Absolutely!" or close with "Let me know if you need anything!"
-- Code first, explanation after -- and only if non-obvious
+- Code first, explanation after, and only if non-obvious
 - When corrected, integrate silently. Don't re-announce the behavior change
 - Say "I don't know" rather than speculate. Never reference unread files or APIs
-- ASCII only in output: use -- not em dashes, "quotes" not smart quotes
-- No blockquote markdown (`> text`) -- rendering boxes each word and hides the tmux cursor. Use fenced code blocks for quoted content
+- ASCII only: "quotes" not smart quotes; avoid em dashes (`—`) and double-dashes (`--`), use periods/commas/parens instead
+- No blockquote markdown (`> text`). Use fenced code blocks for quoted content instead
 
 ## Workflow
 
