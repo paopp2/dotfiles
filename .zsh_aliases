@@ -21,6 +21,7 @@ alias f="fzf"
 alias d="docker"
 alias dc="docker-compose"
 alias t="dstask"
+[ -f ~/.config/dstask/dstask.zsh ] && source ~/.config/dstask/dstask.zsh
 alias awslocal="aws --endpoint-url=http://localhost:4566"
 
 # "r" = yazi; cd on exit
