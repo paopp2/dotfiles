@@ -28,26 +28,35 @@ return {
       },
       keys = (function()
         local function set(state)
-          return function()
-            require('checkmate').toggle(state)
-          end
+          return { rhs = ('<cmd>Checkmate toggle %s<cr>'):format(state), modes = { 'n', 'v' } }
         end
-        local function backlog()
-          local line = vim.api.nvim_get_current_line()
+        -- Rewrite a line to bare `- item` (strips any `[ ]`/`[x]`/etc markers).
+        local function backlog_line(line)
           local indent, rest = line:match('^(%s*)(.*)$')
           local stripped, n = rest:gsub('^([%-%*])%s*%[.%]%s*', '%1 ')
           if n == 0 and not rest:match('^[%-%*]%s') then
             stripped = '- ' .. rest
           end
-          vim.api.nvim_set_current_line(indent .. stripped)
+          return indent .. stripped
+        end
+        local function backlog_range()
+          local s = vim.fn.line('v')
+          local e = vim.fn.line('.')
+          if s > e then s, e = e, s end
+          for l = s, e do
+            vim.fn.setline(l, backlog_line(vim.fn.getline(l)))
+          end
+          if vim.fn.mode():match('[vV\22]') then
+            vim.cmd('normal! \27')
+          end
         end
         return {
-          ['<leader>tp'] = { rhs = set('unchecked'), desc = 'Todo: pending',   modes = { 'n' } },
-          ['<leader>ta'] = { rhs = set('active'),    desc = 'Todo: active',    modes = { 'n' } },
-          ['<leader>tx'] = { rhs = set('checked'),   desc = 'Todo: done',      modes = { 'n' } },
-          ['<leader>t!'] = { rhs = set('blocked'),   desc = 'Todo: blocked',   modes = { 'n' } },
-          ['<leader>t-'] = { rhs = set('cancelled'), desc = 'Todo: cancelled', modes = { 'n' } },
-          ['<leader>tb'] = { rhs = backlog,          desc = 'Todo: backlog',   modes = { 'n' } },
+          ['<leader>tp'] = vim.tbl_extend('force', set('unchecked'), { desc = 'Todo: pending' }),
+          ['<leader>ta'] = vim.tbl_extend('force', set('active'),    { desc = 'Todo: active' }),
+          ['<leader>tx'] = vim.tbl_extend('force', set('checked'),   { desc = 'Todo: done' }),
+          ['<leader>t!'] = vim.tbl_extend('force', set('blocked'),   { desc = 'Todo: blocked' }),
+          ['<leader>t-'] = vim.tbl_extend('force', set('cancelled'), { desc = 'Todo: cancelled' }),
+          ['<leader>tb'] = { rhs = backlog_range, desc = 'Todo: backlog', modes = { 'n', 'v' } },
           ['<leader>tA'] = { rhs = '<cmd>Checkmate archive<cr>', desc = 'Todo: archive', modes = { 'n' } },
         }
       end)(),

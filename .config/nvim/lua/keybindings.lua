@@ -60,24 +60,29 @@ vim.api.nvim_set_keymap('x', '{', '<Esc>[{v%o', { noremap = true })
 -- Toggle markdown checkbox with Ctrl+L.
 -- On a line with [ ] or [x], flip it. On a line without a checkbox, insert one
 -- (promoting bare list items and plain text into `- [ ] ...`).
-local function toggle_checkbox()
-  local line = vim.api.nvim_get_current_line()
-  local new_line
-
+-- Works on the current line in normal mode and on each selected line in visual mode.
+local function toggle_checkbox_line(line)
   if line:find('%[ %]') then
-    new_line = line:gsub('%[ %]', '[x]', 1)
+    return (line:gsub('%[ %]', '[x]', 1))
   elseif line:find('%[x%]') then
-    new_line = line:gsub('%[x%]', '[ ]', 1)
-  else
-    local indent, rest = line:match('^(%s*)(.*)$')
-    local marker, text = rest:match('^([%-%*])%s+(.*)$')
-    if marker then
-      new_line = indent .. marker .. ' [ ] ' .. text
-    else
-      new_line = indent .. '- [ ] ' .. rest
-    end
+    return (line:gsub('%[x%]', '[ ]', 1))
   end
-
-  vim.api.nvim_set_current_line(new_line)
+  local indent, rest = line:match('^(%s*)(.*)$')
+  local marker, text = rest:match('^([%-%*])%s+(.*)$')
+  if marker then
+    return indent .. marker .. ' [ ] ' .. text
+  end
+  return indent .. '- [ ] ' .. rest
 end
-vim.keymap.set('n', '<C-L>', toggle_checkbox, { noremap = true, desc = 'Toggle/create markdown checkbox' })
+local function toggle_checkbox_range()
+  local s = vim.fn.line('v')
+  local e = vim.fn.line('.')
+  if s > e then s, e = e, s end
+  for l = s, e do
+    vim.fn.setline(l, toggle_checkbox_line(vim.fn.getline(l)))
+  end
+  if vim.fn.mode():match('[vV\22]') then
+    vim.cmd('normal! \27')
+  end
+end
+vim.keymap.set({ 'n', 'x' }, '<C-L>', toggle_checkbox_range, { noremap = true, desc = 'Toggle/create markdown checkbox' })
