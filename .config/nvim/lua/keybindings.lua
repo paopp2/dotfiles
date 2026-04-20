@@ -57,17 +57,27 @@ vim.api.nvim_set_keymap('n', '<Leader>{', '<Esc>[{v%o', { noremap = true })
 -- Map { in visual mode to surround text in curly braces
 vim.api.nvim_set_keymap('x', '{', '<Esc>[{v%o', { noremap = true })
 
--- Toggle markdown checkbox with Ctrl+Shift+L
+-- Toggle markdown checkbox with Ctrl+L.
+-- On a line with [ ] or [x], flip it. On a line without a checkbox, insert one
+-- (promoting bare list items and plain text into `- [ ] ...`).
 local function toggle_checkbox()
   local line = vim.api.nvim_get_current_line()
   local new_line
+
   if line:find('%[ %]') then
     new_line = line:gsub('%[ %]', '[x]', 1)
   elseif line:find('%[x%]') then
     new_line = line:gsub('%[x%]', '[ ]', 1)
+  else
+    local indent, rest = line:match('^(%s*)(.*)$')
+    local marker, text = rest:match('^([%-%*])%s+(.*)$')
+    if marker then
+      new_line = indent .. marker .. ' [ ] ' .. text
+    else
+      new_line = indent .. '- [ ] ' .. rest
+    end
   end
-  if new_line then
-    vim.api.nvim_set_current_line(new_line)
-  end
+
+  vim.api.nvim_set_current_line(new_line)
 end
-vim.keymap.set('n', '<C-L>', toggle_checkbox, { noremap = true, desc = 'Toggle markdown checkbox' })
+vim.keymap.set('n', '<C-L>', toggle_checkbox, { noremap = true, desc = 'Toggle/create markdown checkbox' })
