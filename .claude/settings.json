@@ -45,7 +45,9 @@
     "rust-analyzer-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
+  "awaySummaryEnabled": false,
+  "tui": "default",
   "skipDangerousModePermissionPrompt": true,
   "teammateMode": "tmux"
 }
