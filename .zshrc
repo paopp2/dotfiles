@@ -1,3 +1,7 @@
+# Machine-local env vars (not tracked in dotfiles)
+# Sourced before tmux startup so the tmux server inherits the full PATH.
+[[ -f "$HOME/.zsh_local" ]] && source "$HOME/.zsh_local"
+
 # Check if TMUX is not set, then start TMUX
 if [[ -z $TMUX ]]; then
     tmux new-session -d -s default
@@ -16,9 +20,6 @@ export HISTFILESIZE=10000
 export HISTSIZE=10000
 setopt HIST_IGNORE_ALL_DUPS
 setopt INC_APPEND_HISTORY
-
-# Machine-local env vars (not tracked in dotfiles)
-[[ -f "$HOME/.zsh_local" ]] && source "$HOME/.zsh_local"
 
 source ~/.zsh_aliases
 
