@@ -86,3 +86,9 @@ local function toggle_checkbox_range()
   end
 end
 vim.keymap.set({ 'n', 'x' }, '<C-L>', toggle_checkbox_range, { noremap = true, desc = 'Toggle/create markdown checkbox' })
+
+-- Toggle comment with Ctrl+/ (some terminals send <C-_> for the same chord)
+vim.keymap.set('n', '<C-/>', 'gcc', { remap = true, desc = 'Toggle comment line' })
+vim.keymap.set('n', '<C-_>', 'gcc', { remap = true, desc = 'Toggle comment line' })
+vim.keymap.set('x', '<C-/>', 'gc', { remap = true, desc = 'Toggle comment selection' })
+vim.keymap.set('x', '<C-_>', 'gc', { remap = true, desc = 'Toggle comment selection' })
