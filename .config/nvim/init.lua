@@ -252,6 +252,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
+-- Treat dotenv files as shell so they get a valid commentstring (#%s).
+-- Neovim has no built-in rule for .env/.env.local, so without this the
+-- filetype is empty and comment plugins error out.
+vim.filetype.add {
+  filename = { ['.env'] = 'sh' },
+  pattern = { ['%.env%.[%w_.-]+'] = 'sh' },
+}
+
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
