@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# zd-popup: fzf over zoxide's directory database, then paste the chosen path
+# as keystrokes into the pane that was active before the tmux popup opened.
+# Meant to be bound in tmux via: display-popup -E "zd-popup '#{pane_id}'"
+set -euo pipefail
+
+# display-popup does NOT expand #{pane_id} in its command, so resolve the
+# originating pane from inside the popup, where it is still the active pane.
+target_pane="${1:-}"
+case "$target_pane" in
+  %[0-9]*) ;;  # a valid pane id was passed
+  *) target_pane="$(tmux display-message -p '#{pane_id}' 2>/dev/null || true)" ;;
+esac
+
+command -v zoxide >/dev/null || { echo "zoxide not found" >&2; exit 1; }
+command -v fzf    >/dev/null || { echo "fzf not found" >&2; exit 1; }
+
+dir=$(
+  zoxide query -l | fzf \
+    --no-sort \
+    --reverse \
+    --prompt='cd-paste > ' \
+    --header='enter: paste path into previous pane' \
+    --preview 'echo {}' \
+    --preview-window='down,3,wrap'
+) || exit 0   # non-zero (e.g. Esc / Ctrl-C) means no selection: do nothing
+
+[ -n "$dir" ] || exit 0
+
+if [ -n "$target_pane" ]; then
+  # -l sends the path literally, so characters are never read as key names.
+  tmux send-keys -t "$target_pane" -l "$dir"
+else
+  printf '%s' "$dir"
+fi
