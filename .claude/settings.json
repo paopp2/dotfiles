@@ -11,6 +11,39 @@
   },
   "model": "opus",
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.claude/hooks/track-tmux-pane-session.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.claude/hooks/track-tmux-pane-session.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.claude/hooks/track-tmux-pane-session.sh"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
