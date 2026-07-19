@@ -163,8 +163,10 @@ require('lazy').setup({
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    -- The main-branch rewrite is incompatible with this config; stay on master.
+    branch = 'master',
     dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
+      { 'nvim-treesitter/nvim-treesitter-textobjects', branch = 'master' },
     },
     build = ':TSUpdate',
   },
