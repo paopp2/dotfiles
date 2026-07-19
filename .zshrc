@@ -73,6 +73,11 @@ n () {
 # Load Angular CLI autocompletion.
 # source <(ng completion script)
 
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# zsh-syntax-highlighting + zsh-autosuggestions (Homebrew on macOS, apt on Linux)
+for _plugin in zsh-syntax-highlighting zsh-autosuggestions; do
+  for _dir in /opt/homebrew/share /usr/share; do
+    [[ -r "$_dir/$_plugin/$_plugin.zsh" ]] && { source "$_dir/$_plugin/$_plugin.zsh"; break }
+  done
+done
+unset _plugin _dir
 
