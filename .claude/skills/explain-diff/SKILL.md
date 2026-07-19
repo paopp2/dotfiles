@@ -27,3 +27,4 @@ Format:
     Before saving the file, scan each code block in the HTML source and confirm its CSS includes
     `white-space: pre` or `pre-wrap`.
 - Use callouts for key concepts or definitions, important edge cases, etc.
+- Once the file is fully written and verified, open it in my default browser with `open <path-to-file>`.
