@@ -1,0 +1,65 @@
+developer_instructions = """
+When creating a Git commit for work assisted by Codex, append exactly one AI attribution trailer as the final line of the commit message:
+
+Assisted-by: Codex:<model-id>
+
+Replace <model-id> with the exact model ID powering the current session. Emit only the resulting single trailer line for AI attribution, following https://docs.kernel.org/process/coding-assistants.html. Do not add a Co-authored-by trailer for Codex.
+"""
+
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+sandbox_mode = "workspace-write"
+
+[features]
+memories = true
+
+[projects."/Users/npaolopepito"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/operation-manic-purge/marketpush-engine"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/.config"]
+trust_level = "trusted"
+
+[tui.model_availability_nux]
+"gpt-5.6-sol" = 4
+
+[tui]
+vim_mode_default = true
+notifications = true
+notification_condition = "unfocused"
+notification_method = "bel"
+status_line = [
+  "model-with-reasoning",
+  "git-branch",
+  "context-remaining",
+  "five-hour-limit",
+  "weekly-limit",
+  "current-dir",
+]
+
+[[hooks.SessionStart]]
+matcher = ""
+
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = "/Users/npaolopepito/.codex/hooks/track-tmux-pane-session.sh"
+
+[[hooks.UserPromptSubmit]]
+matcher = ""
+
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = "/Users/npaolopepito/.codex/hooks/track-tmux-pane-session.sh"
+
+[hooks.state]
+
+[hooks.state."/Users/npaolopepito/.codex/config.toml:session_start:0:0"]
+trusted_hash = "sha256:59c0afa15dc4b1f860859f9052d5d9403f951babde271ada177a6255f86a4d03"
+
+[hooks.state."/Users/npaolopepito/.codex/config.toml:user_prompt_submit:0:0"]
+trusted_hash = "sha256:23c60c5ccfcbcb7489db146aede1c7ea357244ebfb5d4e2e8e1b93a8143ed60d"
+
+[plugins."superpowers@openai-curated"]
+enabled = true

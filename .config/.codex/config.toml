@@ -1,0 +1,14 @@
+developer_instructions = """
+When creating a Git commit for work assisted by Codex, append exactly one AI attribution trailer as the final line of the commit message:
+
+Assisted-by: Codex:<model-id>
+
+Replace <model-id> with the exact model ID powering the current session. Emit only the resulting single trailer line for AI attribution, following https://docs.kernel.org/process/coding-assistants.html. Do not add a Co-authored-by trailer for Codex.
+"""
+
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+sandbox_mode = "workspace-write"
+
+[tui]
+vim_mode_default = true

@@ -241,3 +241,4 @@ alias azs='(( $+commands[az] )) && az account set --subscription "$(az account l
 
 # Claude Code
 alias cc="claude"
+alias cx="codex"
