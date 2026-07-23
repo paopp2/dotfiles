@@ -5,7 +5,6 @@ Assisted-by: Codex:<model-id>
 
 Replace <model-id> with the exact model ID powering the current session. Emit only the resulting single trailer line for AI attribution, following https://docs.kernel.org/process/coding-assistants.html. Do not add a Co-authored-by trailer for Codex.
 """
-
 approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 sandbox_mode = "workspace-write"
@@ -22,8 +21,8 @@ trust_level = "trusted"
 [projects."/Users/npaolopepito/.config"]
 trust_level = "trusted"
 
-[tui.model_availability_nux]
-"gpt-5.6-sol" = 4
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/.plan/260721-2336-ibc-product-import-task"]
+trust_level = "trusted"
 
 [tui]
 vim_mode_default = true
@@ -31,13 +30,16 @@ notifications = true
 notification_condition = "unfocused"
 notification_method = "bel"
 status_line = [
-  "model-with-reasoning",
-  "git-branch",
-  "context-remaining",
-  "five-hour-limit",
-  "weekly-limit",
-  "current-dir",
+    "model-with-reasoning",
+    "git-branch",
+    "context-remaining",
+    "five-hour-limit",
+    "weekly-limit",
+    "current-dir",
 ]
+
+[tui.model_availability_nux]
+"gpt-5.6-sol" = 4
 
 [[hooks.SessionStart]]
 matcher = ""
@@ -53,8 +55,6 @@ matcher = ""
 type = "command"
 command = "/Users/npaolopepito/.codex/hooks/track-tmux-pane-session.sh"
 
-[hooks.state]
-
 [hooks.state."/Users/npaolopepito/.codex/config.toml:session_start:0:0"]
 trusted_hash = "sha256:59c0afa15dc4b1f860859f9052d5d9403f951babde271ada177a6255f86a4d03"
 
@@ -63,3 +63,55 @@ trusted_hash = "sha256:23c60c5ccfcbcb7489db146aede1c7ea357244ebfb5d4e2e8e1b93a81
 
 [plugins."superpowers@openai-curated"]
 enabled = true
+
+[plugins."chrome-devtools-mcp@chrome-devtools-plugins"]
+enabled = true
+
+[plugins."frontend-design@claude-plugins-official"]
+enabled = true
+
+[plugins."pr-review-toolkit@claude-plugins-official"]
+enabled = true
+
+[plugins."ralph-loop@claude-plugins-official"]
+enabled = true
+
+[plugins."rust-analyzer-lsp@claude-plugins-official"]
+enabled = true
+
+[plugins."superpowers@claude-plugins-official"]
+enabled = true
+
+[plugins."typescript-lsp@claude-plugins-official"]
+enabled = true
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+
+[mcp_servers.context7.http_headers]
+CONTEXT7_API_KEY = "ctx7sk-b4744788-2bc3-4211-8ebd-25628fb07af4"
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+DISABLE_ZOXIDE = "1"
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+
+[marketplaces.chrome-devtools-plugins]
+last_updated = "2026-07-23T11:45:35Z"
+source_type = "git"
+source = "https://github.com/ChromeDevTools/chrome-devtools-mcp.git"
+
+[marketplaces.claude-plugins-official]
+last_updated = "2026-07-23T11:46:31Z"
+source_type = "git"
+source = "https://github.com/anthropics/claude-plugins-official.git"
+
+[marketplaces.pulumi-agent-skills]
+last_updated = "2026-07-23T11:58:45Z"
+source_type = "git"
+source = "https://github.com/pulumi/agent-skills.git"
