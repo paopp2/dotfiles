@@ -113,9 +113,9 @@ When multiple valid approaches exist, choose based on:
 - Use `--no-verify` to bypass commit hooks
 - Disable tests instead of fixing them
 - Make assumptions -- verify with existing code
-- Remove `.plan/`, `.research/`, or `.gotstuck/` directories
+- Remove `.plan/`, `.research/`, `.gotstuck/`, or `.handoff/` directories
 
 **ALWAYS**:
 - Update plan documentation as you go
 - Avoid `any` type -- use correct types based on context; `any` is an absolute last resort
-- Do not git add document artifacts in dotfile directories (`.plan/`, `.research/`, `.gotstuck/`, etc.)
+- Do not git add document artifacts in dotfile directories (`.plan/`, `.research/`, `.gotstuck/`, `.handoff/`, etc.)
