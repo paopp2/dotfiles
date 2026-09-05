@@ -119,3 +119,13 @@ When multiple valid approaches exist, choose based on:
 - Update plan documentation as you go
 - Avoid `any` type -- use correct types based on context; `any` is an absolute last resort
 - Do not git add document artifacts in dotfile directories (`.plan/`, `.research/`, `.gotstuck/`, etc.)
+
+## Claude Code memory
+
+- Before non-trivial project work, consult the matching Claude Code auto memory in addition to Codex's own memory workflow.
+- Look under `~/.claude/projects/<encoded-project-path>/memory/`. Match the full absolute project path, with non-alphanumeric characters replaced by `-`, and confirm that `MEMORY.md` exists. Never select a project using only its basename.
+- For Git worktrees, check the main checkout's memory first (resolve its location from `git rev-parse --path-format=absolute --git-common-dir`), then the current checkout's memory if needed. If Claude has a user-configured `autoMemoryDirectory`, check that location and confirm the notes apply to the current task.
+- Read `MEMORY.md` first, then only the topic files relevant to the task. Resolve relative links from that memory directory. Avoid loading unrelated projects or the entire memory archive.
+- Treat remembered facts as potentially stale context. Verify claims against current files or live evidence when the task depends on them. Current user instructions and applicable project rules take precedence over remembered guidance.
+- Claude owns these memory files. Read them without editing, deleting, moving, symlinking, or synchronizing them into Codex's managed memory directory.
+- If no matching readable memory exists, continue normally. Mention missing access only when it materially limits the task.
