@@ -8,9 +8,20 @@ Replace <model-id> with the exact model ID powering the current session. Emit on
 approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 sandbox_mode = "workspace-write"
+model = "gpt-6-astra"
+model_reasoning_effort = "xhigh"
+
+notify = [
+  # managed-by: tmux-scout
+  "/Users/npaolopepito/.tmux/plugins/tmux-scout-golang/bin/tmux-scout",
+  "hook",
+  "codex"
+]
+service_tier = "default"
 
 [features]
 memories = true
+js_repl = false
 
 [projects."/Users/npaolopepito"]
 trust_level = "trusted"
@@ -22,6 +33,51 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/.plan/260721-2336-ibc-product-import-task"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/marketpush-portal"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/Marketpush.External.Api"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/.codex"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/operation-manic-purge"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/mp_hasura_metadata"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/eetech-commerce-cms"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/storefronts/amphenol"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/.claude"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/mp_cart"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/.plan/260713-1902-bourns_data_task"]
+trust_level = "trusted"
+
+[projects."/private/tmp"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/.temp/contract-realignment"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/.plan/260826-0215-aem-product-update"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/.plan/jrh-stale-offer-cleanup"]
 trust_level = "trusted"
 
 [tui]
@@ -40,6 +96,7 @@ status_line = [
 
 [tui.model_availability_nux]
 "gpt-5.6-sol" = 4
+gpt-6-astra = 4
 
 [[hooks.SessionStart]]
 matcher = ""
@@ -55,11 +112,34 @@ matcher = ""
 type = "command"
 command = "/Users/npaolopepito/.codex/hooks/track-tmux-pane-session.sh"
 
+[hooks.state]
+
 [hooks.state."/Users/npaolopepito/.codex/config.toml:session_start:0:0"]
 trusted_hash = "sha256:59c0afa15dc4b1f860859f9052d5d9403f951babde271ada177a6255f86a4d03"
 
 [hooks.state."/Users/npaolopepito/.codex/config.toml:user_prompt_submit:0:0"]
 trusted_hash = "sha256:23c60c5ccfcbcb7489db146aede1c7ea357244ebfb5d4e2e8e1b93a8143ed60d"
+
+[hooks.state."/Users/npaolopepito/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:f612044818cc8e2161de83ae48650fa535cbb96709a22f9ae01a1446d026ed6a"
+
+[hooks.state."/Users/npaolopepito/.codex/hooks.json:session_end:0:0"]
+trusted_hash = "sha256:e70b7f2c2a53caadcc07fd70d4e1da87fe6dbb25a2c7fc9aafcb1b52e0afc2b5"
+
+[hooks.state."/Users/npaolopepito/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:39e1696349f11f4aa60e3fac564be2d7471594823cb1b06c87d4c9df97aebed9"
+
+[hooks.state."/Users/npaolopepito/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:da43528ca1e8ed35300e191fe928fb7a80ce054e4e7a239e43cd2a5d5927a554"
+
+[hooks.state."ralph-loop@claude-plugins-official:hooks/hooks.json:stop:0:0"]
+trusted_hash = "sha256:6157c9f3776a29424b3a497707296124a3f628909fc09129dc89412d1c6b35b1"
+
+[hooks.state."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/eetech-commerce-cms/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:85398d0493aa337db50b360393edaf33f03a403a0b4c0187bf9158fee2bc5bba"
+
+[hooks.state."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/eetech-commerce-cms/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:18e756c9d846f4394fe2bf3b759e13e80e8789ac6e3b8705b17be9be01440400"
 
 [plugins."superpowers@openai-curated"]
 enabled = true
@@ -85,6 +165,39 @@ enabled = true
 [plugins."typescript-lsp@claude-plugins-official"]
 enabled = true
 
+[plugins."codex-security@openai-curated"]
+enabled = true
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."sites@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
 [mcp_servers.openaiDeveloperDocs]
 url = "https://developers.openai.com/mcp"
 
@@ -94,6 +207,33 @@ url = "https://mcp.context7.com/mcp"
 [mcp_servers.context7.http_headers]
 CONTEXT7_API_KEY = "ctx7sk-b4744788-2bc3-4211-8ebd-25628fb07af4"
 
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/npaolopepito/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+CODEX_HOME = "/Users/npaolopepito/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_TINYSKY_ENABLED = "0"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.818.21641"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/Users/npaolopepito/.codex/plugins/cache/openai-bundled/browser/26.818.21641/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
+CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
+
+[mcp_servers.computer-use]
+command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
+args = ["mcp"]
+cwd = "."
+enabled = false
+
 [shell_environment_policy]
 inherit = "core"
 
@@ -102,16 +242,34 @@ DISABLE_ZOXIDE = "1"
 CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
 
 [marketplaces.chrome-devtools-plugins]
-last_updated = "2026-07-23T11:45:35Z"
+last_updated = "2026-09-05T10:19:33Z"
+last_revision = "086299a69e6d322df43d7e54417fce25b3a2fc08"
 source_type = "git"
 source = "https://github.com/ChromeDevTools/chrome-devtools-mcp.git"
 
 [marketplaces.claude-plugins-official]
-last_updated = "2026-07-23T11:46:31Z"
+last_updated = "2026-09-05T10:19:45Z"
+last_revision = "85cce0381e7860082641b59d961a2b8c368b8b79"
 source_type = "git"
 source = "https://github.com/anthropics/claude-plugins-official.git"
 
 [marketplaces.pulumi-agent-skills]
-last_updated = "2026-07-23T11:58:45Z"
+last_updated = "2026-08-30T08:41:58Z"
+last_revision = "681aafed85e138462f0cd08c7bd56b1a767fb640"
 source_type = "git"
 source = "https://github.com/pulumi/agent-skills.git"
+
+[marketplaces.openai-bundled]
+last_updated = "2026-09-05T10:19:34Z"
+source_type = "local"
+source = "/Users/npaolopepito/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-09-05T10:20:13Z"
+source_type = "local"
+source = "/Users/npaolopepito/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[desktop]
+conversationDetailMode = "STEPS_COMMANDS"
+ambient-suggestions-enabled = false
+followUpQueueMode = "queue"

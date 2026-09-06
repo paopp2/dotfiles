@@ -20,6 +20,16 @@
             "command": "/Users/npaolopepito/.claude/hooks/track-tmux-pane-session.sh"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.tmux/plugins/tmux-scout-golang/bin/tmux-scout hook claude",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -31,6 +41,16 @@
             "command": "/Users/npaolopepito/.claude/hooks/track-tmux-pane-session.sh"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.tmux/plugins/tmux-scout-golang/bin/tmux-scout hook claude",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -40,6 +60,16 @@
           {
             "type": "command",
             "command": "/Users/npaolopepito/.claude/hooks/track-tmux-pane-session.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.tmux/plugins/tmux-scout-golang/bin/tmux-scout hook claude",
+            "timeout": 5
           }
         ]
       }
@@ -64,6 +94,40 @@
             "command": "/Users/npaolopepito/.claude/hooks/stop-notify.sh"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.tmux/plugins/tmux-scout-golang/bin/tmux-scout hook claude",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.tmux/plugins/tmux-scout-golang/bin/tmux-scout hook claude",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/npaolopepito/.tmux/plugins/tmux-scout-golang/bin/tmux-scout hook claude",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
@@ -81,7 +145,8 @@
     "rust-analyzer-lsp@claude-plugins-official": true,
     "azure@claude-plugins-official": true,
     "pulumi-authoring@pulumi-agent-skills": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "pulumi-agent-skills": {
@@ -89,10 +154,27 @@
         "source": "github",
         "repo": "pulumi/agent-skills"
       }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    },
+    "claude-fable-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "medium"
+    }
+  },
   "awaySummaryEnabled": false,
   "tui": "fullscreen",
   "voice": {

@@ -4,4 +4,7 @@ description: A relentless interview to sharpen a plan or design, which also crea
 disable-model-invocation: true
 ---
 
-Call the Skill tool twice, for "grilling" and "domain-modeling".
+Load both `grilling` and `domain-modeling` before starting the interview.
+
+- In Claude Code, call the Skill tool for "grilling" and "domain-modeling".
+- In Codex, read [grilling](../grilling/SKILL.md) and [domain-modeling](../domain-modeling/SKILL.md), then follow both skills together.

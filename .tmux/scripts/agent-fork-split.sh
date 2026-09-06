@@ -10,8 +10,9 @@ command=$(tmux display-message -p -t "$pane" '#{pane_current_command}')
 pane_pid=$(tmux display-message -p -t "$pane" '#{pane_pid}')
 child_args=$(ps -axo ppid=,args= | awk -v parent="$pane_pid" '$1 == parent { sub(/^[^ ]+[[:space:]]+/, ""); print }')
 
+# Match Codex with arguments or at the end of a process command line.
 case "$command $child_args" in
-    codex*|*"/codex "*|*" codex "*)
+    codex*|*/codex|*/codex[[:space:]]*|*" codex"|*" codex"[[:space:]]*)
         exec "$HOME/.tmux/scripts/codex-fork-split.sh" "$orient" "$pane" "$dir"
         ;;
     *)
