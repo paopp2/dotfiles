@@ -98,20 +98,6 @@ status_line = [
 "gpt-5.6-sol" = 4
 gpt-6-astra = 4
 
-[[hooks.SessionStart]]
-matcher = ""
-
-[[hooks.SessionStart.hooks]]
-type = "command"
-command = "/Users/npaolopepito/.codex/hooks/track-tmux-pane-session.sh"
-
-[[hooks.UserPromptSubmit]]
-matcher = ""
-
-[[hooks.UserPromptSubmit.hooks]]
-type = "command"
-command = "/Users/npaolopepito/.codex/hooks/track-tmux-pane-session.sh"
-
 [hooks.state]
 
 [hooks.state."/Users/npaolopepito/.codex/config.toml:session_start:0:0"]
