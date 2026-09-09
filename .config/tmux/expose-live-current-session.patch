@@ -1,0 +1,43 @@
+diff --git a/src/main.rs b/src/main.rs
+index e4c1dcd..a3c79ae 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -27,6 +27,10 @@ struct Cli {
+     #[arg(long, default_value_t = 500, value_name = "MS", value_parser = clap::value_parser!(u64).range(1..))]
+     refresh_interval: u64,
+
++    /// Refresh the originating session too. Use only inside a tmux popup.
++    #[arg(long)]
++    live_current_session: bool,
++
+     #[arg(long, value_name = "COLS", value_parser = clap::value_parser!(u16).range(1..))]
+     thumbnail_width: Option<u16>,
+
+@@ -172,7 +176,11 @@ fn main() -> Result<()> {
+     let cli = Cli::parse();
+
+     let current_session_name = tmux::current_session_name().unwrap_or(None);
+-    let current_session_id = tmux::current_session_id().unwrap_or(None);
++    let current_session_id = if cli.live_current_session {
++        None
++    } else {
++        tmux::current_session_id().unwrap_or(None)
++    };
+     let agent_sort = !cli.no_agent_sort;
+     let mut app = match tmux::list_sessions() {
+         Ok(mut sessions) => {
+@@ -321,6 +329,14 @@ mod tests {
+
+     use super::*;
+
++    #[test]
++    fn live_current_session_is_opt_in() {
++        let defaults = Cli::parse_from(["tmux-expose"]);
++        assert!(!defaults.live_current_session);
++        let live = Cli::parse_from(["tmux-expose", "--live-current-session"]);
++        assert!(live.live_current_session);
++    }
++
+     #[test]
+     fn thumbnail_width_defaults_to_fit_screen_mode() {
+         let cli = Cli::parse_from(["tmux-expose"]);
