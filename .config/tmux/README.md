@@ -5,7 +5,7 @@ The status bar passes shell-escaped socket and session IDs to it.
 
 ## Live session overview
 
-`Ctrl+e`, then `v` opens tmux-expose with live previews, including the originating
+`Ctrl+e`, then `e` opens tmux-expose with live previews, including the originating
 session. The upstream version freezes that session. The local patch adds
 `--live-current-session`, intended only for popup mode (running it directly in
 a pane can capture the overview itself).
