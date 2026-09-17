@@ -9,7 +9,7 @@ approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 sandbox_mode = "workspace-write"
 model = "gpt-6-astra"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 
 notify = [
   # managed-by: tmux-scout
@@ -80,7 +80,20 @@ trust_level = "trusted"
 [projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/_references/.plan/jrh-stale-offer-cleanup"]
 trust_level = "trusted"
 
+[projects."/Users/npaolopepito/.config/aerospace"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Documents/Codex/2026-09-07/is-t"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Work/marketpush/Projects/eetech_commerce/operation-manic-purge/marketpush-engine/.plan/260911-0208-ibc-data-issues"]
+trust_level = "trusted"
+
+[projects."/Users/npaolopepito/Documents/Codex/2026-09-11/n"]
+trust_level = "trusted"
+
 [tui]
+animations = false
 vim_mode_default = true
 notifications = true
 notification_condition = "unfocused"
@@ -228,20 +241,20 @@ DISABLE_ZOXIDE = "1"
 CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
 
 [marketplaces.chrome-devtools-plugins]
-last_updated = "2026-09-05T10:19:33Z"
-last_revision = "086299a69e6d322df43d7e54417fce25b3a2fc08"
+last_updated = "2026-09-14T05:53:53Z"
+last_revision = "d9a8cb6ec22aadf5cb964c5e97a8b047693046e2"
 source_type = "git"
 source = "https://github.com/ChromeDevTools/chrome-devtools-mcp.git"
 
 [marketplaces.claude-plugins-official]
-last_updated = "2026-09-05T10:19:45Z"
-last_revision = "85cce0381e7860082641b59d961a2b8c368b8b79"
+last_updated = "2026-09-14T05:53:56Z"
+last_revision = "022b3c274938ddfb9fd928fc582eb9b9ed0f537f"
 source_type = "git"
 source = "https://github.com/anthropics/claude-plugins-official.git"
 
 [marketplaces.pulumi-agent-skills]
-last_updated = "2026-08-30T08:41:58Z"
-last_revision = "681aafed85e138462f0cd08c7bd56b1a767fb640"
+last_updated = "2026-09-14T05:53:59Z"
+last_revision = "e57d1d117b585a3b5bf6bc612ff327acfa89bd29"
 source_type = "git"
 source = "https://github.com/pulumi/agent-skills.git"
 
@@ -256,6 +269,6 @@ source_type = "local"
 source = "/Users/npaolopepito/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [desktop]
-conversationDetailMode = "STEPS_COMMANDS"
+conversationDetailMode = "STEPS_PROSE"
 ambient-suggestions-enabled = false
 followUpQueueMode = "queue"
