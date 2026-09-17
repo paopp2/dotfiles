@@ -93,7 +93,7 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [tui]
-animations = false
+whimsy = false
 vim_mode_default = true
 notifications = true
 notification_condition = "unfocused"
