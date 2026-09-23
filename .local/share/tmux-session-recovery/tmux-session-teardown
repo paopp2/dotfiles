@@ -1,0 +1,461 @@
+#!/usr/bin/env python3
+"""Save the current tmux session's Claude Code and Codex conversations.
+
+Usage: tmux-session-teardown
+
+Despite the name, this only saves: no agent is stopped and no session is
+closed. Writes saves/<session-key>/state.json (read by tmux-session-restore)
+and README.md (bulleted resume commands) beside this script. Each conversation
+ID is verified against live process ownership; anything unverifiable is
+reported and skipped, never guessed.
+
+Exit status: 0 saved or unchanged, 2 saved but incomplete, 1 nothing saved.
+"""
+import fcntl
+import json
+import os
+import re
+import shlex
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from urllib.parse import quote
+
+ROOT = Path(__file__).resolve().parent
+SAVES = ROOT / "saves"
+CLAUDE_SESSIONS = Path.home() / ".claude" / "sessions"
+CLAUDE_PROJECTS = Path.home() / ".claude" / "projects"
+CODEX_LOCKS = Path.home() / ".codex" / "thread-writer-locks"
+CODEX_SESSIONS = Path.home() / ".codex" / "sessions"
+UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+VERSION = 1
+LABELS = {"claude": "Claude Code", "codex": "Codex"}
+
+
+class Unresolved(Exception):
+    """An agent pane whose conversation cannot be verified."""
+
+
+def session_key(name: str) -> str:
+    if not name or "\0" in name:
+        raise ValueError("Invalid session name")
+    key = quote(name, safe="-_")
+    return "%2E" + key[1:] if key.startswith(".") else key
+
+
+def resume_argv(tool: str, conversation_id: str) -> list:
+    if tool == "claude":
+        return ["claude", "--resume", conversation_id]
+    if tool == "codex":
+        return ["codex", "resume", conversation_id]
+    raise ValueError("Unsupported agent: " + tool)
+
+
+def resume_command(tool: str, conversation_id: str, cwd: str) -> str:
+    return "cd " + shlex.quote(cwd) + " && " + shlex.join(
+        resume_argv(tool, conversation_id)
+    )
+
+
+def run(argv, env=None) -> str:
+    return subprocess.run(
+        argv, check=True, capture_output=True, text=True, timeout=10, env=env
+    ).stdout
+
+
+def tmux(*args) -> str:
+    return run(["tmux", *args]).removesuffix("\n")
+
+
+def lsof_names(*args) -> list:
+    # lsof exits 1 when nothing matches, including a process that has exited.
+    result = subprocess.run(
+        ["lsof", "-F", "n", *args], capture_output=True, text=True, timeout=10
+    )
+    if result.returncode not in (0, 1):
+        raise RuntimeError("lsof failed: " + result.stderr.strip())
+    return [line[1:] for line in result.stdout.splitlines() if line.startswith("n")]
+
+
+# Processes
+
+
+def process_table() -> dict:
+    """pid -> (ppid, pgid, tpgid, UTC start time, command name)."""
+    env = dict(os.environ, TZ="UTC", LC_ALL="C")
+    out = run(["ps", "-A", "-o", "pid=,ppid=,pgid=,tpgid=,lstart=,comm="], env=env)
+    table = {}
+    for line in out.splitlines():
+        fields = line.split(None, 9)
+        if len(fields) == 10:
+            pid, ppid, pgid, tpgid = map(int, fields[:4])
+            table[pid] = (ppid, pgid, tpgid, " ".join(fields[4:9]), fields[9])
+    return table
+
+
+def agent_tool(pid: int, table: dict):
+    name = os.path.basename(table[pid][4])
+    if name == "codex":
+        return "codex"
+    if name == "claude" or registry_matches(pid, table[pid][3]):
+        return "claude"
+    return None
+
+
+def registry_matches(pid: int, start: str) -> bool:
+    """True if a Claude registry names this exact process (not a reused PID)."""
+    try:
+        reg = json.loads((CLAUDE_SESSIONS / f"{pid}.json").read_text())
+    except (OSError, ValueError):
+        return False
+    return (isinstance(reg, dict) and reg.get("pid") == pid
+            and " ".join(str(reg.get("procStart", "")).split()) == start)
+
+
+def pane_agents(pane_pid: int, table: dict) -> list:
+    """Outermost agent processes under a pane. Nested child agents are ignored."""
+    children = {}
+    for pid, row in table.items():
+        children.setdefault(row[0], []).append(pid)
+    found, stack = [], [pane_pid]
+    while stack:
+        pid = stack.pop()
+        if pid in table and agent_tool(pid, table):
+            found.append(pid)
+        else:
+            stack.extend(children.get(pid, []))
+    return sorted(found)
+
+
+# Identity
+
+
+def process_cwd(pid: int) -> str:
+    names = lsof_names("-a", "-p", str(pid), "-d", "cwd")
+    if not names:
+        raise Unresolved("process exited during save")
+    return names[0]
+
+
+def claude_transcript(conversation_id: str) -> str:
+    matches = sorted(CLAUDE_PROJECTS.glob(f"*/{conversation_id}.jsonl"))
+    if not matches:
+        raise Unresolved(f"Claude {conversation_id} has no local history yet")
+    if len(matches) > 1:
+        raise Unresolved(f"Claude {conversation_id} has several transcripts")
+    return str(matches[0])
+
+
+def resolve_claude(pid: int, start: str) -> dict:
+    try:
+        reg = json.loads((CLAUDE_SESSIONS / f"{pid}.json").read_text())
+    except (OSError, ValueError):
+        raise Unresolved("Claude process has no readable session registry")
+    sid = reg.get("sessionId")
+    if (
+        reg.get("pid") != pid
+        or " ".join(str(reg.get("procStart", "")).split()) != start
+        or reg.get("kind") != "interactive"
+        or reg.get("entrypoint") != "cli"
+        or not isinstance(sid, str)
+        or not UUID_RE.fullmatch(sid)
+    ):
+        raise Unresolved("Claude session registry does not match the live process")
+    socket = reg.get("messagingSocketPath")
+    owned = lsof_names("-a", "-p", str(pid), "-U")
+    if not isinstance(socket, str) or not any(
+        name == socket or os.path.realpath(name) == os.path.realpath(socket)
+        for name in owned
+    ):
+        raise Unresolved("Claude process does not own its registered socket")
+    return {
+        "tool": "claude",
+        "conversation_id": sid,
+        "cwd": process_cwd(pid),
+        "transcript_path": claude_transcript(sid),
+    }
+
+
+def codex_meta(path: str) -> dict:
+    try:
+        with open(path, encoding="utf-8") as f:
+            record = json.loads(f.readline())
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(record, dict) or record.get("type") != "session_meta":
+        return {}
+    payload = record.get("payload")
+    return payload if isinstance(payload, dict) else {}
+
+
+def codex_transcript(conversation_id: str, open_files: list) -> str:
+    suffix = f"-{conversation_id}.jsonl"
+    for name in open_files:
+        if name.startswith(str(CODEX_SESSIONS) + "/") and name.endswith(suffix):
+            return name
+    matches = sorted(CODEX_SESSIONS.glob(f"*/*/*/rollout-*{suffix}"))
+    return str(matches[0]) if len(matches) == 1 else ""
+
+
+def resolve_codex(pid: int) -> dict:
+    open_files = lsof_names("-p", str(pid))
+    if not open_files:
+        raise Unresolved("process exited during save")
+    held = sorted({
+        Path(name).stem
+        for name in open_files
+        if os.path.dirname(name) == str(CODEX_LOCKS) and name.endswith(".lock")
+    })
+    ids = []
+    for conversation_id in held:
+        transcript = codex_transcript(conversation_id, open_files)
+        meta = codex_meta(transcript) if transcript else {}
+        if meta.get("id") == conversation_id and meta.get("source") == "cli":
+            ids.append((conversation_id, transcript))
+    if not ids:
+        raise Unresolved("Codex holds no interactive conversation lock (no history yet?)")
+    if len(ids) > 1:
+        raise Unresolved("Codex holds several conversation locks: " + ", ".join(i for i, _ in ids))
+    conversation_id, transcript = ids[0]
+    if not UUID_RE.fullmatch(conversation_id):
+        raise Unresolved("Codex conversation ID is not a UUID")
+    return {
+        "tool": "codex",
+        "conversation_id": conversation_id,
+        "cwd": process_cwd(pid),
+        "transcript_path": transcript,
+    }
+
+
+def resolve(pid: int, table: dict) -> dict:
+    if agent_tool(pid, table) == "claude":
+        return resolve_claude(pid, table[pid][3])
+    return resolve_codex(pid)
+
+
+def pane_agent(pane_pid: int, table: dict) -> int:
+    """The single foreground agent PID in a pane, or None if it has no agent."""
+    candidates = pane_agents(pane_pid, table)
+    if not candidates:
+        return None
+    foreground = [pid for pid in candidates if table[pid][1] == table[pid][2]]
+    if len(foreground) > 1:
+        raise Unresolved("several interactive agents in one pane")
+    if not foreground:
+        raise Unresolved("agent is not in the foreground (suspended or background)")
+    return foreground[0]
+
+
+# Capture
+
+
+def capture(pane_id: str):
+    session_id = tmux("display-message", "-p", "-t", pane_id, "#{session_id}")
+    session_name = tmux("display-message", "-p", "-t", session_id, "#{session_name}")
+    rows = tmux(
+        "list-panes", "-s", "-t", session_id, "-F", "#{window_id} #{pane_id} #{pane_pid}"
+    ).splitlines()
+    table = process_table()
+    window_names, windows, skipped, found = {}, {}, [], []
+    for row in rows:
+        window_id, pane, pane_pid = row.split(" ")
+        if window_id not in window_names:
+            window_names[window_id] = tmux(
+                "display-message", "-p", "-t", window_id, "#{window_name}"
+            )
+            windows[window_id] = []
+        window = window_names[window_id]
+        try:
+            pid = pane_agent(int(pane_pid), table)
+            if pid is not None:
+                found.append((window_id, pane, pid, resolve(pid, table)))
+        except Unresolved as e:
+            skipped.append({"window": window, "pane": pane, "reason": str(e)})
+
+    # Recheck every identity so an exit or /clear during capture is not saved.
+    table = process_table()
+    seen = set()
+    for window_id, pane, pid, agent in found:
+        window = window_names[window_id]
+        try:
+            if pid not in table or resolve(pid, table) != agent:
+                raise Unresolved("agent exited or changed conversation during save")
+        except Unresolved as e:
+            skipped.append({"window": window, "pane": pane, "reason": str(e)})
+            continue
+        identity = (agent["tool"], agent["conversation_id"])
+        if identity in seen:
+            skipped.append({"window": window, "pane": pane,
+                            "reason": "conversation already saved from another pane"})
+            continue
+        seen.add(identity)
+        windows[window_id].append(agent)
+
+    return {
+        "version": VERSION,
+        "session_name": session_name,
+        "windows": [
+            {"name": window_names[w], "agents": agents}
+            for w, agents in windows.items() if agents
+        ],
+        "skipped": skipped,
+    }
+
+
+# Output
+
+
+def md_text(text: str) -> str:
+    text = " ".join(text.splitlines())
+    return re.sub(r"([\\`*_\[\]<>|~])", r"\\\1", text)
+
+
+def md_code(text: str) -> str:
+    runs = re.findall(r"`+", text)
+    fence = "`" * (max(map(len, runs), default=0) + 1)
+    pad = " " if text.startswith("`") or text.endswith("`") else ""
+    return fence + pad + text + pad + fence
+
+
+def render_readme(state: dict, record_dir: Path) -> str:
+    lines = [f"# Tmux session recovery: {md_text(state['session_name'])}", ""]
+    lines.append("Restore all agents: " + md_code(
+        shlex.join(["tmux-session-restore", str(record_dir)])))
+    if state["skipped"]:
+        lines += ["", "## INCOMPLETE: skipped panes", ""]
+        for s in state["skipped"]:
+            lines.append(f"- Window {md_text(s['window'])}, pane {md_text(s['pane'])}: "
+                         f"{md_text(s['reason'])}.")
+    for window in state["windows"]:
+        lines += ["", f"## Window: {md_text(window['name'])}", ""]
+        for a in window["agents"]:
+            lines.append(f"- {LABELS[a['tool']]}. Conversation: {a['conversation_id']}. "
+                         f"Directory: {md_code(a['cwd'])}.")
+            lines.append("  Resume: " + md_code(
+                resume_command(a["tool"], a["conversation_id"], a["cwd"])))
+    return "\n".join(lines) + "\n"
+
+
+def encode(state: dict) -> bytes:
+    return (json.dumps(state, indent=2, ensure_ascii=False) + "\n").encode()
+
+
+def read_bytes(path: Path):
+    try:
+        return path.read_bytes()
+    except FileNotFoundError:
+        return None
+
+
+def replace_bytes(path: Path, data: bytes) -> None:
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".tmp-")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def publish(record_dir: Path, state: dict) -> bool:
+    """Write README.md, then state.json (the commit point). False if unchanged."""
+    record_dir.mkdir(parents=True, exist_ok=True)
+    readme, state_json = record_dir / "README.md", record_dir / "state.json"
+    new_readme = render_readme(state, record_dir).encode()
+    new_state = encode(state)
+    old_readme, old_state = read_bytes(readme), read_bytes(state_json)
+    if old_readme == new_readme and old_state == new_state:
+        return False
+    if old_readme != new_readme:
+        replace_bytes(readme, new_readme)
+    if old_state != new_state:
+        try:
+            replace_bytes(state_json, new_state)
+        except BaseException:
+            # Keep the notes consistent with the prior authoritative record.
+            if old_readme is None:
+                readme.unlink(missing_ok=True)
+            else:
+                replace_bytes(readme, old_readme)
+            raise
+    return True
+
+
+def repair_readme(record_dir: Path) -> None:
+    """Regenerate notes from an existing record, in case a save was interrupted."""
+    try:
+        state = json.loads((record_dir / "state.json").read_text())
+        data = render_readme(state, record_dir).encode()
+    except (OSError, ValueError, KeyError, TypeError):
+        return
+    if read_bytes(record_dir / "README.md") != data:
+        replace_bytes(record_dir / "README.md", data)
+
+
+def main(argv) -> int:
+    if argv[1:] in (["-h"], ["--help"]):
+        print(__doc__.strip())
+        return 0
+    if argv[1:]:
+        print("usage: tmux-session-teardown (takes no arguments)", file=sys.stderr)
+        return 64
+    pane_id = os.environ.get("TMUX_PANE")
+    if not pane_id or not os.environ.get("TMUX"):
+        print("tmux-session-teardown: run this inside a tmux pane", file=sys.stderr)
+        return 64
+
+    SAVES.mkdir(parents=True, exist_ok=True)
+    with open(SAVES / ".lock", "a") as lock:
+        # Held from discovery through publication so an older capture never
+        # overwrites a newer one.
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            state = capture(pane_id)
+        except (subprocess.SubprocessError, OSError, RuntimeError) as e:
+            print(f"tmux-session-teardown: inspection failed: {e}", file=sys.stderr)
+            return 1
+        record_dir = SAVES / session_key(state["session_name"])
+
+        for s in state["skipped"]:
+            print(f"SKIPPED: window {s['window']!r} pane {s['pane']}: {s['reason']}",
+                  file=sys.stderr)
+        if not state["windows"]:
+            if (record_dir / "state.json").exists():
+                try:
+                    repair_readme(record_dir)
+                except OSError as e:
+                    print(f"tmux-session-teardown: could not refresh README.md: {e}",
+                          file=sys.stderr)
+                print(f"No resumable agents found; kept previous record: {record_dir}",
+                      file=sys.stderr)
+            else:
+                print("No resumable agents found; nothing saved.", file=sys.stderr)
+            return 1
+        try:
+            changed = publish(record_dir, state)
+        except OSError as e:
+            print(f"tmux-session-teardown: save failed, previous record kept: {e}",
+                  file=sys.stderr)
+            return 1
+
+    count = sum(len(w["agents"]) for w in state["windows"])
+    print(f"{'Saved' if changed else 'Unchanged'}: {count} agent(s) in {record_dir}")
+    for window in state["windows"]:
+        for a in window["agents"]:
+            print(f"  [{window['name']}] {LABELS[a['tool']]} {a['conversation_id']}")
+    if state["skipped"]:
+        print(f"INCOMPLETE: {len(state['skipped'])} pane(s) skipped; see "
+              f"{record_dir / 'README.md'}", file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
