@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """Save the current tmux session's Claude Code and Codex conversations.
 
-Usage: tmux-session-teardown
+Usage: tmux-session-teardown [--close]
 
-Despite the name, this only saves: no agent is stopped and no session is
-closed. Writes saves/<session-key>/state.json (read by tmux-session-restore)
-and README.md (bulleted resume commands) beside this script. Each conversation
-ID is verified against live process ownership; anything unverifiable is
-reported and skipped, never guessed.
+Writes saves/<session-key>/state.json (read by tmux-session-restore) and
+README.md (bulleted resume commands) beside this script. Each conversation ID
+is verified against live process ownership; anything unverifiable is reported
+and skipped, never guessed.
 
-Exit status: 0 saved or unchanged, 2 saved but incomplete, 1 nothing saved.
+Without --close this only saves: no agent is stopped and no session is closed.
+With --close, each saved agent is then sent Ctrl-C, as if typed in its pane,
+until it exits. Unsaved agents and the agent running this command stay open.
+
+Exit status: 0 saved or unchanged, 2 saved but incomplete or an agent did not
+close, 1 nothing saved (nothing closed).
 """
 import fcntl
 import json
@@ -19,6 +23,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 from urllib.parse import quote
 
@@ -31,6 +36,13 @@ CODEX_SESSIONS = Path.home() / ".codex" / "sessions"
 UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 VERSION = 1
 LABELS = {"claude": "Claude Code", "codex": "Codex"}
+# Claude exits on a second Ctrl-C within about a second; a busy agent needs
+# one more press to interrupt its turn first, and Claude with background tasks
+# asks to confirm (repeated presses choose "Exit and stop tasks"). Shutdown
+# can finish a few seconds after the last press.
+CLOSE_PRESSES = 8
+CLOSE_INTERVAL = 0.4
+CLOSE_GRACE = 30
 
 
 class Unresolved(Exception):
@@ -257,7 +269,7 @@ def capture(pane_id: str):
         "list-panes", "-s", "-t", session_id, "-F", "#{window_id} #{pane_id} #{pane_pid}"
     ).splitlines()
     table = process_table()
-    window_names, windows, skipped, found = {}, {}, [], []
+    window_names, windows, skipped, found, saved = {}, {}, [], [], []
     for row in rows:
         window_id, pane, pane_pid = row.split(" ")
         if window_id not in window_names:
@@ -291,8 +303,9 @@ def capture(pane_id: str):
             continue
         seen.add(identity)
         windows[window_id].append(agent)
+        saved.append((pane, pid, table[pid][3]))
 
-    return {
+    state = {
         "version": VERSION,
         "session_name": session_name,
         "windows": [
@@ -301,6 +314,37 @@ def capture(pane_id: str):
         ],
         "skipped": skipped,
     }
+    return state, saved
+
+
+# Closing
+
+
+def running(agents: list) -> list:
+    table = process_table()
+    return [a for a in agents if a[1] in table and table[a[1]][3] == a[2]]
+
+
+def close_agents(saved: list) -> list:
+    """Press Ctrl-C in each agent's pane until it exits. Returns panes still open."""
+    pending = saved
+    for _ in range(CLOSE_PRESSES):
+        pending = running(pending)
+        if not pending:
+            return []
+        for pane, _, _ in pending:
+            # Not checked: the pane may close as its agent exits.
+            subprocess.run(["tmux", "send-keys", "-t", pane, "C-c"],
+                           capture_output=True, timeout=10)
+        time.sleep(CLOSE_INTERVAL)
+    if running(pending):
+        print(f"Waiting up to {CLOSE_GRACE}s for {len(pending)} agent(s) to exit...",
+              file=sys.stderr, flush=True)
+    deadline = time.monotonic() + CLOSE_GRACE
+    while pending and time.monotonic() < deadline:
+        time.sleep(CLOSE_INTERVAL)
+        pending = running(pending)
+    return [pane for pane, _, _ in pending]
 
 
 # Output
@@ -403,9 +447,10 @@ def main(argv) -> int:
     if argv[1:] in (["-h"], ["--help"]):
         print(__doc__.strip())
         return 0
-    if argv[1:]:
-        print("usage: tmux-session-teardown (takes no arguments)", file=sys.stderr)
+    if argv[1:] not in ([], ["--close"]):
+        print("usage: tmux-session-teardown [--close]", file=sys.stderr)
         return 64
+    close = argv[1:] == ["--close"]
     pane_id = os.environ.get("TMUX_PANE")
     if not pane_id or not os.environ.get("TMUX"):
         print("tmux-session-teardown: run this inside a tmux pane", file=sys.stderr)
@@ -417,7 +462,7 @@ def main(argv) -> int:
         # overwrites a newer one.
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
-            state = capture(pane_id)
+            state, saved = capture(pane_id)
         except (subprocess.SubprocessError, OSError, RuntimeError) as e:
             print(f"tmux-session-teardown: inspection failed: {e}", file=sys.stderr)
             return 1
@@ -450,11 +495,30 @@ def main(argv) -> int:
     for window in state["windows"]:
         for a in window["agents"]:
             print(f"  [{window['name']}] {LABELS[a['tool']]} {a['conversation_id']}")
+    status = 0
     if state["skipped"]:
         print(f"INCOMPLETE: {len(state['skipped'])} pane(s) skipped; see "
               f"{record_dir / 'README.md'}", file=sys.stderr)
-        return 2
-    return 0
+        status = 2
+    if close:
+        sys.stdout.flush()
+        own = [a for a in saved if a[0] == pane_id]
+        if own:
+            print(f"Not closing the agent in {pane_id}: it is running this command.",
+                  file=sys.stderr)
+        try:
+            still_open = close_agents([a for a in saved if a[0] != pane_id])
+        except (subprocess.SubprocessError, OSError) as e:
+            print(f"tmux-session-teardown: closing failed: {e}", file=sys.stderr)
+            return 1
+        closed = len(saved) - len(own) - len(still_open)
+        print(f"Closed {closed} agent(s) with Ctrl-C.")
+        if still_open:
+            print("Still running after Ctrl-C: " + " ".join(still_open), file=sys.stderr)
+            status = 2
+        if state["skipped"]:
+            print("Skipped panes were not closed.", file=sys.stderr)
+    return status
 
 
 if __name__ == "__main__":
