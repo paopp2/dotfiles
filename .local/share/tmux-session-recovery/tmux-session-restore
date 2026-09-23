@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Recreate a saved tmux session's agent panes and resume their conversations.
 
-Usage: tmux-session-restore SESSION-NAME
+Usage: tmux-session-restore
+       tmux-session-restore SESSION-NAME
        tmux-session-restore RECORD-DIRECTORY
 
-A plain name selects saves/<session-key>/ beside this script; an argument
-containing "/" is a record directory (use ./name for a relative one). Refuses
+With no argument, pick one of the 50 newest saved sessions with fzf (or list
+them when fzf or a terminal is unavailable). A plain name selects
+saves/<session-key>/ beside this script; an argument containing "/" is a
+record directory (use ./name for a relative one). Refuses
 if a session with the saved name exists. Agents whose directory, command, or
 local history is missing are skipped and reported. An agent that fails at
 startup stays in its dead pane so the error remains visible.
 
 Exit status: 0 restored, 2 restored with skipped agents, 1 nothing restored or
-tmux failed, 64 invalid invocation.
+tmux failed, 64 invalid invocation or nothing picked.
 """
 import json
 import os
@@ -28,6 +31,7 @@ SAVES = ROOT / "saves"
 UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 VERSION = 1
 PLACEHOLDER = "/bin/sleep 86400"
+PICK_LIMIT = 50  # older saves stay on disk and restore by name
 
 
 def session_key(name: str) -> str:
@@ -160,6 +164,43 @@ def session_exists(name: str) -> bool:
     return name in result.stdout.splitlines()
 
 
+# Picker
+
+
+def saved_records() -> list:
+    """(record directory, state, mtime) for each valid record, newest first."""
+    records = []
+    for d in SAVES.iterdir() if SAVES.is_dir() else []:
+        if d.name.startswith("."):
+            continue
+        try:
+            state = load_state(d / "state.json")
+            records.append((d, state, (d / "state.json").stat().st_mtime))
+        except (ValueError, OSError):
+            continue
+    return sorted(records, key=lambda r: r[2], reverse=True)
+
+
+def pick_record():
+    """Record directory chosen with fzf from the newest saved sessions, or None."""
+    records = saved_records()
+    lines = [d.name + "\t" + " ".join(state["session_name"].split())
+             for d, state, _ in records[:PICK_LIMIT]]
+    if not lines:
+        print(f"No saved sessions in {SAVES}", file=sys.stderr)
+        return None
+    if not (shutil.which("fzf") and sys.stdin.isatty() and sys.stdout.isatty()):
+        print("\n".join(line.split("\t", 1)[1] for line in lines))
+        return None
+    result = subprocess.run(
+        ["fzf", "--reverse", "--no-sort", "--delimiter=\t", "--with-nth=2"],
+        input="\n".join(lines) + "\n", stdout=subprocess.PIPE, text=True,
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    return str(SAVES / result.stdout.split("\t", 1)[0])
+
+
 # Construction
 
 
@@ -207,10 +248,16 @@ def main(argv) -> int:
     if argv[1:] in (["-h"], ["--help"]):
         print(__doc__.strip())
         return 0
-    if len(argv) != 2 or not argv[1]:
-        print("usage: tmux-session-restore SESSION-NAME | RECORD-DIRECTORY", file=sys.stderr)
+    if len(argv) == 1:
+        arg = pick_record()
+        if arg is None:
+            return 64
+    elif len(argv) != 2 or not argv[1]:
+        print("usage: tmux-session-restore [SESSION-NAME | RECORD-DIRECTORY]",
+              file=sys.stderr)
         return 64
-    arg = argv[1]
+    else:
+        arg = argv[1]
     try:
         path = record_path(arg)
         state = load_state(path)
