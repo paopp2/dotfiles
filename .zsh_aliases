@@ -242,3 +242,5 @@ alias azs='(( $+commands[az] )) && az account set --subscription "$(az account l
 # Claude Code
 alias cc="claude"
 alias cx="codex"
+# Own process, not the shared daemon, so tmux-session-teardown can save it.
+alias codex="codex --no-daemon"

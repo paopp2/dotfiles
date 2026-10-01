@@ -45,7 +45,9 @@ def resume_argv(tool: str, conversation_id: str) -> list:
     if tool == "claude":
         return ["claude", "--resume", conversation_id]
     if tool == "codex":
-        return ["codex", "resume", conversation_id]
+        # Without the shared daemon the process holds its own conversation lock,
+        # which teardown needs to identify it.
+        return ["codex", "resume", "--no-daemon", conversation_id]
     raise ValueError("Unsupported agent: " + tool)
 
 

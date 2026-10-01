@@ -60,7 +60,9 @@ def resume_argv(tool: str, conversation_id: str) -> list:
     if tool == "claude":
         return ["claude", "--resume", conversation_id]
     if tool == "codex":
-        return ["codex", "resume", conversation_id]
+        # Without the shared daemon the process holds its own conversation lock,
+        # which teardown needs to identify it.
+        return ["codex", "resume", "--no-daemon", conversation_id]
     raise ValueError("Unsupported agent: " + tool)
 
 
@@ -226,7 +228,8 @@ def resolve_codex(pid: int) -> dict:
         if meta.get("id") == conversation_id and meta.get("source") == "cli":
             ids.append((conversation_id, transcript))
     if not ids:
-        raise Unresolved("Codex holds no interactive conversation lock (no history yet?)")
+        raise Unresolved("Codex holds no interactive conversation lock "
+                         "(no history yet, or not started with --no-daemon?)")
     if len(ids) > 1:
         raise Unresolved("Codex holds several conversation locks: " + ", ".join(i for i, _ in ids))
     conversation_id, transcript = ids[0]
