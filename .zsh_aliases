@@ -240,7 +240,19 @@ alias zed-update='cd "$ZED_CUSTOM_BUILD" && git fetch upstream && git checkout m
 alias azs='(( $+commands[az] )) && az account set --subscription "$(az account list --query '"'"'[?name!=`N/A(tenant level account)`].name'"'"' -o tsv | fzf)"'
 
 # Claude Code
-alias cc="claude"
+# cc [account] [claude args...]. Plain claude unless the first arg names an
+# account in CLAUDE_ACCOUNTS (name -> config dir), set per machine in ~/.zsh_local.
+unalias cc 2>/dev/null
+function cc {
+  local dir
+  [[ ${(t)CLAUDE_ACCOUNTS} == association* && -n $1 ]] && dir=${CLAUDE_ACCOUNTS[$1]}
+  if [[ -n $dir ]]; then
+    shift
+    CLAUDE_CONFIG_DIR=$dir claude "$@"
+  else
+    claude "$@"
+  fi
+}
 alias cx="codex"
 # Own process, not the shared daemon, so tmux-session-teardown can save it.
 alias codex="codex --no-daemon"
