@@ -1,9 +1,9 @@
 #!/bin/sh
 # Show 5-hour and weekly usage for every Claude Code account on this machine.
 # usage: cc-usage          print and exit
-#        cc-usage --pick   for the tmux popup (Ctrl-q): number the accounts, mark
-#                          the one the pane's Claude session is on, and move that
-#                          session to the account whose number is pressed
+#        cc-usage --pick   for the tmux popup (Ctrl-q): mark the account the pane's
+#                          Claude session is on, and move that session to the
+#                          account chosen with Up/Down and Enter
 #
 # An account is a config dir (~/.claude or ~/.claude-*) holding an
 # account-label file. Usage comes from ccstatusline, which already knows how
@@ -90,7 +90,7 @@ out_at() {
 
 window() { # window <name> <percent> <time left> <resets at> <time until the limit, or empty>
     pct=$(trim "$2")
-    printf '  %-7s ' "$1"; bar "$pct"; printf ' %6s  ' "$pct"
+    printf '%s  %-7s ' "$gutter" "$1"; bar "$pct"; printf ' %6s  ' "$pct"
     case $3 in
         *Loading*) printf 'no active window' ;;
         *)         printf 'resets in %s (%s)' "$(trim "$3")" "$(clock "$4")" ;;
@@ -113,19 +113,31 @@ identity() { # identity <login file>; "email (org)", with a one-person org shown
                              then "personal" else .organizationName end))"' "$1" 2>/dev/null
 }
 
-pick= pane= current=
+pick= pane= current= gutter=
 if [ "${1:-}" = --pick ]; then
     pick=1
+    gutter='  ' # room for the selection marker
     # Inside a tmux popup the active pane is still the one it was opened from.
     pane=$(tmux display-message -p '#{pane_id}')
     current=$(TMUX_PANE=$pane cc-handover --which 2>/dev/null || true)
 fi
 
-key() { # key; wait for one keypress and print it
+key() { # key; wait for one keypress and name it: up, down, enter or other
     saved=$(stty -g)
     stty -icanon -echo -ixon min 1 time 0 # -ixon so Ctrl-q arrives as a key
-    dd bs=1 count=1 2>/dev/null
+    bytes=$(dd bs=1 count=1 2>/dev/null)
+    if [ "$bytes" = "$esc" ]; then
+        # An arrow key sends two more bytes at once; a bare Esc sends none.
+        stty min 0 time 1
+        bytes=$bytes$(dd bs=2 count=1 2>/dev/null)
+    fi
     stty "$saved"
+    case $bytes in
+        "$esc[A" | "${esc}OA" | k) echo up ;;
+        "$esc[B" | "${esc}OB" | j) echo down ;;
+        '') echo enter ;; # Enter arrives as a newline, which $(...) strips
+        *) echo other ;;
+    esac
 }
 
 # Fetch every account at once, then print in a stable order.
@@ -145,32 +157,71 @@ for dir in "$HOME/.claude" "$HOME"/.claude-*; do
 done
 wait
 
-acct=0
-while [ "$acct" -lt "$count" ]; do
-    acct=$((acct + 1))
-    if [ -n "$pick" ]; then
-        printf '%s  %s' "$acct" "$(cat "$tmp/$acct.name")"
-        [ "$(cat "$tmp/$acct.label")" = "$current" ] && printf '  <- this session'
-        printf '\n'
-    else
-        cat "$tmp/$acct.name"
+heading() { # heading <account number> [selected]; the account's name line, without a newline
+    if [ -n "${2:-}" ]; then printf '> \033[7m%s\033[0m' "$(cat "$tmp/$1.name")"
+    else printf '%s%s' "$gutter" "$(cat "$tmp/$1.name")"; fi
+    if [ -n "$current" ] && [ "$(cat "$tmp/$1.label")" = "$current" ]; then
+        printf '  <- this session'
     fi
-    s_pct=
-    IFS='|' read -r s_pct s_left s_at w_pct w_left w_at rest < "$tmp/$acct.line" || true
-    if [ -z "$s_pct" ]; then
-        printf '  usage unavailable, run again\n'
-        continue
-    fi
-    window 5h "$s_pct" "$s_left" "$s_at" "$(tagged 5h "$rest")"
-    window weekly "$w_pct" "$w_left" "$w_at" "$(tagged wk "$rest")"
-done
+}
 
-[ -n "$pick" ] || exit 0
-[ -n "$current" ] && printf '\nPress a number to move this session to that account. Any other key closes.\n'
-pressed=$(key)
-# Only a number naming another account does anything; there must be a session to move.
-[ -n "$current" ] && [ -f "$tmp/$pressed.label" ] || exit 0
-label=$(cat "$tmp/$pressed.label")
+render() { # print every account, noting the screen row of each heading for paint
+    acct=0 row=1
+    while [ "$acct" -lt "$count" ]; do
+        acct=$((acct + 1))
+        echo "$row" > "$tmp/$acct.row"
+        heading "$acct"
+        printf '\n'
+        s_pct=
+        IFS='|' read -r s_pct s_left s_at w_pct w_left w_at rest < "$tmp/$acct.line" || true
+        if [ -z "$s_pct" ]; then
+            printf '%s  usage unavailable, run again\n' "$gutter"
+            row=$((row + 2))
+            continue
+        fi
+        window 5h "$s_pct" "$s_left" "$s_at" "$(tagged 5h "$rest")"
+        window weekly "$w_pct" "$w_left" "$w_at" "$(tagged wk "$rest")"
+        row=$((row + 3))
+    done
+}
+
+# paint <account number> [selected]; redraw only that heading, so moving the
+# selection does not repaint the whole popup. The cursor is parked below the list.
+paint() {
+    printf '\033[%s;1H' "$(cat "$tmp/$1.row")"
+    heading "$1" "${2:-}"
+    printf '\033[K\033[%s;1H' "$row"
+}
+
+if [ -z "$pick" ]; then
+    render
+    exit 0
+fi
+if [ -z "$current" ]; then # no Claude session in the pane: nothing to move
+    render
+    key > /dev/null
+    exit 0
+fi
+
+# Start on the session's own account, so Enter alone changes nothing.
+selected=1
+while [ "$(cat "$tmp/$selected.label")" != "$current" ]; do selected=$((selected + 1)); done
+printf '\033[H\033[2J'
+render
+# Up/Down (or k/j) moves the selection, Enter moves the session there, and any
+# other key closes.
+while :; do
+    paint "$selected" selected
+    case $(key) in
+        up) next=$(( (selected + count - 2) % count + 1 )) ;;
+        down) next=$(( selected % count + 1 )) ;;
+        enter) break ;;
+        *) exit 0 ;;
+    esac
+    paint "$selected"
+    selected=$next
+done
+label=$(cat "$tmp/$selected.label")
 [ "$label" != "$current" ] || exit 0
 if ! TMUX_PANE=$pane cc-handover "$label" > /dev/null 2> "$tmp/error"; then
     cat "$tmp/error"
