@@ -1,7 +1,9 @@
 #!/bin/sh
 # Continue the current Claude Code session under another account, in a new tmux pane.
 # usage: cc-handover <account> [claude args...]
-#        cc-handover --which     print the account the session is on
+#        cc-handover --list            every running session, by account
+#        cc-handover --all <account>   move every idle session to that account
+#        cc-handover --which           print the account the session is on
 #
 # Run it from inside the session with `! cc-handover personal`. That needs no
 # model call, so it still works once the current account is out of usage.
@@ -30,6 +32,86 @@ if [ "${1:-}" = --close-when-ready ]; then
         fi
         sleep 0.5
         tries=$((tries + 1))
+    done
+    exit 0
+fi
+
+tab=$(printf '\t')
+
+account_dir() { # account_dir <label>; the config dir whose account-label says <label>
+    for dir in "$HOME/.claude" "$HOME"/.claude-*; do
+        [ -f "$dir/account-label" ] || continue
+        if [ "$(cat "$dir/account-label")" = "$1" ]; then
+            printf '%s\n' "$dir"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# running <config dir>; one tab-separated line per live session on that account:
+# status, tmux pane, tmux session, session id, name ("-" where there is none).
+# Claude keeps this registry itself, as <config dir>/sessions/<pid>.json.
+running() {
+    for file in "$1"/sessions/*.json; do
+        [ -f "$file" ] || continue
+        kill -0 "$(jq -r .pid "$file" 2>/dev/null)" 2>/dev/null || continue
+        jq -r '[.status, (.tmux // "" | split(".") | last), (.tmux // "" | split(":") | first),
+                .sessionId, .name] | map(if . == null or . == "" then "-" else . end) | @tsv' "$file"
+    done | sort -t "$tab" -k 3
+}
+
+if [ "${1:-}" = --list ]; then
+    for dir in "$HOME/.claude" "$HOME"/.claude-*; do
+        [ -f "$dir/account-label" ] || continue
+        cat "$dir/account-label"
+        sessions=$(running "$dir")
+        if [ -z "$sessions" ]; then
+            printf '  no sessions\n'
+            continue
+        fi
+        printf '%s\n' "$sessions" | while IFS="$tab" read -r status pane session sid name; do
+            printf '  %-5s %-34s %s\n' "$status" "$session" "$name"
+        done
+    done
+    exit 0
+fi
+
+if [ "${1:-}" = --all ]; then
+    account=${2:-}
+    [ -n "$account" ] || die "usage: cc-handover --all <account>"
+    target=$(account_dir "$account") || die "no account labelled '$account'"
+    sessions=$(for dir in "$HOME/.claude" "$HOME"/.claude-*; do
+        if [ -f "$dir/account-label" ] && [ "$dir" != "$target" ]; then running "$dir"; fi
+    done)
+    [ -n "$sessions" ] || { printf 'No sessions to move.\n'; exit 0; }
+    # The session this was run from goes last: its pane closes under us.
+    own=${CLAUDE_CODE_SESSION_ID:-none}
+    {
+        printf '%s\n' "$sessions" | grep -v "$tab$own$tab" || true
+        printf '%s\n' "$sessions" | grep "$tab$own$tab" || true
+    } | while IFS="$tab" read -r status pane session sid name; do
+        printf '%-34s %-28s ' "$session" "$name"
+        if [ "$pane" = - ]; then
+            printf 'skipped, not in tmux\n'
+        elif [ "$status" != idle ] && [ "$sid" != "$own" ]; then
+            # Mid-turn or running a shell command: moving it would cut that off.
+            printf 'skipped, %s\n' "$status"
+        elif ! error=$(env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CONFIG_DIR TMUX_PANE="$pane" \
+            "$0" "$account" 2>&1 > /dev/null < /dev/null); then
+            printf 'failed: %s\n' "${error#cc-handover: }"
+        elif [ "$sid" = "$own" ]; then
+            printf 'moving, this pane closes once it is running\n'
+        else
+            # Let it start before the next one, so they do not all launch at once.
+            tries=0
+            while [ "$tries" -lt 40 ] && tmux list-panes -a -F '#{pane_id}' | grep -qx "$pane"; do
+                sleep 0.5
+                tries=$((tries + 1))
+            done
+            if [ "$tries" -lt 40 ]; then printf 'moved\n'
+            else printf 'started, waiting at a prompt in its new pane\n'; fi
+        fi
     done
     exit 0
 fi
@@ -63,15 +145,7 @@ fi
 account=$1
 shift
 
-target=
-labels=
-for dir in "$HOME/.claude" "$HOME"/.claude-*; do
-    [ -f "$dir/account-label" ] || continue
-    label=$(cat "$dir/account-label")
-    labels="$labels $label"
-    [ "$label" = "$account" ] && target=$dir
-done
-[ -n "$target" ] || die "no account labelled '$account' (have:$labels)"
+target=$(account_dir "$account") || die "no account labelled '$account'"
 [ "$target" != "$source_dir" ] || die "this session is already on '$account'"
 
 transcript=$(find "$source_dir/projects" -maxdepth 2 -name "$sid.jsonl" 2>/dev/null | head -1)
