@@ -44,10 +44,24 @@ trim() { printf '%s' "$1" | sed 's/^ *//; s/ *$//'; }
 # Reduce "2026-11-21 10:39 GMT+8" or "Sun 19:59 GMT+8" to local "10:39" / "Sun 19:59".
 clock() { trim "$1" | sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2} //; s/([0-9]{2}:[0-9]{2}).*$/\1/'; }
 
-window() { # window <percent> <time left> <resets at>
-    case $2 in
-        *Loading*) printf '%s, no active window' "$(trim "$1")" ;;
-        *)         printf '%s, resets in %s (%s)' "$(trim "$1")" "$(trim "$2")" "$(clock "$3")" ;;
+bar() { # bar <percent>; 20 cells, coloured by level when printing to a terminal
+    level=${1%%%}; level=${level%%.*}
+    filled=$(( (level * 20 + 50) / 100 )); [ "$filled" -gt 20 ] && filled=20
+    if [ "$level" -ge 80 ]; then colour=31; elif [ "$level" -ge 50 ]; then colour=33; else colour=32; fi
+    [ -t 1 ] && printf '\033[%sm' "$colour"
+    i=0; while [ "$i" -lt "$filled" ]; do printf '█'; i=$((i + 1)); done
+    [ -t 1 ] && printf '\033[90m'
+    while [ "$i" -lt 20 ]; do printf '░'; i=$((i + 1)); done
+    [ -t 1 ] && printf '\033[0m'
+    return 0
+}
+
+window() { # window <name> <percent> <time left> <resets at>
+    pct=$(trim "$2")
+    printf '  %-7s ' "$1"; bar "$pct"; printf ' %6s  ' "$pct"
+    case $3 in
+        *Loading*) printf 'no active window\n' ;;
+        *)         printf 'resets in %s (%s)\n' "$(trim "$3")" "$(clock "$4")" ;;
     esac
 }
 
@@ -61,6 +75,6 @@ for dir in "$HOME/.claude" "$HOME"/.claude-*; do
 $line
 EOF
     printf '%s\n' "$(cat "$dir/account-label")"
-    printf '  5h      %s\n' "$(window "$s_pct" "$s_left" "$s_at")"
-    printf '  weekly  %s\n' "$(window "$w_pct" "$w_left" "$w_at")"
+    window 5h "$s_pct" "$s_left" "$s_at"
+    window weekly "$w_pct" "$w_left" "$w_at"
 done
