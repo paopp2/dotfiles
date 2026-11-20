@@ -1,0 +1,66 @@
+#!/bin/sh
+# Show 5-hour and weekly usage for every Claude Code account on this machine.
+# usage: claude-usage
+#
+# An account is a config dir (~/.claude or ~/.claude-*) holding an
+# account-label file. Usage comes from ccstatusline, which already knows how
+# to read each config dir's login, so no credentials are handled here.
+set -eu
+
+tz=$(readlink /etc/localtime | sed 's|.*/zoneinfo/||')
+config=$(mktemp)
+esc=$(printf '\033')
+nbsp=$(printf '\302\240') # ccstatusline pads with non-breaking spaces
+trap 'rm -f "$config"' EXIT
+
+widget() { # widget <id> <type> [absolute]
+    printf '{"id":"%s","type":"%s","rawValue":true' "$1" "$2"
+    [ -n "${3:-}" ] && printf ',"metadata":{"absolute":"true","weekday":"true","timezone":"%s"}' "$tz"
+    printf '}'
+}
+sep() { printf ',{"id":"s%s","type":"separator"},' "$1"; }
+
+usage_line() { # usage_line [config dir]; prints six " | " separated fields
+    {
+        printf '{"version":4,"colorLevel":0,"lines":[['
+        widget 1 session-usage;            sep 1
+        widget 2 reset-timer;              sep 2
+        widget 3 reset-timer absolute;     sep 3
+        widget 4 weekly-usage;             sep 4
+        widget 5 weekly-reset-timer;       sep 5
+        widget 6 weekly-reset-timer absolute
+        printf '],[],[]]}'
+    } > "$config"
+    printf '{"session_id":"claude-usage","model":{"display_name":"-"},"cwd":"/"}' |
+        if [ -n "${1:-}" ]; then
+            CLAUDE_CONFIG_DIR=$1 bunx -y ccstatusline@latest --config "$config"
+        else
+            env -u CLAUDE_CONFIG_DIR bunx -y ccstatusline@latest --config "$config"
+        fi 2>/dev/null | tail -1 | sed "s/$esc\[[0-9;]*m//g; s/$nbsp/ /g"
+}
+
+trim() { printf '%s' "$1" | sed 's/^ *//; s/ *$//'; }
+
+# Reduce "2026-11-21 10:39 GMT+8" or "Sun 19:59 GMT+8" to local "10:39" / "Sun 19:59".
+clock() { trim "$1" | sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2} //; s/([0-9]{2}:[0-9]{2}).*$/\1/'; }
+
+window() { # window <percent> <time left> <resets at>
+    case $2 in
+        *Loading*) printf '%s, no active window' "$(trim "$1")" ;;
+        *)         printf '%s, resets in %s (%s)' "$(trim "$1")" "$(trim "$2")" "$(clock "$3")" ;;
+    esac
+}
+
+for dir in "$HOME/.claude" "$HOME"/.claude-*; do
+    [ -f "$dir/account-label" ] || continue
+    # The default dir must run with CLAUDE_CONFIG_DIR unset: setting it, even
+    # to ~/.claude, makes Claude tooling look up a different login.
+    [ "$dir" = "$HOME/.claude" ] && arg= || arg=$dir
+    line=$(usage_line "$arg")
+    IFS='|' read -r s_pct s_left s_at w_pct w_left w_at <<EOF
+$line
+EOF
+    printf '%s\n' "$(cat "$dir/account-label")"
+    printf '  5h      %s\n' "$(window "$s_pct" "$s_left" "$s_at")"
+    printf '  weekly  %s\n' "$(window "$w_pct" "$w_left" "$w_at")"
+done
