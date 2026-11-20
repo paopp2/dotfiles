@@ -1,6 +1,6 @@
 #!/bin/sh
 # Show 5-hour and weekly usage for every Claude Code account on this machine.
-# usage: claude-usage
+# usage: cc-usage
 #
 # An account is a config dir (~/.claude or ~/.claude-*) holding an
 # account-label file. Usage comes from ccstatusline, which already knows how
@@ -31,7 +31,7 @@ usage_line() { # usage_line [config dir]; prints six " | " separated fields
         widget 6 weekly-reset-timer absolute
         printf '],[],[]]}'
     } > "$config"
-    printf '{"session_id":"claude-usage","model":{"display_name":"-"},"cwd":"/"}' |
+    printf '{"session_id":"cc-usage","model":{"display_name":"-"},"cwd":"/"}' |
         if [ -n "${1:-}" ]; then
             CLAUDE_CONFIG_DIR=$1 bunx -y ccstatusline@latest --config "$config"
         else
