@@ -1,0 +1,106 @@
+#!/bin/sh
+# Continue the current Claude Code session under another account, in a new tmux pane.
+# usage: cc-handover <account> [claude args...]
+#        cc-handover --which     print the account the session is on
+#
+# Run it from inside the session with `! cc-handover personal`. That needs no
+# model call, so it still works once the current account is out of usage.
+# <account> is the text of a config dir's account-label file. `cc-usage --pick`
+# (the Ctrl-q popup in tmux) calls this for the pane it was opened from.
+#
+# The transcript is copied to the target account, so each account keeps its own
+# session store. The source pane closes once the new session is running, and
+# stays if it never starts.
+set -eu
+
+die() { printf 'cc-handover: %s\n' "$1" >&2; exit 1; }
+
+# Internal: cc-handover --close-when-ready <old pane> <new pane> <session id>
+# Runs under the tmux server so it outlives the pane it closes. The new session
+# counts as running once its SessionStart hook has recorded it for the new
+# pane; first-run prompts (folder trust and the like) come before that.
+if [ "${1:-}" = --close-when-ready ]; then
+    old=$2 new=$3 sid=$4
+    tries=0
+    while [ "$tries" -lt 600 ]; do
+        tmux list-panes -a -F '#{pane_id}' | grep -qx "$new" || exit 0
+        if [ "$(cat "$HOME/.claude/tmux-pane-sessions/$new" 2>/dev/null)" = "$sid" ]; then
+            tmux kill-pane -t "$old"
+            exit 0
+        fi
+        sleep 0.5
+        tries=$((tries + 1))
+    done
+    exit 0
+fi
+
+pane=${TMUX_PANE:-}
+
+# Which session this is, and which account it is on.
+if [ -n "${CLAUDE_CODE_SESSION_ID:-}" ]; then
+    # Run inside the session: Claude exports both.
+    sid=$CLAUDE_CODE_SESSION_ID
+    source_dir=${CLAUDE_CONFIG_DIR:-$HOME/.claude}
+else
+    # Run from a tmux key for $TMUX_PANE: the session id comes from the pane
+    # map kept by ~/.claude/hooks/track-tmux-pane-session.sh, the account from
+    # the environment of the Claude process on that pane's terminal.
+    [ -n "$pane" ] || die "run it inside a Claude session: ! cc-handover <account>"
+    sid=$(cat "$HOME/.claude/tmux-pane-sessions/$pane" 2>/dev/null || true)
+    tty=$(tmux display-message -p -t "$pane" '#{pane_tty}' 2>/dev/null || true)
+    pid=$(ps -t "${tty#/dev/}" -o pid=,comm= 2>/dev/null | awk '$2 ~ /(^|\/)claude$/ { print $1; exit }')
+    [ -n "$sid" ] && [ -n "$pid" ] || die "no Claude session in this pane"
+    source_dir=$(ps eww -o command= -p "$pid" | tr ' ' '\n' | sed -n 's/^CLAUDE_CONFIG_DIR=//p' | head -1)
+    source_dir=${source_dir:-$HOME/.claude}
+fi
+source_dir=${source_dir%/}
+
+[ $# -ge 1 ] || die "usage: cc-handover <account> [claude args...]"
+if [ "$1" = --which ]; then
+    cat "$source_dir/account-label"
+    exit 0
+fi
+account=$1
+shift
+
+target=
+labels=
+for dir in "$HOME/.claude" "$HOME"/.claude-*; do
+    [ -f "$dir/account-label" ] || continue
+    label=$(cat "$dir/account-label")
+    labels="$labels $label"
+    [ "$label" = "$account" ] && target=$dir
+done
+[ -n "$target" ] || die "no account labelled '$account' (have:$labels)"
+[ "$target" != "$source_dir" ] || die "this session is already on '$account'"
+
+transcript=$(find "$source_dir/projects" -maxdepth 2 -name "$sid.jsonl" 2>/dev/null | head -1)
+[ -n "$transcript" ] || die "no transcript for session $sid under $source_dir"
+copy=$target/projects/$(basename "$(dirname "$transcript")")/$sid.jsonl
+
+# Handing back to an account that has since carried the conversation further
+# would throw those turns away.
+if [ -f "$copy" ] && [ "$copy" -nt "$transcript" ]; then
+    die "'$account' already has a newer copy of this session; resume that one instead"
+fi
+mkdir -p "$(dirname "$copy")"
+cp -p "$transcript" "$copy"
+
+# --resume only finds the session from the directory it was started in.
+cwd=$(grep -m1 -o '"cwd":"[^"]*"' "$transcript" | sed 's/^"cwd":"//; s/"$//')
+cwd=${cwd:-$PWD}
+
+# The default dir must run with CLAUDE_CONFIG_DIR unset: setting it, even to
+# ~/.claude, makes Claude look up a different login.
+if [ "$target" = "$HOME/.claude" ]; then launch="env -u CLAUDE_CONFIG_DIR"
+else launch="env CLAUDE_CONFIG_DIR=$target"; fi
+command="$launch $HOME/.local/bin/claude --resume $sid $*"
+
+if [ -n "${TMUX_PANE:-}" ]; then
+    new=$(tmux split-window -h -t "$TMUX_PANE" -c "$cwd" -P -F '#{pane_id}' "$command")
+    tmux select-layout -t "$TMUX_PANE" -E
+    tmux run-shell -b "'$0' --close-when-ready '$TMUX_PANE' '$new' '$sid'"
+    printf 'Handed over to %s in a new pane. This pane closes once it is running.\n' "$account"
+else
+    printf 'Copied to %s. Not in tmux, so continue with:\n  cd %s && %s\n' "$account" "$cwd" "$command"
+fi
