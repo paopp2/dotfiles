@@ -1,6 +1,9 @@
 #!/bin/sh
 # Show 5-hour and weekly usage for every Claude Code account on this machine.
-# usage: cc-usage
+# usage: cc-usage          print and exit
+#        cc-usage --pick   for the tmux popup (Ctrl-q): number the accounts, mark
+#                          the one the pane's Claude session is on, and move that
+#                          session to the account whose number is pressed
 #
 # An account is a config dir (~/.claude or ~/.claude-*) holding an
 # account-label file. Usage comes from ccstatusline, which already knows how
@@ -8,10 +11,17 @@
 set -eu
 
 tz=$(readlink /etc/localtime | sed 's|.*/zoneinfo/||')
-config=$(mktemp)
+tmp=$(mktemp -d)
 esc=$(printf '\033')
 nbsp=$(printf '\302\240') # ccstatusline pads with non-breaking spaces
-trap 'rm -f "$config"' EXIT
+trap 'rm -rf "$tmp"' EXIT
+
+# bunx spends about half a second resolving the package on every call, so run
+# the newest copy it has already cached and only fall back to bunx without one.
+dist=$(ls "$HOME"/.bun/install/cache/ccstatusline@*/dist/ccstatusline.js 2>/dev/null | sort -V | tail -1)
+ccstatusline() {
+    if [ -n "$dist" ]; then bun "$dist" "$@"; else bunx -y ccstatusline@latest "$@"; fi
+}
 
 widget() { # widget <id> <type> [absolute]
     printf '{"id":"%s","type":"%s","rawValue":true' "$1" "$2"
@@ -19,8 +29,13 @@ widget() { # widget <id> <type> [absolute]
     printf '}'
 }
 sep() { printf ',{"id":"s%s","type":"separator"},' "$1"; }
+# Time until the limit at the current pace. ccstatusline hides it unless the
+# limit comes before the reset, so it is tagged instead of read by position.
+limit() { printf '{"id":"%s","type":"%s","metadata":{"label":"%s"}}' "$1" "$2" "$3"; }
 
-usage_line() { # usage_line [config dir]; prints six " | " separated fields
+# usage_line <scratch file> [config dir]; prints six " | " separated fields,
+# then "5h=<time>" and "wk=<time>" for any window on pace to run out.
+usage_line() {
     {
         printf '{"version":4,"colorLevel":0,"lines":[['
         widget 1 session-usage;            sep 1
@@ -28,14 +43,16 @@ usage_line() { # usage_line [config dir]; prints six " | " separated fields
         widget 3 reset-timer absolute;     sep 3
         widget 4 weekly-usage;             sep 4
         widget 5 weekly-reset-timer;       sep 5
-        widget 6 weekly-reset-timer absolute
+        widget 6 weekly-reset-timer absolute; sep 6
+        limit 7 block-limit-timer 5h=;     sep 7
+        limit 8 weekly-limit-timer wk=
         printf '],[],[]]}'
-    } > "$config"
+    } > "$1"
     printf '{"session_id":"cc-usage","model":{"display_name":"-"},"cwd":"/"}' |
-        if [ -n "${1:-}" ]; then
-            CLAUDE_CONFIG_DIR=$1 bunx -y ccstatusline@latest --config "$config"
+        if [ -n "${2:-}" ]; then
+            CLAUDE_CONFIG_DIR=$2 ccstatusline --config "$1"
         else
-            env -u CLAUDE_CONFIG_DIR bunx -y ccstatusline@latest --config "$config"
+            (unset CLAUDE_CONFIG_DIR; ccstatusline --config "$1")
         fi 2>/dev/null | tail -1 | sed "s/$esc\[[0-9;]*m//g; s/$nbsp/ /g"
 }
 
@@ -56,25 +73,107 @@ bar() { # bar <percent>; 20 cells, coloured by level when printing to a terminal
     return 0
 }
 
-window() { # window <name> <percent> <time left> <resets at>
+# out_at <duration such as "1d 2hr 5m">; the local 24-hour clock time that far
+# from now, with the weekday when it is not today.
+out_at() {
+    secs=0
+    for part in $1; do
+        case $part in
+            *d)  secs=$((secs + ${part%d} * 86400)) ;;
+            *hr) secs=$((secs + ${part%hr} * 3600)) ;;
+            *m)  secs=$((secs + ${part%m} * 60)) ;;
+        esac
+    done
+    if [ "$(date -v "+${secs}S" +%F)" = "$(date +%F)" ]; then date -v "+${secs}S" +%H:%M
+    else date -v "+${secs}S" '+%a %H:%M'; fi
+}
+
+window() { # window <name> <percent> <time left> <resets at> <time until the limit, or empty>
     pct=$(trim "$2")
     printf '  %-7s ' "$1"; bar "$pct"; printf ' %6s  ' "$pct"
     case $3 in
-        *Loading*) printf 'no active window\n' ;;
-        *)         printf 'resets in %s (%s)\n' "$(trim "$3")" "$(clock "$4")" ;;
+        *Loading*) printf 'no active window' ;;
+        *)         printf 'resets in %s (%s)' "$(trim "$3")" "$(clock "$4")" ;;
     esac
+    if [ -n "$5" ]; then
+        [ -t 1 ] && printf '\033[31m'
+        printf ', out at %s' "$(out_at "$5")"
+        [ -t 1 ] && printf '\033[0m'
+    fi
+    printf '\n'
 }
 
+tagged() { # tagged <tag> <text>; the value after "<tag>=" up to the next separator
+    printf '%s' "$2" | sed -n "s/.*$1=\([^|]*\).*/\1/p" | sed 's/ *$//'
+}
+
+identity() { # identity <login file>; "email (org)", with a one-person org shown as "personal"
+    jq -r --arg own "'s Organization" '.oauthAccount // empty |
+        "\(.emailAddress) (\(if .organizationName == .emailAddress + $own
+                             then "personal" else .organizationName end))"' "$1" 2>/dev/null
+}
+
+pick= pane= current=
+if [ "${1:-}" = --pick ]; then
+    pick=1
+    # Inside a tmux popup the active pane is still the one it was opened from.
+    pane=$(tmux display-message -p '#{pane_id}')
+    current=$(TMUX_PANE=$pane cc-handover --which 2>/dev/null || true)
+fi
+
+key() { # key; wait for one keypress and print it
+    saved=$(stty -g)
+    stty -icanon -echo -ixon min 1 time 0 # -ixon so Ctrl-q arrives as a key
+    dd bs=1 count=1 2>/dev/null
+    stty "$saved"
+}
+
+# Fetch every account at once, then print in a stable order.
+count=0
 for dir in "$HOME/.claude" "$HOME"/.claude-*; do
     [ -f "$dir/account-label" ] || continue
-    # The default dir must run with CLAUDE_CONFIG_DIR unset: setting it, even
-    # to ~/.claude, makes Claude tooling look up a different login.
-    [ "$dir" = "$HOME/.claude" ] && arg= || arg=$dir
-    line=$(usage_line "$arg")
-    IFS='|' read -r s_pct s_left s_at w_pct w_left w_at <<EOF
-$line
-EOF
-    printf '%s\n' "$(cat "$dir/account-label")"
-    window 5h "$s_pct" "$s_left" "$s_at"
-    window weekly "$w_pct" "$w_left" "$w_at"
+    count=$((count + 1))
+    # The default dir keeps its login file beside it and must run with
+    # CLAUDE_CONFIG_DIR unset: setting it, even to ~/.claude, makes Claude
+    # tooling look up a different login.
+    if [ "$dir" = "$HOME/.claude" ]; then arg=; login=$HOME/.claude.json
+    else arg=$dir; login=$dir/.claude.json; fi
+    name=$(identity "$login" || true)
+    cp "$dir/account-label" "$tmp/$count.label"
+    printf '%s\n' "${name:-$(cat "$dir/account-label") (not logged in)}" > "$tmp/$count.name"
+    usage_line "$tmp/$count.json" "$arg" > "$tmp/$count.line" &
 done
+wait
+
+acct=0
+while [ "$acct" -lt "$count" ]; do
+    acct=$((acct + 1))
+    if [ -n "$pick" ]; then
+        printf '%s  %s' "$acct" "$(cat "$tmp/$acct.name")"
+        [ "$(cat "$tmp/$acct.label")" = "$current" ] && printf '  <- this session'
+        printf '\n'
+    else
+        cat "$tmp/$acct.name"
+    fi
+    s_pct=
+    IFS='|' read -r s_pct s_left s_at w_pct w_left w_at rest < "$tmp/$acct.line" || true
+    if [ -z "$s_pct" ]; then
+        printf '  usage unavailable, run again\n'
+        continue
+    fi
+    window 5h "$s_pct" "$s_left" "$s_at" "$(tagged 5h "$rest")"
+    window weekly "$w_pct" "$w_left" "$w_at" "$(tagged wk "$rest")"
+done
+
+[ -n "$pick" ] || exit 0
+[ -n "$current" ] && printf '\nPress a number to move this session to that account. Any other key closes.\n'
+pressed=$(key)
+# Only a number naming another account does anything; there must be a session to move.
+[ -n "$current" ] && [ -f "$tmp/$pressed.label" ] || exit 0
+label=$(cat "$tmp/$pressed.label")
+[ "$label" != "$current" ] || exit 0
+if ! TMUX_PANE=$pane cc-handover "$label" > /dev/null 2> "$tmp/error"; then
+    cat "$tmp/error"
+    printf 'Press any key.\n'
+    key > /dev/null
+fi
