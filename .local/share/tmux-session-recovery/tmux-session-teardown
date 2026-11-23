@@ -18,6 +18,10 @@ account but the default.
 Without --close this only saves: no agent is stopped and no session is closed.
 With --close, each saved agent is then sent Ctrl-C, as if typed in its pane,
 until it exits. Unsaved agents and the agent running this command stay open.
+If every agent closed and nothing else is left in the session (only the
+saved agents' panes, dead panes, and the pane this was typed into), the
+session is killed too, including the saved agent running this command. Its
+clients move to the most recently used other session instead of detaching.
 
 Exit status: 0 saved or unchanged, 2 saved but incomplete or an agent did not
 close, 1 nothing saved (nothing closed).
@@ -426,6 +430,38 @@ def close_agents(saved: list) -> list:
     return [pane for pane, _, _ in pending]
 
 
+def typed_into(pane: str) -> bool:
+    """True if this was typed into the pane: stdin is its terminal. A script or
+    an agent's shell tool also inherits TMUX_PANE, but not the terminal."""
+    try:
+        tty = os.ttyname(sys.stdin.fileno())
+    except OSError:
+        return False
+    return tmux("display-message", "-p", "-t", pane, "#{pane_tty}") == tty
+
+
+def end_finished_session(pane_id: str, saved_panes: set) -> None:
+    """Kill the session once only its closed agents were in it."""
+    session_id = tmux("display-message", "-p", "-t", pane_id, "#{session_id}")
+    rows = tmux("list-panes", "-s", "-t", session_id, "-F", "#{pane_id} #{pane_dead}")
+    others = [
+        pane for pane, dead in (row.split(" ") for row in rows.splitlines())
+        if pane not in saved_panes and dead != "1"
+        and not (pane == pane_id and typed_into(pane))
+    ]
+    if others:
+        print(f"Keeping the session: other panes are open ({' '.join(others)}).",
+              file=sys.stderr)
+        return
+    print("Closing the session: only its saved agents were in it.", flush=True)
+    sys.stderr.flush()
+    # Attached clients then switch to the most recently used other session
+    # instead of detaching. Killing the session also ends this command when
+    # it runs inside it, so this is the last thing it does.
+    tmux("set-option", "-t", session_id, "detach-on-destroy", "off")
+    tmux("kill-session", "-t", session_id)
+
+
 # Output
 
 
@@ -601,6 +637,13 @@ def main(argv) -> int:
             status = 2
         if state["skipped"]:
             print("Skipped panes were not closed.", file=sys.stderr)
+        if not still_open:
+            try:
+                end_finished_session(pane_id, {a[0] for a in saved})
+            except (subprocess.SubprocessError, OSError) as e:
+                print(f"tmux-session-teardown: could not close the session: {e}",
+                      file=sys.stderr)
+                return 1
     return status
 
 
