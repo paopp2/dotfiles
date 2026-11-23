@@ -4,6 +4,9 @@
 #        cc-usage --pick   for the tmux popup (Ctrl-q): mark the account the pane's
 #                          Claude session is on, and move that session to the
 #                          account chosen with Up/Down and Enter
+#        cc-usage --best [--not <config dir>]
+#                          print the config dir of the account to use next,
+#                          or nothing when none has room
 #
 # An account is a config dir (~/.claude or ~/.claude-*) holding an
 # account-label file. Usage comes from ccstatusline, which already knows how
@@ -73,17 +76,23 @@ bar() { # bar <percent>; 20 cells, coloured by level when printing to a terminal
     return 0
 }
 
-# out_at <duration such as "1d 2hr 5m">; the local 24-hour clock time that far
-# from now, with the weekday when it is not today.
-out_at() {
+seconds() { # seconds <duration such as "1d 2hr 5m">; 0 for anything else
     secs=0
     for part in $1; do
         case $part in
+            *[!0-9]*d | *[!0-9]*hr | *[!0-9]*m) ;;
             *d)  secs=$((secs + ${part%d} * 86400)) ;;
             *hr) secs=$((secs + ${part%hr} * 3600)) ;;
             *m)  secs=$((secs + ${part%m} * 60)) ;;
         esac
     done
+    echo "$secs"
+}
+
+# out_at <duration>; the local 24-hour clock time that far from now, with the
+# weekday when it is not today.
+out_at() {
+    secs=$(seconds "$1")
     if [ "$(date -v "+${secs}S" +%F)" = "$(date +%F)" ]; then date -v "+${secs}S" +%H:%M
     else date -v "+${secs}S" '+%a %H:%M'; fi
 }
@@ -113,7 +122,43 @@ identity() { # identity <login file>; "email (org)", with a one-person org shown
                              then "personal" else .organizationName end))"' "$1" 2>/dev/null
 }
 
-pick= pane= current= gutter=
+# best <limit>; the config dir of the account to start or continue a session
+# on, among those under <limit> percent in both windows.
+#
+# An account's surplus is its weekly percent left minus the percent of its week
+# left: what an even pace would leave unused at the reset, where it is lost.
+# The largest surplus wins once it is worth chasing. Otherwise accounts are
+# used in the order listed, the default one first: it is the one whose 5-hour
+# windows run out soonest, and a window left idle is lost as well.
+chase=20 # surplus, in points, from which an account jumps the order
+best() {
+    acct=0 best_dir= best_surplus=-101 first_dir=
+    while [ "$acct" -lt "$count" ]; do
+        acct=$((acct + 1))
+        dir=$(cat "$tmp/$acct.dir")
+        [ "$dir" != "$skip" ] || continue
+        s_pct=
+        IFS='|' read -r s_pct s_left s_at w_pct w_left w_at rest < "$tmp/$acct.line" || true
+        s_used=$(trim "$s_pct"); s_used=${s_used%%.*}
+        w_used=$(trim "$w_pct"); w_used=${w_used%%.*}
+        case $s_used$w_used in '' | *[!0-9]*) continue ;; esac # no usage: logged out or offline
+        [ "$s_used" -lt "$1" ] && [ "$w_used" -lt "$1" ] || continue
+        left=$(seconds "$w_left")
+        [ "$left" -gt 0 ] || left=604800 # no weekly window open yet: a full week
+        surplus=$(( 100 - w_used - left / 6048 )) # 6048s is a percent of a week
+        [ -n "$first_dir" ] || first_dir=$dir
+        if [ "$surplus" -gt "$best_surplus" ]; then best_dir=$dir best_surplus=$surplus; fi
+    done
+    [ -n "$first_dir" ] || return 1
+    if [ "$best_surplus" -ge "$chase" ]; then printf '%s\n' "$best_dir"
+    else printf '%s\n' "$first_dir"; fi
+}
+
+pick= pane= current= gutter= choose= skip=
+if [ "${1:-}" = --best ]; then
+    choose=1
+    [ "${2:-}" = --not ] && skip=${3%/}
+fi
 if [ "${1:-}" = --pick ]; then
     pick=1
     gutter='  ' # room for the selection marker
@@ -152,10 +197,17 @@ for dir in "$HOME/.claude" "$HOME"/.claude-*; do
     else arg=$dir; login=$dir/.claude.json; fi
     name=$(identity "$login" || true)
     cp "$dir/account-label" "$tmp/$count.label"
+    printf '%s\n' "$dir" > "$tmp/$count.dir"
     printf '%s\n' "${name:-$(cat "$dir/account-label") (not logged in)}" > "$tmp/$count.name"
     usage_line "$tmp/$count.json" "$arg" > "$tmp/$count.line" &
 done
 wait
+
+if [ -n "$choose" ]; then
+    # Prefer an account with real room; one that is nearly out is a last resort.
+    best 95 || best 100 || true
+    exit 0
+fi
 
 heading() { # heading <account number> [selected]; the account's name line, without a newline
     if [ -n "${2:-}" ]; then printf '> \033[7m%s\033[0m' "$(cat "$tmp/$1.name")"

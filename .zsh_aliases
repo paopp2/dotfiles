@@ -241,14 +241,23 @@ alias zed-update='cd "$ZED_CUSTOM_BUILD" && git fetch upstream && git checkout m
 alias azs='(( $+commands[az] )) && az account set --subscription "$(az account list --query '"'"'[?name!=`N/A(tenant level account)`].name'"'"' -o tsv | fzf)"'
 
 # Claude Code
-# cc [account] [claude args...]. Plain claude unless the first arg names an
-# account in CLAUDE_ACCOUNTS (name -> config dir), set per machine in ~/.zsh_local.
+# cc [account] [claude args...]. The first arg may name an account in
+# CLAUDE_ACCOUNTS (name -> config dir), set per machine in ~/.zsh_local.
+# Without one, a new session goes to the account cc-usage finds the most room
+# on. Resuming stays on the default account, where the session may live, and so
+# does a subcommand (cc mcp, cc update), which is a single bare word.
 unalias cc 2>/dev/null
 function cc {
   local dir
-  [[ ${(t)CLAUDE_ACCOUNTS} == association* && -n $1 ]] && dir=${CLAUDE_ACCOUNTS[$1]}
-  if [[ -n $dir ]]; then
+  if [[ ${(t)CLAUDE_ACCOUNTS} == association* && -n $1 && -n ${CLAUDE_ACCOUNTS[$1]} ]]; then
+    dir=${CLAUDE_ACCOUNTS[$1]}
     shift
+  elif [[ -z $1 || $1 == (-*|* *) ]] && (( ! ${@[(I)(-c|--continue|-r|--resume)]} )); then
+    dir=$(cc-usage --best 2>/dev/null)
+  fi
+  # The default dir must run with CLAUDE_CONFIG_DIR unset: setting it, even to
+  # ~/.claude, makes Claude look up a different login.
+  if [[ -n $dir && $dir != $HOME/.claude ]]; then
     CLAUDE_CONFIG_DIR=$dir claude "$@"
   else
     claude "$@"
