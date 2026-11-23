@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Recreate a saved tmux session's agent panes and resume their conversations.
 
-Usage: tmux-session-restore
-       tmux-session-restore SESSION-NAME
-       tmux-session-restore RECORD-DIRECTORY
+Usage: tmux-session-restore [--account LABEL]
+       tmux-session-restore [--account LABEL] SESSION-NAME
+       tmux-session-restore [--account LABEL] RECORD-DIRECTORY
 
 With no argument, pick one of the 50 newest saved sessions with fzf (or list
 them when fzf or a terminal is unavailable). A plain name selects
@@ -12,6 +12,18 @@ record directory (use ./name for a relative one). Refuses
 if a session with the saved name exists. Agents whose directory, command, or
 local history is missing are skipped and reported. An agent that fails at
 startup stays in its dead pane so the error remains visible.
+
+Each Claude agent resumes on the account it was saved from: the default
+~/.claude (with CLAUDE_CONFIG_DIR unset) when the record names none, else its
+recorded config dir. --account LABEL resumes every Claude agent on the account
+whose config dir holds that account-label instead (for example when the saved
+account is out of usage): as cc-handover does, the transcript is first copied
+into that account's projects dir; if that account already has a newer copy,
+nothing is copied and that copy is resumed. Without --account, a Claude agent
+is skipped when another account holds a newer copy of its conversation (it
+was handed over after the save); the message names the --account to restore
+it with. "Newer" means more user and assistant messages, not a later mtime. Codex
+agents are unaffected.
 
 Exit status: 0 restored, 2 restored with skipped agents, 1 nothing restored or
 tmux failed, 64 invalid invocation or nothing picked.
@@ -29,7 +41,11 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parent
 SAVES = ROOT / "saves"
 UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
-VERSION = 1
+# Version 2 adds config_dir to Claude agents; version 1 means the default account.
+VERSIONS = (1, 2)
+# The default account. It must run with CLAUDE_CONFIG_DIR unset: setting it,
+# even to this dir, makes Claude look up a different login.
+DEFAULT_CLAUDE_DIR = str(Path.home() / ".claude")
 PLACEHOLDER = "/bin/sleep 86400"
 PICK_LIMIT = 50  # older saves stay on disk and restore by name
 
@@ -41,9 +57,19 @@ def session_key(name: str) -> str:
     return "%2E" + key[1:] if key.startswith(".") else key
 
 
-def resume_argv(tool: str, conversation_id: str) -> list:
+def same_path(a: str, b: str) -> bool:
+    return os.path.realpath(a) == os.path.realpath(b)
+
+
+def resume_argv(tool: str, conversation_id: str, config_dir: str = DEFAULT_CLAUDE_DIR) -> list:
     if tool == "claude":
-        return ["claude", "--resume", conversation_id]
+        # Set or clear CLAUDE_CONFIG_DIR explicitly: the pane would otherwise
+        # inherit whatever the tmux server's environment holds.
+        if same_path(config_dir, DEFAULT_CLAUDE_DIR):
+            account = ["env", "-u", "CLAUDE_CONFIG_DIR"]
+        else:
+            account = ["env", "CLAUDE_CONFIG_DIR=" + config_dir]
+        return [*account, "claude", "--resume", conversation_id]
     if tool == "codex":
         # Without the shared daemon the process holds its own conversation lock,
         # which teardown needs to identify it.
@@ -69,15 +95,15 @@ def text(value, what: str, absolute: bool = False) -> str:
 
 
 def load_state(path: Path) -> dict:
-    """Read and strictly validate a version 1 record. Raises ValueError."""
+    """Read and strictly validate a version 1 or 2 record. Raises ValueError."""
     try:
         state = json.loads(path.read_text(encoding="utf-8"))
     except OSError as e:
         raise ValueError(f"Cannot read {path}: {e.strerror}")
     except ValueError as e:
         raise ValueError(f"{path} is not valid JSON: {e}")
-    if not isinstance(state, dict) or state.get("version") != VERSION:
-        raise ValueError(f"{path} is not a version {VERSION} recovery record")
+    if not isinstance(state, dict) or state.get("version") not in VERSIONS:
+        raise ValueError(f"{path} is not a version 1 or 2 recovery record")
     text(state.get("session_name"), "session name")
     windows, skipped = state.get("windows"), state.get("skipped")
     if not isinstance(windows, list) or not isinstance(skipped, list):
@@ -96,6 +122,10 @@ def load_state(path: Path) -> dict:
                 raise ValueError(f"Invalid conversation ID: {cid!r}")
             text(agent.get("cwd"), "directory", absolute=True)
             text(agent.get("transcript_path"), "transcript path", absolute=True)
+            if state["version"] >= 2 and agent["tool"] == "claude":
+                text(agent.get("config_dir"), "config dir", absolute=True)
+            elif "config_dir" in agent:
+                raise ValueError("config_dir is only valid on version 2 Claude agents")
             if (agent["tool"], cid) in seen:
                 raise ValueError(f"Conversation listed twice: {cid}")
             seen.add((agent["tool"], cid))
@@ -132,8 +162,90 @@ def history_problem(agent: dict) -> str:
     return "" if ok else "history is for another conversation"
 
 
-def usable_windows(state: dict):
-    """Split the record into restorable windows and reasons for skipped agents."""
+def accounts() -> list:
+    """(label, config dir) for each account, found as cc-handover finds them."""
+    home = Path.home()
+    found = []
+    for d in [home / ".claude", *sorted(home.glob(".claude-*"))]:
+        try:
+            found.append(((d / "account-label").read_text().strip(), str(d)))
+        except OSError:
+            continue
+    return found
+
+
+def account_dir(label: str) -> str:
+    for name, d in accounts():
+        if name == label:
+            return d
+    raise ValueError(f"no account labelled {label!r}")
+
+
+def account_copy(config_dir: str, transcript: str) -> str:
+    """Where another account keeps the same transcript (same project dir)."""
+    return os.path.join(config_dir, "projects", os.path.basename(os.path.dirname(transcript)),
+                        os.path.basename(transcript))
+
+
+def messages(path: str) -> int:
+    """How far a transcript has got: its user and assistant messages. Not the
+    mtime: after a handover the old account's Claude still writes bookkeeping
+    lines as it exits, which can leave the stale copy the last one written."""
+    count = 0
+    with open(path, "rb") as f:
+        for line in f:
+            try:
+                count += json.loads(line).get("type") in ("user", "assistant")
+            except (ValueError, AttributeError):
+                continue
+    return count
+
+
+def newer_copy(agent: dict, ignore: list) -> str:
+    """Why the saved history is stale, or ''. After a later cc-handover another
+    account carries the conversation further; resuming the saved copy would
+    silently drop those turns."""
+    source = agent["transcript_path"]
+    try:
+        saved = messages(source)
+        for label, d in accounts():
+            copy = account_copy(d, source)
+            if any(same_path(d, i) for i in ignore) or same_path(copy, source):
+                continue
+            if os.path.isfile(copy) and messages(copy) > saved:
+                return (f"account {label!r} has a newer copy of this conversation; "
+                        f"restore with --account {label} to continue it there")
+    except OSError as e:
+        return f"cannot compare history across accounts: {e}"
+    return ""
+
+
+def handover(agent: dict, target: str):
+    """Copy a Claude transcript into another account, as cc-handover does.
+    Returns the agent as it resumes there, and a problem ('' if none)."""
+    source = agent["transcript_path"]
+    copy = account_copy(target, source)
+    moved = dict(agent, config_dir=target, transcript_path=copy)
+    if same_path(copy, source):
+        return moved, ""
+    try:
+        # A target that has since carried the conversation further (a later
+        # cc-handover) is resumed as it is: copying over it would throw those
+        # turns away. Any turns only the saved copy has stay in its file.
+        if os.path.isfile(copy) and messages(copy) > messages(source):
+            print(f"NOTE: {agent['conversation_id']}: resuming the further-along copy "
+                  f"in {target}; the saved copy was not copied over it", file=sys.stderr)
+            return moved, ""
+        os.makedirs(os.path.dirname(copy), exist_ok=True)
+        shutil.copy2(source, copy)  # keeps the mtime, as cp -p does
+    except OSError as e:
+        return agent, f"cannot copy history to {target}: {e}"
+    return moved, ""
+
+
+def usable_windows(state: dict, target=None):
+    """Split the record into restorable windows and reasons for skipped agents.
+    With a target config dir, Claude agents are handed over to it first."""
     windows, problems = [], []
     for window in state["windows"]:
         agents = []
@@ -143,6 +255,11 @@ def usable_windows(state: dict):
             ) or (
                 "" if os.path.isdir(agent["cwd"]) else f"directory missing: {agent['cwd']}"
             ) or history_problem(agent)
+            if not problem and agent["tool"] == "claude":
+                # handover() resumes the target's copy when that is the newer one.
+                problem = newer_copy(agent, [target] if target else [])
+            if not problem and target and agent["tool"] == "claude":
+                agent, problem = handover(agent, target)
             if problem:
                 problems.append(f"window {window['name']!r} {agent['tool']} "
                                 f"{agent['conversation_id']}: {problem}")
@@ -208,7 +325,10 @@ def pick_record():
 
 def start_agent(pane_id: str, agent: dict) -> None:
     """Replace a placeholder pane created by this restore with the agent."""
-    command = "exec " + shlex.join(resume_argv(agent["tool"], agent["conversation_id"]))
+    # A version 1 record has no config_dir: it was the default account.
+    command = "exec " + shlex.join(resume_argv(
+        agent["tool"], agent["conversation_id"],
+        agent.get("config_dir", DEFAULT_CLAUDE_DIR)))
     tmux("respawn-pane", "-k", "-t", pane_id, "-c", agent["cwd"],
          "-e", "PATH=" + os.environ.get("PATH", ""), command)
 
@@ -250,16 +370,26 @@ def main(argv) -> int:
     if argv[1:] in (["-h"], ["--help"]):
         print(__doc__.strip())
         return 0
-    if len(argv) == 1:
+    args, target = argv[1:], None
+    if args[:1] == ["--account"]:
+        try:
+            if len(args) < 2 or not args[1]:
+                raise ValueError("--account needs an account label")
+            target = account_dir(args[1])
+        except ValueError as e:
+            print(f"tmux-session-restore: {e}", file=sys.stderr)
+            return 64
+        args = args[2:]
+    if not args:
         arg = pick_record()
         if arg is None:
             return 64
-    elif len(argv) != 2 or not argv[1]:
-        print("usage: tmux-session-restore [SESSION-NAME | RECORD-DIRECTORY]",
-              file=sys.stderr)
+    elif len(args) != 1 or not args[0]:
+        print("usage: tmux-session-restore [--account LABEL] "
+              "[SESSION-NAME | RECORD-DIRECTORY]", file=sys.stderr)
         return 64
     else:
-        arg = argv[1]
+        arg = args[0]
     try:
         path = record_path(arg)
         state = load_state(path)
@@ -279,7 +409,7 @@ def main(argv) -> int:
         print(f"tmux-session-restore: {e}", file=sys.stderr)
         return 1
 
-    windows, problems = usable_windows(state)
+    windows, problems = usable_windows(state, target)
     for s in state["skipped"]:
         problems.insert(0, f"window {s['window']!r} pane {s['pane']} "
                            f"(not saved): {s['reason']}")

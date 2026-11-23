@@ -8,6 +8,13 @@ README.md (bulleted resume commands) beside this script. Each conversation ID
 is verified against live process ownership; anything unverifiable is reported
 and skipped, never guessed.
 
+Claude Code may run on several accounts: ~/.claude (the default, run with
+CLAUDE_CONFIG_DIR unset) and each ~/.claude-* config dir. Each Claude agent is
+saved with the config dir its live process is using, found from the session
+registry that names that process and cross-checked against CLAUDE_CONFIG_DIR in
+its environment. The README's resume commands set CLAUDE_CONFIG_DIR for any
+account but the default.
+
 Without --close this only saves: no agent is stopped and no session is closed.
 With --close, each saved agent is then sent Ctrl-C, as if typed in its pane,
 until it exits. Unsaved agents and the agent running this command stay open.
@@ -29,12 +36,16 @@ from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent
 SAVES = ROOT / "saves"
-CLAUDE_SESSIONS = Path.home() / ".claude" / "sessions"
-CLAUDE_PROJECTS = Path.home() / ".claude" / "projects"
+# The default account. It must run with CLAUDE_CONFIG_DIR unset: setting it,
+# even to this dir, makes Claude look up a different login.
+DEFAULT_CLAUDE_DIR = str(Path.home() / ".claude")
 CODEX_LOCKS = Path.home() / ".codex" / "thread-writer-locks"
 CODEX_SESSIONS = Path.home() / ".codex" / "sessions"
 UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
-VERSION = 1
+# Version 2 adds config_dir to Claude agents. Version 1 records (no config_dir)
+# mean the default account; the bump makes an older restore refuse a new
+# record instead of resuming it on the wrong account.
+VERSION = 2
 LABELS = {"claude": "Claude Code", "codex": "Codex"}
 # Claude exits on a second Ctrl-C within about a second; a busy agent needs
 # one more press to interrupt its turn first, and Claude with background tasks
@@ -66,8 +77,12 @@ def resume_argv(tool: str, conversation_id: str) -> list:
     raise ValueError("Unsupported agent: " + tool)
 
 
-def resume_command(tool: str, conversation_id: str, cwd: str) -> str:
-    return "cd " + shlex.quote(cwd) + " && " + shlex.join(
+def resume_command(tool: str, conversation_id: str, cwd: str, config_dir=None) -> str:
+    """A command to paste by hand. No config_dir means the default account."""
+    account = ""
+    if config_dir and not same_dir(config_dir, DEFAULT_CLAUDE_DIR):
+        account = "CLAUDE_CONFIG_DIR=" + shlex.quote(config_dir) + " "
+    return "cd " + shlex.quote(cwd) + " && " + account + shlex.join(
         resume_argv(tool, conversation_id)
     )
 
@@ -112,19 +127,82 @@ def agent_tool(pid: int, table: dict):
     name = os.path.basename(table[pid][4])
     if name == "codex":
         return "codex"
-    if name == "claude" or registry_matches(pid, table[pid][3]):
+    if name == "claude" or claude_registries(pid, table[pid][3]):
         return "claude"
     return None
 
 
-def registry_matches(pid: int, start: str) -> bool:
-    """True if a Claude registry names this exact process (not a reused PID)."""
+# Accounts
+
+
+def same_dir(a: str, b: str) -> bool:
+    return os.path.realpath(a) == os.path.realpath(b)
+
+
+def claude_config_dirs() -> list:
+    """Every account's config dir that keeps a session registry."""
+    home = Path.home()
+    dirs = [home / ".claude", *sorted(home.glob(".claude-*"))]
+    return [str(d) for d in dirs if (d / "sessions").is_dir()]
+
+
+def claude_registries(pid: int, start: str) -> list:
+    """(config dir, registry) for each account whose registry names this exact
+    process: same PID and start time, so a reused PID never matches."""
+    found = []
+    for config_dir in claude_config_dirs():
+        try:
+            reg = json.loads((Path(config_dir) / "sessions" / f"{pid}.json").read_text())
+        except (OSError, ValueError):
+            continue
+        if (isinstance(reg, dict) and reg.get("pid") == pid
+                and " ".join(str(reg.get("procStart", "")).split()) == start):
+            found.append((config_dir, reg))
+    return found
+
+
+def env_config_dir(pid: int):
+    """The config dir named by the process environment, as cc-handover reads it:
+    CLAUDE_CONFIG_DIR, or the default dir when unset. None if the environment
+    is not readable."""
+    result = subprocess.run(["ps", "eww", "-o", "command=", "-p", str(pid)],
+                            capture_output=True, text=True, timeout=10)
+    if result.returncode != 0:
+        raise Unresolved("process exited during save")
+    # ps prints the command line, then the environment, split on spaces. A
+    # Claude process always has PATH, so without it the environment is hidden.
+    words = result.stdout.split()
+    if not any(w.startswith("PATH=") for w in words):
+        return None
+    values = {w.split("=", 1)[1] for w in words if w.startswith("CLAUDE_CONFIG_DIR=")}
+    if len(values) > 1:
+        raise Unresolved("Claude process environment names several CLAUDE_CONFIG_DIR values")
+    return values.pop() if values else DEFAULT_CLAUDE_DIR
+
+
+def claude_account(pid: int, start: str):
+    """The config dir and registry of the account this live process runs on."""
+    matches = claude_registries(pid, start)
+    if not matches:
+        raise Unresolved("Claude process has no readable session registry in any "
+                         "account (" + ", ".join(claude_config_dirs()) + ")")
+    if len(matches) > 1:
+        raise Unresolved("Claude process is registered in several accounts: "
+                         + ", ".join(d for d, _ in matches))
+    config_dir, reg = matches[0]
+    named = env_config_dir(pid)
+    if named is not None and not same_dir(named, config_dir):
+        raise Unresolved(f"Claude process runs with config dir {named} but is "
+                         f"registered in {config_dir}")
+    return config_dir, reg
+
+
+def account_label(config_dir: str) -> str:
+    """The account's name from its account-label file, or the dir itself."""
     try:
-        reg = json.loads((CLAUDE_SESSIONS / f"{pid}.json").read_text())
-    except (OSError, ValueError):
-        return False
-    return (isinstance(reg, dict) and reg.get("pid") == pid
-            and " ".join(str(reg.get("procStart", "")).split()) == start)
+        return (Path(config_dir) / "account-label").read_text().strip() or config_dir
+    except OSError:
+        return config_dir
 
 
 def pane_agents(pane_pid: int, table: dict) -> list:
@@ -152,25 +230,20 @@ def process_cwd(pid: int) -> str:
     return names[0]
 
 
-def claude_transcript(conversation_id: str) -> str:
-    matches = sorted(CLAUDE_PROJECTS.glob(f"*/{conversation_id}.jsonl"))
+def claude_transcript(config_dir: str, conversation_id: str) -> str:
+    matches = sorted((Path(config_dir) / "projects").glob(f"*/{conversation_id}.jsonl"))
     if not matches:
-        raise Unresolved(f"Claude {conversation_id} has no local history yet")
+        raise Unresolved(f"Claude {conversation_id} has no local history yet in {config_dir}")
     if len(matches) > 1:
-        raise Unresolved(f"Claude {conversation_id} has several transcripts")
+        raise Unresolved(f"Claude {conversation_id} has several transcripts in {config_dir}")
     return str(matches[0])
 
 
 def resolve_claude(pid: int, start: str) -> dict:
-    try:
-        reg = json.loads((CLAUDE_SESSIONS / f"{pid}.json").read_text())
-    except (OSError, ValueError):
-        raise Unresolved("Claude process has no readable session registry")
+    config_dir, reg = claude_account(pid, start)
     sid = reg.get("sessionId")
     if (
-        reg.get("pid") != pid
-        or " ".join(str(reg.get("procStart", "")).split()) != start
-        or reg.get("kind") != "interactive"
+        reg.get("kind") != "interactive"
         or reg.get("entrypoint") != "cli"
         or not isinstance(sid, str)
         or not UUID_RE.fullmatch(sid)
@@ -187,7 +260,8 @@ def resolve_claude(pid: int, start: str) -> dict:
         "tool": "claude",
         "conversation_id": sid,
         "cwd": process_cwd(pid),
-        "transcript_path": claude_transcript(sid),
+        "transcript_path": claude_transcript(config_dir, sid),
+        "config_dir": config_dir,
     }
 
 
@@ -379,10 +453,13 @@ def render_readme(state: dict, record_dir: Path) -> str:
     for window in state["windows"]:
         lines += ["", f"## Window: {md_text(window['name'])}", ""]
         for a in window["agents"]:
-            lines.append(f"- {LABELS[a['tool']]}. Conversation: {a['conversation_id']}. "
-                         f"Directory: {md_code(a['cwd'])}.")
+            # A version 1 record has no config_dir: it was the default account.
+            config_dir = a.get("config_dir", DEFAULT_CLAUDE_DIR) if a["tool"] == "claude" else None
+            account = f" Account: {md_text(account_label(config_dir))}." if config_dir else ""
+            lines.append(f"- {LABELS[a['tool']]}. Conversation: {a['conversation_id']}."
+                         f"{account} Directory: {md_code(a['cwd'])}.")
             lines.append("  Resume: " + md_code(
-                resume_command(a["tool"], a["conversation_id"], a["cwd"])))
+                resume_command(a["tool"], a["conversation_id"], a["cwd"], config_dir)))
     return "\n".join(lines) + "\n"
 
 
@@ -499,7 +576,8 @@ def main(argv) -> int:
     print(f"{'Saved' if changed else 'Unchanged'}: {count} agent(s) in {record_dir}")
     for window in state["windows"]:
         for a in window["agents"]:
-            print(f"  [{window['name']}] {LABELS[a['tool']]} {a['conversation_id']}")
+            account = f" (account: {account_label(a['config_dir'])})" if "config_dir" in a else ""
+            print(f"  [{window['name']}] {LABELS[a['tool']]} {a['conversation_id']}{account}")
     status = 0
     if state["skipped"]:
         print(f"INCOMPLETE: {len(state['skipped'])} pane(s) skipped; see "
