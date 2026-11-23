@@ -335,12 +335,14 @@ def start_agent(pane_id: str, agent: dict) -> None:
     command = "exec " + shlex.join(resume_argv(
         agent["tool"], agent["conversation_id"],
         agent.get("config_dir", DEFAULT_CLAUDE_DIR)))
+    # Set on the pane, not the window: shells opened in the window later
+    # should close as usual. An agent that exits normally (status 0) closes too.
+    tmux("set-option", "-p", "-t", pane_id, "remain-on-exit", "failed")
     tmux("respawn-pane", "-k", "-t", pane_id, "-c", agent["cwd"],
          "-e", "PATH=" + os.environ.get("PATH", ""), command)
 
 
 def prepare_window(window_id: str, name: str) -> None:
-    tmux("set-option", "-w", "-t", window_id, "remain-on-exit", "failed")
     tmux("set-option", "-w", "-t", window_id, "automatic-rename", "off")
     tmux("rename-window", "-t", window_id, name)  # -n "" alone means "unnamed"
 
