@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Recreate a saved tmux session's agent panes and resume their conversations.
 
-Usage: tmux-session-restore [--account LABEL] [--close-pane]
-       tmux-session-restore [--account LABEL] [--close-pane] SESSION-NAME
-       tmux-session-restore [--account LABEL] [--close-pane] RECORD-DIRECTORY
+Usage: tmux-session-restore [--account LABEL] [--keep-pane]
+       tmux-session-restore [--account LABEL] [--keep-pane] SESSION-NAME
+       tmux-session-restore [--account LABEL] [--keep-pane] RECORD-DIRECTORY
 
 With no argument, pick one of the 50 newest saved sessions with fzf (or list
 them when fzf or a terminal is unavailable). A plain name selects
@@ -25,10 +25,11 @@ was handed over after the save); the message names the --account to restore
 it with. "Newer" means more user and assistant messages, not a later mtime. Codex
 agents are unaffected.
 
---close-pane closes the tmux pane this runs in once the restored session is
-on screen. The pane stays open when there is something in it to read
-(skipped agents, a failure, or a switch that did not happen) and when the
-picker is dismissed.
+Typed into a tmux pane, it closes that pane once the restored session is on
+screen; --keep-pane keeps it. The pane also stays open when there is
+something in it to read (skipped agents, a failure, or a switch that did not
+happen) and when the picker is dismissed. Run by an agent or a script (stdin
+is not the pane's terminal), it never closes a pane.
 
 Exit status: 0 restored, 2 restored with skipped agents, 1 nothing restored or
 tmux failed, 64 invalid invocation or nothing picked.
@@ -371,15 +372,30 @@ def restore_state(state: dict, windows: list) -> str:
     return session_id
 
 
-def close_own_pane(status: int) -> int:
-    """Close the pane this runs in, unless it holds skip reports to read."""
+def typed_pane():
+    """The tmux pane this was typed into, or None. An agent's shell tool or a
+    script also inherits TMUX_PANE, but not the pane's terminal, so only a
+    stdin that is the pane's own tty counts: closing an agent's pane would
+    kill that agent."""
+    pane = os.environ.get("TMUX_PANE")
+    if not pane:
+        return None
+    try:
+        tty = os.ttyname(sys.stdin.fileno())
+        return pane if tmux("display-message", "-p", "-t", pane, "#{pane_tty}") == tty else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def close_own_pane(pane: str, status: int) -> int:
+    """Close the pane this was typed into, unless it holds skip reports to read."""
     if status != 0:
         print("Not closing this pane: see the skipped agents above.", file=sys.stderr)
         return status
     sys.stdout.flush()
     try:
         # Ends this process too; the client already shows the restored session.
-        tmux("kill-pane", "-t", os.environ["TMUX_PANE"])
+        tmux("kill-pane", "-t", pane)
     except subprocess.SubprocessError as e:
         print(f"tmux-session-restore: could not close this pane: "
               f"{(getattr(e, 'stderr', '') or str(e)).strip()}", file=sys.stderr)
@@ -391,10 +407,10 @@ def main(argv) -> int:
     if argv[1:] in (["-h"], ["--help"]):
         print(__doc__.strip())
         return 0
-    args, target, close_pane = argv[1:], None, False
-    while args[:1] in (["--account"], ["--close-pane"]):
-        if args[0] == "--close-pane":
-            close_pane, args = True, args[1:]
+    args, target, keep_pane = argv[1:], None, False
+    while args[:1] in (["--account"], ["--keep-pane"]):
+        if args[0] == "--keep-pane":
+            keep_pane, args = True, args[1:]
             continue
         try:
             if len(args) < 2 or not args[1]:
@@ -404,16 +420,12 @@ def main(argv) -> int:
             print(f"tmux-session-restore: {e}", file=sys.stderr)
             return 64
         args = args[2:]
-    if close_pane and not (os.environ.get("TMUX") and os.environ.get("TMUX_PANE")):
-        print("tmux-session-restore: --close-pane needs to run inside a tmux pane",
-              file=sys.stderr)
-        return 64
     if not args:
         arg = pick_record()
         if arg is None:
             return 64
     elif len(args) != 1 or not args[0]:
-        print("usage: tmux-session-restore [--account LABEL] [--close-pane] "
+        print("usage: tmux-session-restore [--account LABEL] [--keep-pane] "
               "[SESSION-NAME | RECORD-DIRECTORY]", file=sys.stderr)
         return 64
     else:
@@ -464,9 +476,8 @@ def main(argv) -> int:
         except subprocess.SubprocessError:
             print(f"Attach with: tmux attach-session -t {session_id}")
             return status
-        if close_pane:
-            return close_own_pane(status)
-        return status
+        pane = None if keep_pane else typed_pane()
+        return close_own_pane(pane, status) if pane else status
     if sys.stdin.isatty():
         sys.stdout.flush()
         if subprocess.call(["tmux", "attach-session", "-t", session_id]) != 0:
