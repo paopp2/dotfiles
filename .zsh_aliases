@@ -22,6 +22,7 @@ alias dc="docker-compose"
 alias t="dstask"
 [ -f ~/.config/dstask/dstask.zsh ] && source ~/.config/dstask/dstask.zsh
 alias awslocal="aws --endpoint-url=http://localhost:4566"
+alias qr="qrtool encode -t unicode"
 
 # "r" = yazi; cd on exit
 function r {
