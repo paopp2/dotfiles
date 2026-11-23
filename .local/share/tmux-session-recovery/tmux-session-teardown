@@ -225,7 +225,9 @@ def resolve_codex(pid: int) -> dict:
     for conversation_id in held:
         transcript = codex_transcript(conversation_id, open_files)
         meta = codex_meta(transcript) if transcript else {}
-        if meta.get("id") == conversation_id and meta.get("source") == "cli":
+        # Top-level conversations have a string source ("cli", or "vscode" for
+        # a fork); subagents such as the guardian have a dict source.
+        if meta.get("id") == conversation_id and isinstance(meta.get("source"), str):
             ids.append((conversation_id, transcript))
     if not ids:
         raise Unresolved("Codex holds no interactive conversation lock "
