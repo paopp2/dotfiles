@@ -4,6 +4,7 @@
 #        cc-handover --list            every running session, by account
 #        cc-handover --all <account>   move every idle session to that account
 #        cc-handover --which           print the account the session is on
+#        cc-handover --where           print its session id and config dir
 #
 # Run it from inside the session with `! cc-handover personal`. That needs no
 # model call, so it still works once the current account is out of usage.
@@ -140,6 +141,10 @@ source_dir=${source_dir%/}
 [ $# -ge 1 ] || die "usage: cc-handover <account> [claude args...]"
 if [ "$1" = --which ]; then
     cat "$source_dir/account-label"
+    exit 0
+fi
+if [ "$1" = --where ]; then
+    printf '%s %s\n' "$sid" "$source_dir"
     exit 0
 fi
 account=$1
