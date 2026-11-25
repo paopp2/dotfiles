@@ -11,6 +11,8 @@ fi
 
 # Load Starship prompt
 eval "$(starship init zsh)"
+# Mark each prompt (OSC 133;A) so tmux can find commands: C-k/C-j in copy mode
+PROMPT=$'%{\e]133;A\e\\%}'$PROMPT
 
 # Remove Zsh greeting
 unsetopt PROMPT_SP
